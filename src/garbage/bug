@@ -1,0 +1,4 @@
+1 when adding 'int a[100] ={0}' to kernel_c{} just after 'k_screen_reset', kernel crack for general_protection.
+
+/**suspect*/
+1 current assemble source code in kernel violates the intel ABI which claims preserved registers exclude eax,ecx,edx

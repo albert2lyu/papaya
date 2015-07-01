@@ -1,0 +1,4 @@
+#!/bin/bash
+dd if=../bin/boot.bin of=/dev/sdd bs=446 count=1 
+#dd if=../bin/boot.bin of=/dev/sdb skip=1 seek=1
+#dd if=../bin/kernel.elf of=/dev/sdb bs=512 seek=3
