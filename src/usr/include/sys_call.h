@@ -7,5 +7,4 @@ void sleep(int msg_type,int msg_bind);
 int u_obuffer_shift();
 void show_var(unsigned var,unsigned var_type);
 void watch(u32 addr,int write_only);
-int getchar(void);
 #endif

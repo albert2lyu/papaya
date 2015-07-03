@@ -4,9 +4,10 @@
 #include<valType.h>
 #include<proc.h>
 #include<bootinfo.h>
+#include<elf.h>
 static int pgerr_count;
 u32 gmemsize=0;
-	
+char testbuf[1024];
 void init_memory(void){
 	heap_init();
 	/**detect pphysical memory: print memory information and init global variable 'gmemsize'*/
@@ -54,10 +55,22 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 		oprintf("%s: %c %c\n",(err_code&1)?"page protection error":"page not exist error",(err_code&B(0100))?'U':'S',(err_code&B(0010))?'W':'R');
 	if((err_code&B(0001)) == 0){
 	/**page fault:page not exist*/
-		map_pg((u32*)KV(current->cr3),err_addr>>12,alloc_page(__GFP_DEFAULT,0),PG_USU,PG_RWW);
+
+		/*为init进程加载代码页*/
+		if(strcmp(current->p_name, "init") == 0 && (err_addr>>12 == 0x8048)){
+			int vpg = err_addr >> 12;
+			map_pg((u32 *)KV(current->cr3), vpg, alloc_page(__GFP_DEFAULT, 0), PG_USU, PG_RWW);		
+			cell_read("../src/usr/src/init", testbuf);
+			oprintf("%s",testbuf);
+			current->pregs->eip = loadelf(testbuf);
+		}
+		else	map_pg((u32*)KV(current->cr3),err_addr>>12,alloc_page(__GFP_DEFAULT,0),PG_USU,PG_RWW);
 		if(pgerr_count==2) spin("pgerr_count == 2");
 	}
-	else spin("can not handle page protection error\n");
+
+	else{
+		spin("can not handle page protection error\n");
+	} 
 	pgerr_count--;
 	return;
 }

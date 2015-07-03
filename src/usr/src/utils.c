@@ -1,15 +1,6 @@
 #include "utils.h"
-#include "../../../include/ku_proc.h"
 #include "sys_call.h"
 #include "valType.h"
-int getchar(void){
-	int ascii;
-	while((ascii = _getchar()) == -1){
-		sleep(MSGTYPE_CHAR, 0);
-	}
-	return ascii;
-}
-
 boolean loadfile(char*path,char*addr){
 	int fd=open(path,0);
 	if(fd==-1) return 0;

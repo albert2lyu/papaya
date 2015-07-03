@@ -1,0 +1,4 @@
+
+Thu Jul  2 02:04:55 PDT 2015
+1，testbuf太大的话，会DOUBLE PAGE error。先调小ceil_read最后拷贝的size。
+2,把testbuf从exter改成mm.c内的全局声明时就好了，似乎不是1的原因。

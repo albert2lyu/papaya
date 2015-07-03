@@ -17,7 +17,7 @@ usro= ../src/usr/lib/asmtask.o ../src/usr/lib/sys_call.o ../src/usr/lib/utils.o\
 asmo=kernel.asmo utils.asmo bootinfo.asmo
 co= kernel.o   utils.o proc.o  disp.o video_drv.o schedule.o\
 ku_utils.o mm.o func_table.o pmm.o kbd_drv.o mmzone.o irq.o time.o i8259.o\
-ramdisk.o fs_cell.o
+ramdisk.o fs_cell.o elf.o
  
 kernelrelyo=$(asmo)  $(co) $(usro)
 include $(co:.o=.d)

@@ -1,39 +1,29 @@
-cheader_path=-I../include/ -I./usr/include/
-cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -Wno-implicit-function-declaration -g
+#新增的.o文件都要在.phony里注册，这样它才会被编译
+cc=gcc
+cflags=-I../include/ -Wall -fno-builtin -std=c99 -m32
+asmflags=-I../include/
+asm=nasm
+
+libdir:= ../lib
+
+all: $(libdir) sys_call.o utils.o asmtask.o unistd.o
+
+.PHONY:all
+
+$(libdir):
+	mkdir -p $(libdir)
+	echo 'library directory prepared!'
 
 
-all:asmtask.o  utils.o unistd.o sys_call.o
+sys_call.o:sys_call.asm
+	$(asm) -felf -o ../lib/sys_call.o sys_call.asm $(asmflags)
 
-%.o:%.asm
-	nasm -felf -o ../lib/$@ $<
+utils.o:utils.c ../include/utils.h
+	$(cc) -c -o ../lib/utils.o utils.c $(cflags)
 
-%.o:%.c
-	gcc -c -o ../lib/$@ $< $(cflags) $(cheader_path)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+asmtask.o:asmtask.asm
+	$(asm) -felf -o ../lib/asmtask.o asmtask.asm $(asmflags)
+unistd.o:unistd.c ../include/unistd.h
+	$(cc) -c -o ../lib/unistd.o unistd.c $(cflags)
+clean:
+	rm -rf $(libdir)

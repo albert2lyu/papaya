@@ -246,11 +246,10 @@ len_page_fault equ  $ - page_fault
 ; system call
 i80:
 	push 0	;no err_code
-	save	;寄存器入栈顺序约定了
-	mov esi,esp	
-	and esi,0xffffe000
-	mov [esi],esp
+	SAVE_ALL	;寄存器入栈顺序约定了
+	SET_PREG
 	call dword [eax*4+func_table]
+	jmp ret_from_sys_call
 i81:	;an I-gate for kernel thread to submit their time slice.
 	OPRINTF sec_data.spin
 	jmp $
@@ -327,7 +326,7 @@ signal_return:
 	jmp restore_all
 		
 usr_func:
-	push 1
+	;push 1
 	;mov eax,[esp]
 	jmp usr_func
 
@@ -341,7 +340,7 @@ msg:db 'spin',0
 
 ;sys_call table,store address of function
 func_table:
-    dd 0 ;0 _k_show_chars
+    dd _k_show_chars ;0 _k_show_chars
     dd k_sleep	;1
     dd 0 ;2		k_obuffer_shift
     dd 0 ;3		_k_show_var

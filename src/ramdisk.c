@@ -11,6 +11,6 @@ int cell_read(char *file, char *buf){
 	if(cellid == -1) return 0;	
 	oprintf("cellmbr:%x, cellid:%u\n", cellmbr, cellid);
 	char *src = cellmbr + (cellid*CELL_SECTORS + 1) * 512;
-	memcp(buf, src, CELL_SECTORS * 512);
+	memcp(buf, src, 1024);
 }
 

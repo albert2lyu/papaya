@@ -2,14 +2,11 @@
 #include<disp.h>
 #include<proc.h>
 #include<fs.h>
-/**
 //eax=0,写屏函数，在disp.c里
 //对void k_show_chars(char*pt_head,unsigned var_type)的包装
 void _k_show_chars(char*pt_head,unsigned end_flag){
 	k_show_chars(pt_head,end_flag);
-	fire(pcb_table_info.curr_pid);
 }
-*/
 //eax=1,阻塞函数，使当前进程进入休眠，并放弃时间片
 //far-away
 void k_sleep(int msg_type,int msg_bind){

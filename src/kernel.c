@@ -6,7 +6,8 @@
 #include<fs.h>
 #include<schedule.h>
 #include<asm_lable.h>
-char testbuf[8096];
+#include<fs_cell.h>
+char testbuf[1024];
 #define gpgdir ((u32*)0xc0100000)
 #define gpgtbl ((u32*)0xc0101000)
 #define build_equal_map(paddr,tbladdr)	/**tbladdr use physical addr*/\
@@ -116,7 +117,7 @@ void kernel_c(){
 	mem_entity[3]='B';
 	struct pcb *f1 = create_process((u32)func1,9,10,"func1",0);	
 	struct pcb *f0 = create_process((u32)func0,9,5,"func0",0);
-	struct pcb *u_f = create_process((u32)usr_func,9,100,"usr_func",3);
+	struct pcb *u_f = create_process(0x8048000,9,100,"init",3);
 	//tty 调用的getchar时会sleep,等醒来,再被调度时,已经到了ring1堆栈.
 	//暂时把tty放在ring1,但它是按照一个用户进程编写的.它不会调用内核其它模块的函数.暂时不能放在ring3,是因为跳到ring3后,是因为tty的代码是在ring0.
 /*	create_process((u32)tty,9,5,"tty",1);*/
