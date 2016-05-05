@@ -100,13 +100,13 @@ void  key_handler(void){
 		/**the core operation of keyboard driver.
 		 * convert scan-code to key-code(ascii or special code).
 		 */
-		unsigned ascii=keymap[key_code*MAP_COLS+shift_down*1+ctrl_down*2];
+		//unsigned ascii=keymap[key_code*MAP_COLS+shift_down*1+ctrl_down*2];
 		/**wake process sleeping on MSGTYPE_CHAR and pass her a keycode*/
 		struct pcb *curr;
 		for(int i = 0; i < 3; i++){
 			curr = *pcb_lists[i];
 			while(curr){
-				obuffer_push(&curr->obuffer, ascii);
+				//obuffer_push(&curr->obuffer, ascii);
 				/**FIXME check within list_sleep here?*/
 				if(curr->msg_type == MSGTYPE_CHAR){	
 /*					oprintf("wake wait-char process\n");*/

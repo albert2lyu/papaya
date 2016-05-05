@@ -1,0 +1,20 @@
+some bugs encountered:
+
+Mon May  2 05:01:37 EDT 2016
+1, 发现这么久以来，内核里的memset函数竟然一直都是错的。 
+   把memset(char *dest, int value, int n); 定义成了
+     memset(char *dest, int n, int value);
+   这个函数通常用来给内存清零，就因为如此，这个函数不会引发大的错误。因为执行memset(xx, 0, n)的时候，就错就错，认为n=0。于是直接退出。
+   相当于空函数。
+   kmalloc0依赖于它，但因为以前heap很少有free，所以kmalloc拿到的内存都是干净的。但写vfs以来，kfree的情况发生了。就是在read_inode里，读到的cell_headar转换成标准inode之后，就要释放了。
+   今天发现的bug是，若read_inode里申请的内存是1024（它刚刚好需要这么多），则cell/namei.c里的read函数就会出错。
+   经检查，read出错在kmalloc0得到内存不干净。
+   但是read_inode里如果申请1024 * 10或者更多的内存，read就不会出错。
+   原因是什么呢？
+   申请很大的内存的话，因为heap分配时是从高地址向低地址逐渐把堆用完的，read_inode分配很大一块内存时，它只会写开头的一小部分。而且是低地址的。等到它free掉，read函数再kmalloc0时，它要求的size基本也就是1024左右，这样，这一块区域其实就是刚才read_inode拿到的那一大块内存的高地址段，read_inode没有碰那里。还是干净的。
+   所以kmalloc0里memset的bug被隐藏起来。
+   应该是这样。
+
+   -------------
+   值得庆祝的是，这次bug是根据gdb调出来的，不是冥想出来的。这次gdb在page_fault时，竟bt到了上级堆栈。。。gdb和screen log显示的某个heap块里的变量值离奇，我以为是被越界覆盖掉了，但再一查，原来是普通的函数错误。
+   

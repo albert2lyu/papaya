@@ -14,6 +14,7 @@ struct pcb *list_expire;
 
 void sleep_active(struct pcb *p);
 void schedule(void);
+void wake_up(struct pcb *p);
 #define __SAVE()\
 	__asm__ __volatile__(\
 	"pushl $0\n\t"\

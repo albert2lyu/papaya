@@ -1,4 +1,0 @@
-#!/bin/bash
-mkdir ~/lab/backup/$1
-cp -R ../src ~/lab/backup/$1/src/
-cp -R ../include  ~/lab/backup/$1/include/

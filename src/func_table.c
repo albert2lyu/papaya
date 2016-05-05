@@ -45,7 +45,7 @@ void k_write(void){
 
 }
 //eax=7
-void k_close(fd){
+void k_close(void){
 /*	askfs(COMMAND_CLOSE,0,0,fd,0,0,0,0);*/
 }
 //eax=8		attention:kernel-process need this syscall,for they live in ring1 and can not touch dr0~7
@@ -62,11 +62,12 @@ void k_seek(int fd,int offset,int whence){
 /**进程陷入内核就一定会被休眠吗*/
 /**d这是一个异步的getchar,按键缓冲区空直接返回-1*/
 int k_getchar(void){
-	int ascii;
-	if((ascii=obuffer_shift(&current->obuffer))==0) ascii = -1;
+	//int ascii;
+	//if((ascii=obuffer_shift(&current->obuffer))==0) ascii = -1;
 /*	oprintf("k_getchar return:%x\n", ascii);*/
 /*	syscall_ret(ascii, -1);	*/
 	spin("bad sys_call_ret");
+	return 0;
 }
 
 

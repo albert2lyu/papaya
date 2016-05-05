@@ -1,2 +1,0 @@
-mov byte [0x0],1
-add dword [0xdd],1

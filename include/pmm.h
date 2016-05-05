@@ -14,6 +14,7 @@ typedef struct empty_blockk{
 	int size;
 }EMPTY_BLOCK;
 #define BLOCK_DATA_END(block) ((int)((char*)block+sizeof(EMPTY_BLOCK)+block->size-1))
+void * kmalloc0(int bytes);
 void*kmalloc(int byte);
 void kfree(void*pt);
 void heap_init(void);

@@ -7,7 +7,7 @@ static void timer_interrupt(int irq){
 
 void init_time(void){
 	/** request irq0, namely IGATE 0x20 */
-	request_irq(0, &timer_interrupt, SA_INTERRUPT);	
+	request_irq(0, &timer_interrupt, SA_INTERRUPT, 0);	
 	irq_desc[0].status &= ~IRQ_DISABLED;
 }
 

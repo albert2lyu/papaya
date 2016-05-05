@@ -1,0 +1,2 @@
+file ../bin/g_kernel.elf
+target remote localhost:1234

@@ -1,6 +1,9 @@
 #include<mmzone.h>
 #include<utils.h>
 
+void init_free_area(int zone_id, int start_idx);
+void __free_pages_bulk(struct page *page, zone_t *zone, int order);
+void cleave(free_area_t *free_area, int order);
 void info_zone(int zone_id){
 	oprintf("zone%u[spanned_pages:%x]\n", __zones[zone_id]->spanned_pages);
 }
@@ -8,6 +11,7 @@ void info_zone(int zone_id){
 zone_t *__zones[3] = {&zone_dma, &zone_normal, &zone_highmem};
 static unsigned pa_of_zone[3] = {ZONE_DMA_PA, ZONE_NORMAL_PA, ZONE_HIGHMEM_PA};
 void init_zone(void){
+	oprintf("init buddy \n");
 	for(int i = 0; i <= 2; i++){
 		__zones[i]->zone_mem_map = mem_map + pa_idx(pa_of_zone[i]);
 		__zones[i]->spanned_pages = size_of_zone[i]>>12;
@@ -43,7 +47,7 @@ void init_free_area(int zone_id, int start_idx){
 		linked++;
 	}
 
-	oprintf("linked:%x, span:%x, zone_mem_map:%x\n", linked, zone->spanned_pages, zone->zone_mem_map);
+/*	oprintf("linked:%x, span:%x, zone_mem_map:%x\n", linked, zone->spanned_pages, zone->zone_mem_map);*/
 }
 
 /**
@@ -72,7 +76,7 @@ void __free_pages_bulk(struct page *page, zone_t *zone, int order){
 
 		if(phy_neighbor < zone->zone_mem_map || \
 			phy_neighbor >= zone->zone_mem_map + zone->spanned_pages){
-			oprintf("boundary outside ");
+			oprintf("buddy:boundary outside ");
 			break;
 		} 
 		if(!page_is_buddy(phy_neighbor, curr_order)) break;
@@ -142,6 +146,7 @@ void cleave(free_area_t *free_area, int order){
 /**some common functions in linux kernel*/
 
 
+//TODO here we have bug...	zone_t *__zones[3];
 void __free_pages(page_t *page, int order){
 	zone_t *zone = __zones + page->PG_zid;
 	page->_count--;

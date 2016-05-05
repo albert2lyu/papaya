@@ -2,7 +2,7 @@
 #include<irq.h>
 #include<utils.h>
 
-static void end_8259A(int irq){
+static void end_8259A(u32 irq){
 
 }
 
@@ -12,7 +12,7 @@ static void end_8259A(int irq){
  * 4, 暂时不依照函数名做mask操作，<<Careful! The 8259A is a fragile beast,
  * it pretty much _has_ to be done exactly like this (mask it firstly....)>>
  */
-void mask_and_ack_8259A(int irq){
+void mask_and_ack_8259A(u32 irq){
 	if(irq >= 8) out_byte(0xa0, 0x20);
 	out_byte(0x20, 0x20);
 }
@@ -20,8 +20,8 @@ void mask_and_ack_8259A(int irq){
 static void write_imr_bit(bool master, int bit_offset, int value){
 	unsigned port = master ? 0x21 :0xa1;
 	unsigned mask = in_byte(port);
-	if(value) bitset(&mask, bit_offset);
-	else bitclear(&mask, bit_offset);
+	if(value) bitset((u32)&mask, bit_offset);
+	else bitclear((u32)&mask, bit_offset);
 	out_byte(port, mask);	
 }
 
@@ -35,11 +35,11 @@ static void write_imr_by_irq(int irq, int value){
 	else write_imr_bit(true, irq, value);
 }
 
-void enable_8259A_irq(int irq){
+void enable_8259A_irq(u32 irq){
 	write_imr_by_irq(irq, 0);
 }
 
-void disable_8259A_irq(int irq){
+void disable_8259A_irq(u32 irq){
 	write_imr_by_irq(irq, 1);
 }
 
@@ -48,10 +48,10 @@ void init_8259A(int x){
 }
 
 static hw_irq_controller i8259A_irq_type = {
-	&enable_8259A_irq,
-	&disable_8259A_irq,
-	&mask_and_ack_8259A,
-	&end_8259A
+	enable_8259A_irq,
+	disable_8259A_irq,
+	mask_and_ack_8259A,
+	end_8259A
 };
 
 void init_ISA_irqs(void){

@@ -68,9 +68,12 @@ bool  bitsset_long(u32 addr, int bit_off, int num);
 bool  bitsclear_long(u32 addr, int bit_off, int num);
 
 int bit1_count(char*addr,int bytes);
-void memcpy(char*dest,char*src,int bytes);
+void memcpy(void*dest,void*src,int bytes);
 int strlen(char*str);
 char*strcpy(char*dest,char*src);
+char*strncpy(char*dest, const char*src, int n);
+int strcmp(const char *str1, const char *str2);
+int strncmp(const char *str1, const char *str2, int n);
 #define assert(exp)\
 do{if(!(exp)) assert_func(#exp,__FILE__,__BASE_FILE__,__LINE__);} while(0);
 
@@ -83,7 +86,20 @@ dispInt(i);
 #define EXCHG_U32(a,b) do{void *c=a;a=b;b=c;} while(0)
 boolean strmatch(char*seg,char*whole);
 void info_heap(void);
-
+/* 0, 这一组函数不会在critical area用,所以cli_already默认是初始是false
+ * 1, 这组函数是胆小的函数，just for debug usage
+ */
+int cli_already;		//we use this variable because we can't touch eflags
+static inline void cli_safe(){
+	if(cli_already) spin("cli already"); 
+	__asm__ __volatile__("cli");
+	cli_already = 1;
+}
+static inline void sti_safe(){
+	if(!cli_already) spin("not cli yet");
+	__asm__ __volatile__("sti");
+	cli_already = 0;
+}
 /**deleting node from an empty linked-list is forbidden.
  * you must specify the target list's root-node when you use these macros.
  */
@@ -95,7 +111,12 @@ void info_heap(void);
  */
 #define LL_INSERT(list,location,new)\
 	do{\
-		assert(list&&location&&new);\
+		assert(new);\
+		if(!list && !location) {\
+			list = new;\
+			new->next = new->prev = 0;\
+			break;\
+		}\
 		new->next=location;\
 		new->prev=location->prev;\
 		if(location->prev) location->prev->next=new;\
@@ -103,7 +124,19 @@ void info_heap(void);
 		if(list==location) list=new;\
 	} while(0)
 
-/**insert a node to list in an ascending order by compare 'attr'*/
+/**insert a node to list in an ascending order by compare 'attr'
+* 这里用root备份list，而用list遍历，是取巧的方法。
+* 2, 相等时会插在既有节点后面。
+* 3, attr相等时不会停，会继续往后搜索，直到遇到比他大的，或者tail。所以进入
+* 插入操作时，只有两种情况:list iterator是tail，或list iterator的attr大。特殊
+* 情况是既为tail，attr又bigger。
+* 4, 插入时，不要认为遍历停下来的时候，如果new->attr >= list->attr，就是遇到了
+* tail。 这取决于你的遍历条件，如果条件是next when new->attr > list->attr，
+* 那就是说，attr相等时也会停下来。 所以插入时候，不要假定是在末端。（虽然，这样
+* 效率会低一些)
+* 5, 为了效率，可以遇到=就停下来，插入的时候，发现new->attr仍然>，那就判定是
+* tail。这样插入更快。 但随之而来的结果，attr=attr时，new会不断插在前面。
+*/
 #define LL_I_INCRE(list,new,attr)\
 	do{\
 		assert(new);\
@@ -113,22 +146,23 @@ void info_heap(void);
 			break;\
 		}\
 		void*root=list;\
-		while(list->next&&list->attr<new->attr) list=list->next;\
-		if(list->attr<new->attr){\
-			list->next=new;\
-			new->next=0;\
+		while(list->next &&  new->attr > list->attr) list=list->next;\
+		if(new->attr > list->attr){\
+			new->next = 0;\
 			new->prev=list;\
+			list->next = new;\
 			list=root;\
 		}\
 		else{\
-			new->next=list;\
-			new->prev=list->prev;\
-			if(list->prev) list->prev->next=new;\
+			new->next = list;\
+			new->prev = list->prev;\
+			if(list->prev) list->prev->next = new;\
 			list->prev=new;\
 			if(root==list) list=new;\
 		}\
 	} while(0)
 
+//DECRE INSERT在相等时的插入顺序待定
 #define LL_I_DECRE(list,new,attr)\
 	do{\
 		assert(new);\
@@ -138,11 +172,11 @@ void info_heap(void);
 			break;\
 		}\
 		void*root=list;\
-		while(list->next&&list->attr>new->attr) list=list->next;\
-		if(list->attr>new->attr){\
+		while(list->next && new->attr < list->attr) list=list->next;\
+		if(new->attr < list->attr){\
+			new->next = 0;\
 			list->next=new;\
 			new->prev=list;\
-			new->next=0;\
 			list=root;\
 		}\
 		else{\
@@ -185,4 +219,13 @@ void info_heap(void);
 
 #define MEMBER_OFFSET(stru_type, member_name) \
 	(unsigned)&(((stru_type *)0)->member_name)
+
+//杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
+static inline unsigned str_hash(const char *str, int len){
+    unsigned seed = 131; // 31 131 1313 13131 131313 etc..
+    unsigned hash = 0;
+	for (int i = 0; i < len; i++) 	hash = hash * seed + str[i];
+	//hash = hash & 0x7FFFFFFF; 
+	return hash;
+}
 #endif

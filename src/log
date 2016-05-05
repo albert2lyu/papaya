@@ -1,4 +1,74 @@
 
+Mon May  2 01:21:10 EDT 2016
+*vfs层还比较薄弱。 文件的缓冲迫切需要做上。 这依赖于块设备层的缓冲。
+*慢慢来，任何模块都不能生疏，不能做完就放下，如果总是很快就忘，说明那个模块的设计有问题。
+ 
+
+Sat Apr 30 23:25:41 EDT 2016
+*一个进程使用了进程号9，另一个进程open还可能得到9这个fd吗。fd是不是全局的?那就必然要有一个全局的fd table。
+Fri Apr 29 14:16:17 EDT 2016
+*一个目录里有许多dentry，删除了一些之后，这些空置的dentry就以碎片的形式存在。现在有两个问题：1， 怎么在需要的时候找出合适的，怎么找出最合适的？2，一个长度为16的dentry被用于存储10的name，那么剩余的6个字节就永远不能寻回了。。。不对不对，是根本就不能存储非16长度的name，因为还要用这个16定位下一个dentry。 我现在想到的方法，是定期的做碎片整理。时机可以选在系统空闲的时候，或者一个dentry block将满的时候。
+
+Fri Apr 29 06:24:59 EDT 2016
+*刚才为inode_hashtable和dentry_hashtable申请内存时，调用的参数是(4 * D_HASHTABLE_LEN)和(4 * I_HASHTABLE_LEN),但hashtable不是一个指针数组，结果内存越界，出现handle_irq_event里的“sti now"的bug。以后要小心了。 申请内存和初始化这些东西，一定要小心，内存越界的bug排查起来会很辛苦。
+
+Fri Apr 29 04:08:42 EDT 2016
+*必须等init进程加载完分区表，才能创建别的进程。因为就算init vfs，也要等到分区表建立完成。而读分区表（包括ebr）是一个异步的，需要一段时间。（不如就把init vfs放在init 进程的后面，不要fun0,本来就该)
+
+*各个挂载设备的root dentry会放在hash table里吗，如果是，他们的hash值是完全相同的。就没办法在链表里区分了。---------------不会，它们只是由vfsmount->small_root指向。
+
+Thu Apr 28 23:02:24 EDT 2016
+*对于总root，不仅挂载设备的root dentry是虚拟的，而且挂载点是也是虚拟的。 似乎可以不要这个挂载点。。不是。我们要让根设备看起来是挂载在"/"上的。
+* 我在考虑不用挂载的方式实现总root。 但还是不能，因为这是整个文件系统的第一个vfsmount结构，子级的vfsmount要通过parent指向它。
+
+Thu Apr 28 22:06:54 EDT 2016
+*任何一个设备的根目录的dentry，都是内核虚拟出来的，因为已经是根目录了，它就不存在于任何一个父目录。 你可能觉得，它的父目录难道不该是”挂载点“的那个目录吗。不是，要知道，在把一个目录变成挂载点的时候，它作为一个directory，大多数属性是一动不动的，只是dentry->vfsmount加链入了一个vfsmount结构，内核也就因此不再访问它的content（在pathwalk的时候），但只要内核想，内核仍然能把它当做普通的目录进入。 它的ents里并没有那个虚拟的root dentry。它与这个small_root的联系，是通过vfsmount链表里的某个vfsmount->small_root的联系的。
+
+Thu Apr 28 09:09:52 EDT 2016
+*有时间要把utils.h分离出来一些，string.h。
+ 确实，大多数.c文件都需要包含string.h, list.h, valType.h，把它们都包含在一个头文件里，这样写c文件时候只需要包含一次就可以了。
+ 但是，第一，分离还是必要的。 第二，没有必要包含一个头文件时，一定不要包含它。这样干净。而且将来内核大了，总是改变头文件引起的重编译开销最大。第三，是不是用utils.h当这个wrapper，还是把utils.h也清理干净，称为一个纯粹的头文件。专门另外弄一个often.h。
+
+Thu Apr 28 04:46:14 EDT 2016
+*感觉linux的那些头文件也不合理。有dcache.h，为什么没有inode.h. struct dentry declared in dcache.h，struct inode却声明在fs.h。 感觉没必要记它的。
+
+Mon Apr 25 23:28:39 EDT 2016
+*i/shashtable_add/del/has，总觉得这几个接口很好，但hashtable_has这个接口必须用宏实现，而且应该需要7个参数，就显得没有意义了。add/del倒是可以考虑。而且不需要i/s分开。
+但问题是，hashtable_add并不很必要:
+hashtable_add(list_head* hashtable, int hash, list_head *toadd); 它的实现就两句代码，因为紧接着还要调用list_add。更关键的是。。不不不，可以考虑，这儿只是传一个hash value。虽然只是简单的包装，但对程序的可读性帮助很大。 由此也看出c的缺点，太基本太松散，一个逻辑要写一大堆代码，没办法用高级的函数实现。
+
+
+Mon Apr 25 02:51:49 EDT 2016
+*vfs该不该提供不缓存inode的选项？ 实现上是有可能的，像一条路径/home/wws/lab/，pathwalk一道之后，dentry都缓存起来了，下次根本就不经过inode。 但是就现有代码来说，对inode还是默认的硬性的依赖的，像比real_lookup的时候，会无条件的认为indir->dentry->inode是存在于内存的。
+*iget 这个函数被提炼出来是很自然的，但在里面递增inode个count计数就不那么自然了。最好功能纯粹：就是告诉你设备号：inode号，你把它（从hashtable或者磁盘上)读出来。
+
+Tue Apr 19 21:36:00 EDT 2016
+*函数宁可长一些，不要学linux分级成太多的函数。那样会前者鼻子走，忘得很快。
+*觉得不舒服肯定要原因，像刚才把hash的过程合并到一个函数，只是分离出一个通用的
+str_hash函数，就好多了。并且把抄来的str_hash的算法看了一下，就感觉好多了。
+
+Sun Mar 27 14:34:28 EDT 2016
+*在block里添加自己的id的确重要。 好几处都遇到了。 而且通过内存中block的地址根本
+无法算出来它的id，这个空间大概是省不得。
+
+Sat Mar 26 12:28:24 EDT 2016
+*linux的vfs真是清爽。
+
+Thu Mar 24 12:04:09 EDT 2016
+* 今天发现ring0的进程不能被正常schedule。
+  因为kernel.asm里设置了“只在用户态发生的中断才能引起schedule",所以，一个ring0进程的time_slice虽然变成0，并进而被设置成need_resched=1,但从timer的doIRQ返回的时候，根本就是直接restore_all的，不会去ret_with_reschedule。 ring生成1就好了。
+Thu Mar 24 06:24:05 EDT 2016
+×papaya的代码要做到0warning。
+
+Wed Mar 23 12:21:11 EDT 2016
+*放弃对block layer的模拟，因为实在受不了那些数据接口，函数绕来绕去。
+ reqeust queue里的do_request和make_reqeust指针很牵强。
+ 没有动力模仿下去，又没有能力做出判断。
+ 那就还是模仿0.11，只是从2.4里借鉴几个好的数据结构。以后都自己设计着写，看自动进化成什么样子。
+
+Sun Jul  5 03:40:49 EDT 2015
+１，双重页错误，可能是响应ｉｎｉｔ进程页错误时，在响应代码里访问了非法地址。
+像比，数据段在0x8049000，但并没有隐射。
 Thu Jul  2 02:04:55 PDT 2015
 1，testbuf太大的话，会DOUBLE PAGE error。先调小ceil_read最后拷贝的size。
 2,把testbuf从exter改成mm.c内的全局声明时就好了，似乎不是1的原因。

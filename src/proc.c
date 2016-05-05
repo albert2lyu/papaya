@@ -24,10 +24,16 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name,int 
 	baby->time_slice=baby->time_slice_full=time_slice;
 	baby->p_name=p_name;
 	baby->ring=ring;
-	obuffer_init(&baby->obuffer);	/**'->' prior to '&'*/
+	//obuffer_init(&baby->obuffer);	/**'->' prior to '&'*/
 	baby->pregs=&baby->regs;
-	baby->thread.esp = &baby->regs;
-	baby->thread.eip = restore_all;
+	baby->thread.esp = (int)&baby->regs;
+	baby->thread.eip = (int)restore_all;
+	baby->fs = kmalloc0( sizeof(struct fs_struct));
+	baby->files = kmalloc0( sizeof( struct files_struct) );
+	baby->files->filep = baby->files->__file_array;
+	baby->files->max_fds = sizeof(baby->files->__file_array) / 4;
+	baby->rlimits[RLIMIT_NOFILE].cur = 512;
+	baby->rlimits[RLIMIT_NOFILE].max = 1024;
 	if(ring){
 		baby->cr3=(u32*)((alloc_pages(__GFP_DEFAULT,1) - mem_map) <<12);	/**note!cr3 use real physical 
 												  		address*/
@@ -59,9 +65,9 @@ struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name,int rin
 //	oprintf("@create_process addr=%x\n",addr);
 	struct pcb *baby = (struct pcb*)kmalloc_pg(__GFP_DEFAULT,1);
 	init_pcb(baby,addr,prio,time_slice,p_name,ring);
-	oprintf("baby addr:%x\n",baby);
+	oprintf("new process:baby addr:%x\n",baby);
 	LL_I_INCRE(list_active,baby,prio);	
-	oprintf("created a process..\n");
+/*	oprintf("created a process..\n");*/
 	return baby;
 }
 
@@ -97,6 +103,7 @@ unsigned char obuffer_shift(OBUFFER* pt_obuffer){
 struct pcb *get_current(void){
 	struct pcb *p;
 	__asm__ __volatile__("andl %%esp,%0":"=r"(p):"0"(~8191));
+	if((void *)p < (void *)0xc0000000) spin("get ill current");
 	return p;
 }
 

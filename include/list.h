@@ -1,5 +1,6 @@
 #ifndef LIST_H
 #define LIST_H
+/*the host structures will be organised into a circle link-list */
 
 typedef struct list_head{
 	struct list_head *prev;
@@ -52,6 +53,26 @@ static inline void list_del_init(list_head_t *entry){
 	__list_del(entry->prev, entry->next);
 	INIT_LIST_HEAD(entry);
 }
+
+static inline int list_empty(list_head_t *entry){
+	return entry->next == entry;
+}
+
+static inline int list_meet_tail(list_head_t *first, list_head_t *entry){
+	return entry->next == first;
+}
+
+static inline void hashtable_add(list_head_t *hashtable, int hash, list_head_t *new){
+	list_add(new, hashtable + hash)	;
+}
+
+/* not necessary
+static inline void hashtable_del(list_head_t *hashtable, int hash, list_head_t *todel){
+	list_del(todel);
+}
+*/
+#define MB2STRU(stru_type, mb_addr, mb_name)\
+			(stru_type *)( (u32)(mb_addr)-  (u32)&((stru_type *)0)->mb_name )	
 #endif
 
 

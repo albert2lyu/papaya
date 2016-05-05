@@ -1,5 +1,5 @@
 ;这个模块的函数不难写，仅仅是几句传参操作的包装。
-global dotchar,sleep,u_obuffer_shift,show_chars,show_var,open,read,write,close,watch,lseek
+global dotchar,sleep,u_obuffer_shift,show_chars,show_var,open,read,write,close,watch,lseek,fork
 ;不管调用int 80h时要传递几个参数，默认把eip下方的5个dword都写到对应的参数寄存器。
 ;这个操作用宏包装，缺点是体积大些(1~10kb),其实这个宏也可以写成一个函数
 %macro int80h 1
@@ -22,7 +22,7 @@ global dotchar,sleep,u_obuffer_shift,show_chars,show_var,open,read,write,close,w
 show_chars:int80h 0
 
 ;eax=1 void sleep(int msg_type,int msg_bind);
-sleep:int80h 1
+fork:int80h 1
 
 ;eax=2 int u_obuffer_shift();
 u_obuffer_shift: int80h 2

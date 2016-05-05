@@ -8,7 +8,9 @@ SIGPENDING_OFFSET equ (2*4)
 LATCH equ 1193180/100
 extern do_IRQ
 extern oprintf
+extern spin
 
+global ret_from_sys_call
 global page_fault,usr_func
 global restore_all
 global selector_room_plain
@@ -21,7 +23,7 @@ global p3
 global outofproc
 global base_tss
 ; func_table entry
-extern _k_show_chars,k_sleep,k_obuffer_shift,_k_show_var,k_open,k_read,k_write,k_close,k_watch,k_seek,k_getchar
+extern _k_show_chars,k_sleep,k_obuffer_shift,_k_show_var,k_open,k_read,k_write,k_close,k_watch,k_seek,k_getchar,sys_fork
 extern wake_hs,do_page_fault
 extern no_reenter
 extern dump_sys
@@ -209,6 +211,9 @@ i20h:
 
 ; keyboard interrupt
 i21h:
+	;push sec_data.keyboard
+	;call spin
+	iret
 	push 0	;no err_code
 	save
 	mov al,0x20
@@ -216,15 +221,11 @@ i21h:
 	call key_handler;
 	;far away
 i2fh:
-	push 0	;no err_code
-	save
-	;save current esp to 'current->pregs'
-	mov esi,esp	
-	and esi,0xffffe000
-	mov [esi],esp
-
-	jmp $
-;	jmp wake_hs	
+	;push sec_data.IDE0
+	;call spin
+	push 0x2f - 256
+	jmp common_interrupt
+	
 
 i30h:
 	jmp $
@@ -298,7 +299,7 @@ ret_from_intr:
 	mov eax, [ecx + REGS_CS_OFFSET]
 	and eax, 0x3
 	cmp eax,0
-	je restore_all	;前夕是内核态
+	je restore_all	;前夕是内核态。 发生在内核态的中断不会引起调度。
 	jmp ret_with_reschedule		;中断前夕是用户态
 
 ret_from_sys_call:
@@ -336,12 +337,14 @@ sec_data:
 .str2:  db 'hello world->wws',0
 .str3:  dd 0,1,2,3,4,5,6,7,8,9
 .spin:  db 'spin',0
+.keyboard: db 'keyboard IRQ', 0
+.IDE0: db 'IDE IRQ 2f' , 0
 msg:db 'spin',0
 
 ;sys_call table,store address of function
 func_table:
     dd _k_show_chars ;0 _k_show_chars
-    dd k_sleep	;1
+    dd sys_fork	;1
     dd 0 ;2		k_obuffer_shift
     dd 0 ;3		_k_show_var
     dd k_open ;4		k_open

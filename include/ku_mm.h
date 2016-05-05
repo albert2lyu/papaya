@@ -9,6 +9,6 @@ struct usr_psp_struct{
 	unsigned pid;
 	unsigned _errno;
 };
-#define errno (__usr_psp->_errno)
+//#define errno (__usr_psp->_errno)
 #define __usr_psp ((struct usr_psp_struct *)USR_PSP_BASE)
 #endif

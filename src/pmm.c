@@ -75,4 +75,10 @@ void insert_after(EMPTY_BLOCK*mother,EMPTY_BLOCK*block){
 		block->next=next;
 	}
 }
+
+void * kmalloc0(int bytes){
+	void *ptr = kmalloc(bytes);
+	if(ptr) memset(ptr, 0, bytes);
+	return ptr;
+}
 //end kmalloc

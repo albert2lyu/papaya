@@ -2,6 +2,7 @@
 #define KU_UTILS_H
 #include<valType.h>
 #define min(x,y) ((x)<(y)?(x):(y))
+#define MAX(x, y) ((x)>(y)?(x):(y))
 //eat a digit in format-hex,store it in x,and make 'pt 'jump the digit
 //bug:can not distinguish capital in hex-string,like 0XFFF,should be 0xfff
 #define eat_hex(pt,x)\
@@ -52,13 +53,12 @@ donothing:;
 char mem_entity[4];
 void memcp(char*dest,char*src,int byte);
 void memsetw(unsigned short *dest,int word,unsigned short value);
-void memset(char*dest,int value,int byte);
+void memset(char*dest,int value,unsigned n);
 void chars_to_str(char*str,char*chars);
 int charscmp(char*pt1,char*pt2,int end_flag);
 int ceil_divide(int a,int b);
 int pow_int(int base,int exp);
 void human_memsize_into(int*gmkb,int size,int initial_scale_count);
 int*human_memsize(int size,int initial_scale_count);
-int strcmp(char*pt1,char*pt2);
 int hex_int(char x);
 #endif

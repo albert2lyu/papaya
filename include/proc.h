@@ -4,6 +4,8 @@
 #include<utils.h>
 #include<ku_proc.h>
 #include<mm.h>
+#include<asm/resource.h>
+
 
 extern struct tss base_tss;
 #define g_tss (&base_tss)
@@ -29,6 +31,23 @@ typedef struct{
  * XXX this seems to be a ugly action,we can init these fields in a breath just when pcb_table is created,because they will be never touched any more.ok).
  * */
 extern int selector_plain_c0,selector_plain_d0,selector_plain_c1,selector_plain_d1,selector_plain_c3,selector_plain_d3;
+
+struct dentry;	struct vfsmount;	struct file;
+struct fs_struct{
+	struct dentry *root, *pwd, *altroot;
+	struct vfsmount *rootmnt, *pwdmnt, *altrootmnt;
+};
+
+#define NR_OPEN_DEFAULT 32
+/* open file table structure
+ * 1, @file_array points to __file_array at first, and will point to the new allocated
+ * file array(bigger size) when a process open two many files.
+*/
+struct files_struct{
+	int max_fds;
+	struct file **filep;	/* current file array */
+	struct file *__file_array[NR_OPEN_DEFAULT];
+};
 
 struct thread{
 	unsigned esp;
@@ -56,7 +75,7 @@ struct pcb{
 		 	stack_frame *pregs;		/**when a ring0 process interrupted by a
 									  certain exception or interruption,the
 									  cpu current(namely eax,ebx...) won't be
-									  save in member[regs].so we need a pointer
+									  saved in member[regs].so we need a pointer
 									  to know the real saved location.*/
 			int need_resched;
 			int sigpending;
@@ -70,8 +89,10 @@ struct pcb{
 			u32 *cr3;
 			u32 ring;
 			struct thread thread;
-			OBUFFER obuffer;		/**keyboard buffer*/
-			u32 __end;
+			struct fs_struct *fs;
+			struct files_struct *files;
+			struct rlimit rlimits[RLIMIT_MAX];
+			u32 __task_struct_end;
 		};
 		char padden[PCB_SIZE-sizeof(stack_frame)];
 	};
@@ -82,6 +103,7 @@ struct pcb{
 #define current (get_current())
 struct pcb *get_current();
 
+#include<linux/fs.h>
 struct tss{
 	unsigned short back_link,__blh;
 	unsigned long esp0;

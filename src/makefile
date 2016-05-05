@@ -1,87 +1,32 @@
-all:prepare_folder boot.bin kernel.elf ../cmd/dimg
-#'make' will search target-file and rely-file according through VPATH,if she
-#failed under current directory.
-VPATH=../lib/ ../bin/
-#header_path will be used when 'gcc -M'.you can not use '$(cflags)' instead of
-#'$(head_path)' under this case,because other unrelated cflags may affect the 
-#operation of 'gcc -M',according to by test.
-cheader_path=-I../include/ -I./usr/include/
-cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -Wno-implicit-function-declaration -g
-asmflags=-i../include/ -i./usr/include/
-ldpath=-L../lib/
+ROOT=/home/wws/lab/yanqi
+export ROOT
+all:
+	make -C drivers/block/
+	make -C drivers/ide/
+	make -C fs/
+	make -C fs/cell/
+	make -f makefile2
 
-usro= ../src/usr/lib/asmtask.o ../src/usr/lib/sys_call.o ../src/usr/lib/utils.o\
-	  ../src/usr/lib/unistd.o
-#the target of a rule matchs in a stiff way,kernel.a will match '%.a:%.asm' but
-#../lib/kernel.a won't.
-asmo=kernel.asmo utils.asmo bootinfo.asmo
-co= kernel.o   utils.o proc.o  disp.o video_drv.o schedule.o\
-ku_utils.o mm.o func_table.o pmm.o kbd_drv.o mmzone.o irq.o time.o i8259.o\
-ramdisk.o fs_cell.o elf.o
- 
-kernelrelyo=$(asmo)  $(co) $(usro)
-include $(co:.o=.d)
-
-boot.bin:boot.asm
-	nasm -o ../bin/boot.bin boot.asm
-kernel.elf:$(kernelrelyo)
-	cd ../lib/;\
-	ld -m elf_i386 -s -Ttext 0xc0030400 -o ../bin/kernel.elf $(kernelrelyo);\
-	ld -m elf_i386 -Ttext 0xc0030400 -o ../bin/g_kernel.elf $(kernelrelyo) 
-../cmd/dimg:../cmd/dimg.c bootinfo.asmo
-	gcc -c ../cmd/dimg.c -o ../cmd/dimg.o -std=c99 -Wno-implicit-function-declaration
-	gcc -o  ../cmd/dimg  ../cmd/dimg.o ../lib/bootinfo.asmo
-%.d:%.c
-	set -e;rm -f $@;\
-	gcc -M $< $(cheader_path) > this_is_a_tmp_file;\
-	sed 's\:\ $@: \'  this_is_a_tmp_file  > $@;\
-	rm  -f this_is_a_tmp_file
-
-%.o:%.c
-	gcc -c -o ../lib/$@ $< $(cflags)
-
-%.asmo: %.asm ../include/*.inc
-	nasm -felf -o ../lib/$@ $< $(asmflags)
 clean:
-	rm  -rf ../lib/;\
-	rm -f *.d;
-#replace your 400m.img to after using make git
+	rm *.d -f
+	rm *.o -f
+	rm ../lib/* -f
+	rm  drivers/block/*.o -f
+	rm drives/ide/*.o -f
+	rm fs/*.o -f
+	rm fs/cell/*.o -f
+
 git:
-	rm  -f ../lib/*;rm -f ../bin/*;rm -f *.d;\
-	rm -f ../cmd/parport.out ../cmd/dimg;\
-	rm -f usr/lib/*;\
-	mv ../cmd/*.img ../..
-imgback:
-	mv ../../*.img ../cmd/
-prepare_folder:
-	mkdir -p ../lib/ ../bin/
-.PHONY:all
+	mv book* ~/Documents/tmp_for_git/
+	mv ../cmd/400m.img ~/Documents/tmp_for_git/
+	mv ../cmd/cell.img ~/Documents/tmp_for_git/
+	mv ../cmd/dimg ~/Documents/tmp_for_git/
+	mv ../cmd/init ~/Documents/tmp_for_git/
+	mv ../cmd/cell ~/Documents/tmp_for_git/
+	mv ../cmd/bochsout.txt ~/Documents/tmp_for_git/
+	rm ../cmd/*.o
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+tig:
+	mv ~/Documents/tmp_for_git/book* ./
+	mv ~/Documents/tmp_for_git/* ../cmd/
 

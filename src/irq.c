@@ -1,13 +1,18 @@
-#include<errno.h>
+#include<linux/errno.h>
 #include<irq.h>
 #include<proc.h>
-/**生成一个irqacion，并挂到中断服务队列里*/
-int request_irq(int irq, void (*handler)(int), unsigned flags){
+/**生成一个irqacion，并挂到中断服务队列里
+* @irq note! should sub by 0x20.
+* note, the status is marked IRQ_DISABLED, so you should clear this bit manually
+* after you do 'request_irq',(see time.c init_time()) otherwise...
+*/
+int request_irq(int irq, void (*handler)(int, void*), unsigned flags, void *dev){
 	if(irq < 0 || irq >=NR_IRQS || !handler) return -EINVAL;
 
 	struct irqaction *action = kmalloc(sizeof(struct irqaction));
 	action->func = handler;
 	action->flags = flags;
+	action->dev = dev;
 	action->next = 0;
 	
 	int retval = setup_irq(irq, action);	//挂入
@@ -38,7 +43,6 @@ unsigned do_IRQ(stack_frame regs){
 	int irq = err_code - 0x20;
 	irq_desc_t *desc = irq_desc + irq;
 	unsigned status = desc->status;
-
 /*	oprintf("status:%x,%x\n", status,desc->hw_handler->ack);*/
 	desc->hw_handler->ack(irq);
 	
@@ -74,7 +78,7 @@ out:
  * 1,返回值暂时是无意义的。
  */
 int handle_IRQ_event(int irq){
-	int status;
+	int status = 0;
 	struct irqaction *action = irq_desc[irq].action;
 /*	oprintf("irq:%x,%x\n", irq, irq_desc[irq].action);	*/
 	while(action){
@@ -83,7 +87,7 @@ int handle_IRQ_event(int irq){
 			spin("sti now");
 			 __asm__ __volatile__ ("sti");
 		}
-		action->func(irq);		
+		action->func(irq, action->dev);		
 		__asm__ __volatile__ ("cli");
 
 		action = action->next;

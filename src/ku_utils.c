@@ -14,10 +14,9 @@ int hex_int(char x){
 	if(x>='a'&&x<='f') return (x-87);
 	return -1;
 }
-void memset(char*dest,int byte,int value){
-	while(byte-->0){
-		*dest=value;
-		dest++;
+void memset(char*dest,int value,unsigned n){
+	for(int i = 0; i < n; i++){
+		dest[i] = value;
 	}
 }
 
@@ -83,17 +82,6 @@ int charscmp(char*pt1,char*pt2,int end_flag){
 		default:
 			while(1);
 	}
-}
-
-int strcmp(char *s1, char *s2){
-	char *p1 = s1;
-	char *p2 = s2;
-	while(*p1 == *p2){
-		p1++;
-		p2++;
-		if(*p1 == 0) return 0;
-	}
-	return 1;
 }
 
 

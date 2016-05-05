@@ -38,6 +38,7 @@ void do_timer(void){
 
 /*	oprintf("now reduce timeslice of process :%s\n",current->p_name);*/
 	if(--current->time_slice == 0){
+		//oprintf("switch");
 		active_expire(current);
 		current->need_resched = 1;
 	}
@@ -55,9 +56,10 @@ void do_timer(void){
 				  * list_active when awaked,because it might already use out the
 				  * time slice.
 				  */
-/*				oprintf("WAKE process %s now,it's time_slice = %u\n",curr->p_name,curr->time_slice);*/
+				//oprintf("WAKE process %s now,it's time_slice = %u\n",curr->p_name,curr->time_slice);
 				if(curr->time_slice){
 					sleep_active(curr);
+					//spin("see list_active");
 					current->need_resched = 1;
 				} 
 				else sleep_expire(curr);
@@ -97,7 +99,7 @@ void schedule(void){
 	else next = idle;
 /*	oprintf("schedule get next:%s\n", next->p_name);*/
 	if(next == current){
-		oprintf("next==current:%s\n", current->p_name);
+		//oprintf("next==current:%s\n", current->p_name);
 		/**这儿不该spin，因为唤醒timer进程时，也会印发调度，而唤醒的
 		 * timer进程可能是劣优先级的
 		 */
@@ -114,6 +116,7 @@ void schedule(void){
 		 * 陷入内核时，它就找不到自己的内核栈了*/
 		g_tss->esp0 = (unsigned)next + 0x2000;	
 
+		//这一句好。
 		__asm__ __volatile__("movl %0, %%cr3\n\t"
 							:
 							:"r"(next->cr3));
@@ -129,7 +132,10 @@ void schedule(void){
 						"pushl %%edi\n\t"
 						"pushl %%ebp\n\t"
 						"movl %%esp, %0\n\t"
-						"movl $1f, %1\n\t"	/**current进程已经被封存起来*/
+						"movl $1f, %1\n\t"	/*1, current进程已经被封存起来
+											 *2, 用movl %%eip, %1更直观，but..
+											 *3, we can't touch stack before
+											 * label 1f */
 
 						"movl %2, %%esp\n\t"
 						"jmp *%3\n\t"
@@ -170,6 +176,9 @@ void kp_sleep(u32 msg_type,u32 msg_bind){
 	 */
 }
 
+void wake_up(struct pcb *p){
+	sleep_active(p);
+}
 void kthread_sleep(u32 msg_type, u32 msg_bind){
 	active_sleep(current, msg_type, msg_bind);	
 	__asm__ __volatile__ ("int $0x81");

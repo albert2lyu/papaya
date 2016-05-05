@@ -162,13 +162,13 @@ kernel_pg_map:
 cld
 mov edi,_gpgdir_base+0xc00
 mov ecx,224
-mov eax,0x101000|PG_P|PG_USU|PG_RWW
+mov eax,0x101000|PG_P|PG_USS|PG_RWW
 .filldir:
 	stosd
 	add eax,0x1000
 	loop .filldir
 mov ecx,0x400*224
-mov eax,0|PG_P|PG_USU|PG_RWW
+mov eax,0|PG_P|PG_USS|PG_RWW
 mov edi,0x101000
 .filltbl:
 	stosd

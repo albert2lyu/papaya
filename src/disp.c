@@ -9,6 +9,7 @@ u32 oldeflags;
 #define buffer_len 12
 #define EDI_ENTER edi=(((edi/160)+1)*160);
 /* number of bytes in one page ,a char variable shuould be represented by two bytes */
+#undef PAGE_SIZE
 #define PAGE_SIZE (80*25*2)
 /*byte offset in the end*/
 #define BOUND (PAGE_SIZE*2-2)
@@ -33,6 +34,7 @@ while(exp){\
 	}\
 	else{\
 		*(pt_video+edi)=*pt_read;\
+		*(pt_video + edi + 1) = B(01110000);\
 		edi+=2;\
 	}\
 	pt_read++;\

@@ -83,9 +83,9 @@ int bit1_count(char*addr,int bytes){
 	return count;
 }
 
-void memcpy(char*dest,char*src,int bytes){
+void memcpy(void* dest,void *src,int bytes){
 	for(int i=0;i<bytes;i++){
-		dest[i]=src[i];
+		((char *)dest)[i] = ((char *)src)[i];
 	}
 }
 
@@ -110,10 +110,42 @@ char*strcpy(char*dest,char*src){
 	while((*dest++=*src++));
 	return d;
 }
+/*
+  Warning:  
+  1, If there is no null byte among the first n bytes of src, the
+  string placed in dest will not be null-terminated.
+  2, If the length of src is less than n, strncpy() writes additional null  bytes  to
+  dest to ensure that a total of n bytes are written.
+  */
+char *strncpy(char *dest, const char *src, int n){
+	int i;
+	for(i = 0; i < n && src[i]; i++){
+		dest[i] = src[i];	
+	}
+	for (; i<n; i++) dest[i] = 0;
+	return dest;
+}
 
+/* the following two functions are not standardly implemented */
+int strcmp(const char *str1, const char *str2){
+	int i;
+	for(i = 0; str1[i] == str2[i]; i++){
+		if(str1[i] == 0) return 0;
+	}
+	return i + 1;
 
+}
 
-
+int strncmp(const char *str1, const char *str2, int n){
+	for(int i = 0; i < n; i++){
+		if(str1[i] == str2[i]) {
+			if(str1[i]) continue;
+			else return 0;
+		}
+		else return i + 1;
+	}
+	return 0;	
+}
 
 
 
