@@ -1,4 +1,13 @@
-Version 0.606
+[current]Version 0.606
+==========update==========
+1, memory management module: SLAB (without colouring)
+
+[2016,5] Version 0.605
+==========update===============
+1, block device layer without buffer
+2, ide driver
+3, virtual filesystem( interfaces: open(), read(), close() implemented, write() not yet)
+
 Papaya kernel is a hobby os under i386. It's a simplified version of linux 2.4&2.6.
 
 1, this is still for intelnal communication while the code is messy.
