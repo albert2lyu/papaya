@@ -1,6 +1,7 @@
 [current]Version 0.606
 ==========update==========
-1, memory management module: SLAB (without colouring)
+1, memory management module: SLAB (without colouring)	
+   see src/mm/slab.c
 
 [2016,5] Version 0.605
 ==========update===============
