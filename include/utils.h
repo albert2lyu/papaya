@@ -1,8 +1,55 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include<ku_utils.h>
-#include<mm.h>
 #include<valType.h>
+//杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
+static inline unsigned str_hash(const char *str, int len){
+    unsigned seed = 131; // 31 131 1313 13131 131313 etc..
+    unsigned hash = 0;
+	for (int i = 0; i < len; i++) 	hash = hash * seed + str[i];
+	//hash = hash & 0x7FFFFFFF; 
+	return hash;
+}
+/* @desc  round x to 2^n
+ * e.g. given 65, got 128
+ */
+static inline unsigned ceil2n(int x){
+	int highest;
+	__asm__ __volatile__("bsr %1, %0"
+						 :"=r"(highest)
+						 :"r"(x)
+						 );
+	int mask = (1 << highest) - 1;
+	return (x + mask) & ~mask;
+}
+
+/* e.g.  ceil_div(10, 3) = 4, ceil_div(10, 4) = 3, ceil_div(10, 5) = 2 */
+static inline unsigned ceil_div(unsigned a, unsigned b){
+	unsigned quotient;
+	__asm__ __volatile__("xor %%edx, %%edx\n\t"
+						 "div %%ebx\n\t"
+						 "add $-1, %%edx\n\t"
+						 "adc $0, %%eax\n\t"
+						:"=a"(quotient)
+						:"a"(a), "b"(b));
+	return quotient;
+}
+
+static inline unsigned __BSR(unsigned x){
+	unsigned highest;
+	__asm__ __volatile__("bsr %1, %0"
+						 :"=r"(highest)
+						 :"r"(x)
+						 );
+	return highest;
+}
+
+static inline unsigned ceil_align(unsigned x, unsigned granularity){
+	unsigned mask = granularity - 1;
+	return (x + mask) & ~mask;
+}
+
+#include<mm.h>
 /**the following two macros aim at beautify code.
  * and,can you write a 'break_say'?
  */
@@ -220,12 +267,5 @@ static inline void sti_safe(){
 #define MEMBER_OFFSET(stru_type, member_name) \
 	(unsigned)&(((stru_type *)0)->member_name)
 
-//杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
-static inline unsigned str_hash(const char *str, int len){
-    unsigned seed = 131; // 31 131 1313 13131 131313 etc..
-    unsigned hash = 0;
-	for (int i = 0; i < len; i++) 	hash = hash * seed + str[i];
-	//hash = hash & 0x7FFFFFFF; 
-	return hash;
-}
+void memtest(void *, int len);
 #endif

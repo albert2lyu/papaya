@@ -23,8 +23,11 @@ void init_memory(void){
 /*	oprintf("physical memory size:%x\n",gmemsize);	*/
 
 	/**initialize mem_map*/
-	mem_map = kmalloc(G_PGNUM * sizeof(struct page));
-	memset((char *)mem_map, 0, G_PGNUM*sizeof(struct page));
+	int mapsize = G_PGNUM * sizeof(struct page);
+	mem_map = kmalloc(mapsize);
+	/* 不再清零内存，因为似乎很耗时，暂时只identify一下，读比写快*/
+	memtest(mem_map, mapsize);
+	//memset((char *)mem_map, 0, G_PGNUM*sizeof(struct page));
 
 	size_of_zone[0] = 16*0x100000;
 	if(gmemsize > ZONE_HIGHMEM_PA){
@@ -137,7 +140,19 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 
 struct page *alloc_pages(u32 gfp_mask, int order){
 	/**discard gfp_mask for temporary*/
-	struct page *page = (void *)__rmquene(&zone_normal, order);
+	struct page *page;
+	if(gfp_mask & __GFP_DMA){
+		page = (void *)__rmquene(&zone_dma, order);
+	}
+	else if(gfp_mask & __GFP_HIGHMEM){
+		( page = (void *)__rmquene(&zone_highmem, order) ) ||
+		( page = (void *)__rmquene(&zone_normal, order) ) ||
+		( page = (void *)__rmquene(&zone_dma, order) ) 	;
+	}
+	else
+		( page = (void *)__rmquene(&zone_normal, order) ) ||
+		( page = (void *)__rmquene(&zone_dma, order) )	;
+		
 	assert(page);
 	unsigned ppg = page - mem_map;
 	char *vaddr = (char *)KV(ppg << 12);

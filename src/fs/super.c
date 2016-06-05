@@ -2,6 +2,11 @@
 #include<utils.h>
 static  struct file_system_type *fs_types;
 void init_vfs(void){
+	dentry_cache = kmem_cache_create("dentry_cache", sizeof(struct dentry), 0,
+										SLAB_HWCACHE_ALIGN, 0, 0);
+	inode_cache = kmem_cache_create("inode_cache", sizeof(struct inode), 0,
+										SLAB_HWCACHE_ALIGN, 0, 0);
+
 	inode_hashtable = kmalloc(sizeof(struct list_head) * I_HASHTABLE_LEN);
 	dentry_hashtable = kmalloc(sizeof(struct list_head) * D_HASHTABLE_LEN);
 	for(int i = 0; i < I_HASHTABLE_LEN || i < D_HASHTABLE_LEN; i++){

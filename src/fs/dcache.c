@@ -5,7 +5,8 @@
 
 /* d_create时，会为qstr的字符串分配空间，专门存起来 */
 struct dentry *d_create(struct dentry *parent, struct qstr *qstr){
-	struct dentry *dentry = kmalloc(sizeof(struct dentry));
+	//struct dentry *dentry = kmalloc(sizeof(struct dentry));
+	struct dentry *dentry = kmem_cache_alloc(dentry_cache, 0);
 	if(!dentry) return dentry;
 	char *str = kmalloc(qstr->len + 12);	/*kmalloc的bug，需要+12*/	
 	strncpy(str, qstr->name, qstr->len);

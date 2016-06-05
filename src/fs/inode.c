@@ -6,7 +6,8 @@
  * @hash just a shorthand, actually, we can cauculate it by @sb and @ino 
  */
 static struct inode *cache_inode(struct super_block *sb, u32 ino, int hash){
-	struct inode *inode = kmalloc(sizeof(struct inode));
+	//struct inode *inode = kmalloc(sizeof(struct inode));
+	struct inode *inode = kmem_cache_alloc( inode_cache, 0);
 	inode->ino = ino;
 	inode->sb = sb;
 	inode->dev = sb->dev;

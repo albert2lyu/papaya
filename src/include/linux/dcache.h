@@ -152,4 +152,7 @@ kill_it:
 
 struct dentry *d_create(struct dentry *parent, struct qstr *qstr);
 struct dentry *d_lookup(struct dentry *dir, struct qstr *name);
+
+#include<linux/slab.h>
+struct slab_head *dentry_cache;
 #endif

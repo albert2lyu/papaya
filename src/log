@@ -1,3 +1,26 @@
+Sat Jun  4 22:32:15 EDT 2016
+* 再确定一遍。控制mmzone的gfp_flags是在kmem_cache_create时候就确定下来了。 以后kmem_cache_alloc时候，还会传gfp_flags，但那个就是__GFP_KERNEL或者__GFP_ATOMIC。grow时候，alloc_pages时候，用到的flags是slabhead->gfpflags | arg_flags。
+
+Fri Jun  3 21:32:30 EDT 2016
+* 从SET_PAGE_slab()到page_set_slab()的变迁
+  当一个page被分配给slab模块后，就在page结构体内标记上它所属的slab和slab_head。2.4内核里，标记slab是通过SET_PAGE_SLAB，一个宏，具体源码我没看，但是从《情景》的介绍来看，这个宏是把slab链到page->list->prev。
+  到了2.6，有两个改变。第一是函数命名的调整，page_set_slab更符合我的口味.第二是把slab链到lru->prev上，其实新版本里的struct page里已经不再有list这个链接点了。属于内核的变动。
+  这个函数的实现也很喜欢：
+	static inline void page_set_slab(struct page *page, struct slab *slab)
+	{
+		page->lru.prev = (struct list_head *)slab;
+	}
+  在papaya里，我把这个函数命名成page_mark_slab。
+
+* 通过kmem_cache_create()创建的专用slab队列，在创建时，就要指定是否是DMA类型的。它里面的所有slab，要么全在DMA内存区(<16M),要么全不在。
+  但通用slab队列(通过kmalloc分配)，则是在alloc时，指定是否是DAM页面。 generic cache本身就维护了两个slab队列。（一个是DMA，一个不是).
+ 
+* makefile的维护有点吃力了
+  像mm,fs这些目录下的makefile，都是只依赖于c文件，.h文件的更新不会引发重编译。 所以今天slab.c里的一个函数找不到链接，我去utils.h里加了个static inilne的，make，还是提示链接不到。运行make clean，也不行。 似乎必须把.c文件保存了才行。 其实make clean之后按理该重编译的，但因为mm文件夹是新添加的，clean的时候，不会清除其中的.o文件。 必须手动添加相应的命令在总makefile里。
+
+Thu Jun  2 21:33:02 EDT 2016
+*slab的freelist数组是紧跟在slab结构体的后面，这是很常见的，因为freelist长度不固定，所以放在结构体尾巴上。 但因此有一个问题，若遇到1/4,1/2 page_sze的objsize，slab结构体要分离出slab，那给slab结构体分配内存空间就要小心， 它不是固定的大小！那它就没有专用的slab队列了。不知道linux怎么做的。 我暂时不考虑“游离”slab_s的情况。
+* cache_cache不仅通过partial,unsedout,fresh三个指针维持着一个普通的slab_head类型的slab队列，还通过global持有所有正在纸用的slab_head。
 
 Mon May  2 01:21:10 EDT 2016
 *vfs层还比较薄弱。 文件的缓冲迫切需要做上。 这依赖于块设备层的缓冲。

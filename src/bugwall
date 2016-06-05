@@ -1,5 +1,11 @@
 some bugs encountered:
 
+Sun Jun  5 01:58:03 EDT 2016
+1, struct slab_head里的objsize不能是u16类型。 没有任何约束限制objsize不能大于64K。
+  今天的bug就出在这里。bug的起因是objsize是u16类型。
+  所以在kmem_cache_test里测试12组通用cache时，当测到malloc_sizes[11]的时候，发现“连续申请100个obj“，得到的地址竟然不是阶梯变化的，而是每连续若干个是一样的！
+  bug是这样发生的，malloc_sizes[11]的objsize刚刚达到64K，也就是(0xffff+1),但因为objsize是u16类型的，所以赋值时截断，64K就变成了0.以后在分配的时候，当做objsize=0，所以同一个slab分配处的object地址都是一样的！都是第一个！ 当切到下一个slab时，才会变。
+
 Mon May  2 05:01:37 EDT 2016
 1, 发现这么久以来，内核里的memset函数竟然一直都是错的。 
    把memset(char *dest, int value, int n); 定义成了

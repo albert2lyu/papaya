@@ -147,6 +147,24 @@ int strncmp(const char *str1, const char *str2, int n){
 	return 0;	
 }
 
+/* 测试一段内存是否全为0. 因为内存是上电清零的，很多时候我不想再”为保险起见而再次清零”，
+ * 但我会为保险起见确认一下是否全为0. 读比写快.
+ * BTW 这个函数不一定更快，有时间用汇编写。 我是决心不做二次清零的。
+ */
+void memtest(void *start, int len){
+	int n = len / 4;
+	int l = len % 4;
+	int i;
+	for(i = 0; i < n; i++){
+		if(((unsigned *)start)[i] != 0) spin("memtest failed");
+	}
+	for(i = 0; i < l; i++){
+		if(((char *)start)[i] != 0) spin("memtest failed");
+	}
+}
+
+
+
 
 
 

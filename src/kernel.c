@@ -10,6 +10,7 @@
 #include<asm_lable.h>
 #include<linux/blkdev.h>
 #include<linux/ide.h>
+#include<linux/slab.h>
 char testbuf[512*200];
 char *bigbuf;
 int avoid_compiler_warning;
@@ -49,7 +50,10 @@ void func0(void);
 void func_init(void);
 void usr_func(void);
 struct pcb *idle;
-char a[1024*8];
+//char a[1024*8];
+
+
+
 void kernel_c(){
 	k_screen_reset();
 	//init basic data&struct
@@ -116,6 +120,8 @@ void kernel_c(){
 
 /*	oprintf("usr_func_addr:%x\n", usr_func);*/
 	mm_init();
+	kmem_cache_init();	
+	//kmem_cache_test();
 	proc_init();
 	init_ISA_irqs();
 	init_time();

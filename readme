@@ -1,6 +1,6 @@
-Version 0.605
+Version 0.606
 Papaya kernel is a hobby os under i386. It's a simplified version of linux 2.4&2.6.
 
 1, this is still for intelnal communication while the code is messy.
 2, some old source files are reserved, e.g. fs.c,tty.c.
-3, join us http://163.fm/2oxxXKy
+3, join us at http://163.fm/2oxxXKy

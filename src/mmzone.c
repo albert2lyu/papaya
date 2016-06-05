@@ -43,8 +43,10 @@ void init_free_area(int zone_id, int start_idx){
 	while(linked < zone->spanned_pages){
 		zone_map[linked].PG_zid = zone_id;	
 		zone_map[linked]._count = 1;
-		__free_pages_bulk(zone_map + linked, zone, 0);
-		linked++;
+	//	__free_pages_bulk(zone_map + linked, zone, 0);
+		__free_pages_bulk(zone_map + linked, zone, 8);
+		//linked++;
+		linked += 1 << 8;	/* 按M来初始化 */
 	}
 
 /*	oprintf("linked:%x, span:%x, zone_mem_map:%x\n", linked, zone->spanned_pages, zone->zone_mem_map);*/

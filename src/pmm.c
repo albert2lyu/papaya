@@ -27,7 +27,7 @@ void*kmalloc(int byte){
 	*(int*)real_alloc=byte;
 	block->size-=real_byte;
 	void*return_alloc=(void*)(real_alloc+4);
-	memset((char*)return_alloc,0,byte);
+	//memset((char*)return_alloc,0,byte);
 //	oprintf("kmalloc return %x\n",return_alloc);
 	return return_alloc;
 }

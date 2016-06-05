@@ -1,6 +1,7 @@
 #ifndef MM_H
 #define MM_H
 #include<valType.h>
+#include<utils.h>
 #include<pmm.h>
 #include<ku_mm.h>
 #include<list.h>
@@ -15,6 +16,7 @@
 #define __pa(vaddr) ((unsigned)(vaddr) - PAGE_OFFSET)
 #define __va(paddr) ((unsigned)(paddr) + PAGE_OFFSET)
 #define page_va(page) __va( (page - mem_map) << PAGE_SHIFT)
+#define virt_to_page(vaddr) pfn_page( __pa(vaddr) >> PAGE_SHIFT)
 /**macor 'alloc_page' defined for backward compatible, don't use it*/
 #define alloc_page(gfp, order) page_idx(alloc_pages(gfp, order))
 #define kmalloc_pg __get_free_pages
@@ -47,4 +49,13 @@ char* kmalloc_pg(u32 gfp_mask, int order);
 void mm_init(void);
 extern u32 gmemsize;
 
+/* when @size bytes required, we */
+static inline int size2pages(int size){
+	int  least_pages = (size + (PAGE_SIZE - 1)) >> PAGE_SHIFT;	
+	/* round it to the power of 2 */
+	return ceil2n(least_pages);
+}
 #endif
+
+
+

@@ -2,6 +2,7 @@
 #define FS_H
 #include<linux/dcache.h>
 #include<proc.h>
+#include<linux/slab.h>
 
 /* flags in file.mode 
  */
@@ -102,15 +103,12 @@ void register_filesystem(char *name, int (*read_super)(struct super_block *));
 struct vfsmount * do_mount(u16 dev, char *dir, char *type);
 void init_vfs(void);
 
-
-
-
-
-
-
-
 int pathwalk(char *path, struct in_dir *indir, int flags);
 struct inode *iget(struct super_block *sb, unsigned ino);
 int sys_open(char *, unsigned, unsigned);
 int sys_read(unsigned, char*, unsigned);
+
+struct slab_head *inode_cache;
+struct slab_head *file_cache;
+
 #endif
