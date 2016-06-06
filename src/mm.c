@@ -24,10 +24,7 @@ void init_memory(void){
 
 	/**initialize mem_map*/
 	int mapsize = G_PGNUM * sizeof(struct page);
-	mem_map = kmalloc(mapsize);
-	/* 不再清零内存，因为似乎很耗时，暂时只identify一下，读比写快*/
-	memtest(mem_map, mapsize);
-	//memset((char *)mem_map, 0, G_PGNUM*sizeof(struct page));
+	mem_map = kmalloc0(mapsize);
 
 	size_of_zone[0] = 16*0x100000;
 	if(gmemsize > ZONE_HIGHMEM_PA){

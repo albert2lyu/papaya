@@ -47,7 +47,6 @@ base_tss  equ base_text + (tss -_start)
 global _start
 [section .text]
 _start:
-
 mov esp,0xc0300000
 jmp _reallystart
 ;store some data

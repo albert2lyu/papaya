@@ -159,12 +159,6 @@ loop .l
 	pop ax
 %endmacro
 %macro read_floppy_side_o_sector_total_destsa_destea 7
-	push ax
-	push bx
-	push cx
-	push dx
-	push es
-	
 	mov ah,2
 	mov dl,%1
 	mov dh,%2
@@ -176,11 +170,6 @@ loop .l
 	mov bx,%7
 	int 13h
 
-	pop es
-	pop dx
-	pop cx
-	pop bx
-	pop ax
 %endmacro
 
 %macro OPRINTF 1

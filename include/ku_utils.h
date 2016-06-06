@@ -53,7 +53,7 @@ donothing:;
 char mem_entity[4];
 void memcp(char*dest,char*src,int byte);
 void memsetw(unsigned short *dest,int word,unsigned short value);
-void memset(char*dest,int value,unsigned n);
+void memset(void*dest,unsigned value,unsigned n);
 void chars_to_str(char*str,char*chars);
 int charscmp(char*pt1,char*pt2,int end_flag);
 int ceil_divide(int a,int b);

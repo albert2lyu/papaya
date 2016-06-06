@@ -14,9 +14,15 @@ int hex_int(char x){
 	if(x>='a'&&x<='f') return (x-87);
 	return -1;
 }
-void memset(char*dest,int value,unsigned n){
-	for(int i = 0; i < n; i++){
-		dest[i] = value;
+void memset(void*dest,unsigned value,unsigned n){
+	int value32 = value + (value<<8) + (value<<16) + (value<<24);
+	int quard = n / 4;
+	int l = n % 4;
+	for(int i = 0; i < quard; i++){
+		((unsigned*)dest)[i] = value32;
+	}
+	while(l--){
+		((char *)dest)[n-l] = value;
 	}
 }
 

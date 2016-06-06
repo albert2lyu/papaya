@@ -1,28 +1,6 @@
 
-Tue Jun  7 14:32:54 CST 2016
-1, boot.asm里又一个old bug被发现了。 在	int 15probe内存的时候，把jc写成了je。jc跟je其实没关系！ je只跟zf标志有关。
-Tue Jun  7 13:21:18 CST 2016
-*  用08号测parameter，得到400m.img的sector_per是63，heads=(63-48+1)
-  在裸机上测的  h.d1s?  即heads=46 disk=2 sector_per=63
-* 就保证kernel.elf不超过60kb，这样总共只需要读两个track。我不知道第三个track是在哪个side。
-
-Mon Jun  6 22:38:46 EDT 2016
-× 开始裸机测试。
-  连kernel.asm都没能进去。问题出在往0xc00304xx跳过去后失败了。 
-  那里没有指令。
-  kernel reset没问题，但kernel reset的source就么有指令。
-  因为用dap读磁盘失败了。虽然显示的是成功。
-*  关于es:di, ds:si 
-  一直以来都以为[di]默认是用es做为段寄存器，今天才酿成了祸。。。。记住，只要不指定段寄存器，像这样[],都是默认ds的。 
-  之所以有这个错误印象，是因为rep时，是默认ds:si => es:di的。
-
 Sun Jun  5 23:07:13 EDT 2016
-* 开始做网卡驱动了。 rtl8139的datasheet很简略，我一直怀疑realtek公司应该有xx guide一类的文档存在。 在google上搜rtl8139 guide，竟然找到了。
-  这篇文档看的我泪流满面，每句话都说到我心里，我想问的像听的，都在上面，没有一句废话。
-  文档的年份是1999,1,15  RTL8139(A/B) Programming guide: (V0.1)  来源是usfca.edu.com，美国旧金山大学。 我竟然有兴趣搜了搜这个学校怎么样。 
-
-* CAPR是干什么的。 它是由驱动更新的，那网卡硬件要它何用?
-  网摘：收报处理最后一部是更新读指针，包括主机CPU副本cur_rx和8139的CAPR。更行8139的CAPR还有一个重要的副作用，就是如果CAPR=CBA时，8139置CR.RxBufEmpry为1，表示缓冲为空，8139对外发出取消暂停控制帧。。。
+* 开始做网卡驱动了。 rtl8139的datasheet很简略，我一直怀疑realtek公司应该有xx guide一类的文档存在。 在google上搜rtl8139 guide，竟然找到了。1999,1,15 v0.1。 
 
 
 Sat Jun  4 22:32:15 EDT 2016

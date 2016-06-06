@@ -11,8 +11,13 @@ DAP_MEM_COUNT equ (DAP_SECTOR_COUNT * 512)
 org 0x7c00
 
 [bits 16]
+;用int 13h，要担心硬盘的磁头号大于1吗？
 mbrHead:
+	mov ax, 0xb800
+	mov gs, ax
 	read_floppy_side_o_sector_total_destsa_destea 0x80,0,0,2,(_bootbin_occupy_sectors-1),0,0x7e00	;'-1' because bios has alreay load the first sector
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 0,0,1,63,(_base_kernel_loaded - 512 * 3) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 1,0,1,63,(_base_kernel_loaded - 512 * 3) >> 4, 63*512
     jmp entrance
 
 ;[section .gdt]
@@ -31,55 +36,39 @@ gdtPtr:
 	dw len_gdt - 1  ; gdt limits
 	dd gdt          ; this indicates that gdt must locate at mbr
 
-dap_s_count equ 2
-dap_seg equ 6
-dap_lba equ 8
-dap:
-	db  16		; packetsize ==16
-	db  0		; reserved ==0
-	dw  DAP_SECTOR_LIMIT	; sector count,some bios limit it within 256
-	dw  0		; offset
-	dw  _base_kernel_loaded>>4	; seg
-	dd  _kernel_image_start_sector - 1		; start-sector,'-1' due to  dap-format
-	dd  0
-
-dap2:
-	db  16		; packetsize ==16
-	db  0		; reserved ==0
-	dw  DAP_SECTOR_LIMIT	
-	dw  0		; offset
-	dw  RAMDISK_BASE>>4	; seg
-	dd  0		; start sector lba
-	dd  0
 
 entrance:
 	;load disk 1
-    mov ax, 0
-    mov ds, ax
-
-    mov ah, 42h
-    mov dl, 80h
-    mov si, dap
-    int 13h
-    jc read_error
-
-	;load disk 2
-	;诡异的bug又消失了。同一个dap又可以多次int，没有限制了。有时间repeate it.
-    mov ah, 42h
-    mov dl, 81h
-    mov si, dap2
-    int 13h
-    jnc read_ok
+    jmp read_ok
 
 read_error:
 	mov bx, 0xb800
 	mov ds,bx
-	add ah, 48
-	mov byte [0], ah
+	mov al, '?'
+	mov ah, '?'
+	mov byte [0], al
+	mov byte [2], ah
     jmp $
 
 read_ok:
+	mov ax, _base_kernel_loaded>>4
+	mov es, ax
+	mov di, 0
+	mov cx, 255
+	mov bx, 0xb800
+	mov ds, bx
+	mov bx, 0
+show_elf:
+	mov al, [es:di]
+	mov byte [bx], al
+	add bx, 2
+	inc di
+	loop show_elf
+
 	;now get machine physical memory infomation
+	xor ax, ax
+	mov ds, ax
+	mov es, ax
 	get_memory_information:
 	mov ebx,0
 	mov di,_base_meminfo
@@ -88,13 +77,16 @@ read_ok:
 	mov ecx,20
 	mov edx,0534D4150h
 	int 15h
-	je .fail
+	jc .fail
 	add di,20
 	inc dword [_memseg_num]
 	cmp ebx,0
 	jne .loop
 	jmp .done
 .fail:
+mov al, 'X'
+mov byte [gs:0], al
+mov byte [gs:2], al
 jmp $
 .done:
 	jmp mbr_extend
@@ -185,27 +177,57 @@ mov cr3,eax		;page-map active now
 mov eax,cr0
 or eax,0x80000000
 mov cr0,eax
-
 jmp dword selector_plain_c0:_base_entrance_kernel
 times 512-($-mbr_extend) db 0
 
-[bits 16]
-ap_init:		;sector 5 => 0x8000
-get_lock:
-		mov ax,0
-		mov es,ax
-		lock bts dword [es:lock_area],0
-		jc get_lock
-
-		mov ax,0xb800
-		mov ds,ax
-		btr dword [es:lock_area],0
-	.1:
-		inc byte [0]
-		hlt
-		jmp .1
-	ap_init_end:
-	lock_area:dd 0
 
 
 
+;	--int 13h (leaf 8, test parameter)
+;	mov ah, 8
+;	mov dl, 0x80 
+;	mov di, 0
+;	mov es, di 
+;	int 0x13
+;
+;	mov bx, 0xb800 
+;	mov ds, bx
+;	mov bx, 0
+;
+;	mov byte [bx],  'C'
+;
+;	mov ax, cx
+;	add bx, 2
+;	mov byte [bx], ah
+;	shr al, 6
+;	add bx, 2
+;	mov byte [bx], al
+;	add bx, 2
+;	mov byte [bx],  'h'
+;	add bx , 2
+;	add dh, '0'
+;	mov byte [bx], dh
+;	add bx, 2
+;	mov byte [bx], 'd'
+;	add bx, 2
+;	add dl, '0'
+;	mov byte [bx], dl
+;	add bx, 2
+;	mov byte [bx], 's'
+;	mov ax, cx
+;	and al, 00111111b
+;	add bx, 2
+;	mov byte [bx], al
+;	jmp $
+
+
+
+;-----
+;mov ebx, 0xb8000
+;mov ax, cx 
+;add al, '0'
+;add ah, '0'
+;mov byte [ebx], al
+;mov byte [ebx + 2], ah
+;jmp $
+;-----
