@@ -29,7 +29,7 @@ kernel.elf:$(kernelrelyo)
 	ld -m elf_i386 -s -Ttext 0xc0030400 -o ../bin/kernel.elf $(kernelrelyo);\
 	ld -m elf_i386 -Ttext 0xc0030400 -o ../bin/g_kernel.elf $(kernelrelyo) 
 ../cmd/dimg:../cmd/dimg.c bootinfo.asmo
-	gcc -c ../cmd/dimg.c -o ../cmd/dimg.o -std=c99 -Wno-implicit-function-declaration
+	gcc -c ../cmd/dimg.c -o ../cmd/dimg.o -std=c99 -Wno-implicit-function-declaration -g
 	gcc -o  ../cmd/dimg  ../cmd/dimg.o ../lib/bootinfo.asmo
 %.d:%.c
 	set -e;rm -f $@;\

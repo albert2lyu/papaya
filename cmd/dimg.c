@@ -10,7 +10,7 @@
 #include "../include/bootinfo.h"
 static char *filepaths[] = { "../cmd/400m.img", "/dev/sdb" };
 static int filesize(char *name){
-	int fd = open(name);
+	int fd = open(name, 1+1, 0);
 	if(fd == -1) return -1;
 	int count = lseek(fd, 0, SEEK_END);
 	close(fd);
@@ -20,7 +20,8 @@ int main(int argc, char *argv[]){
 	char cmd[100];
 	assert(argc <= 2);
 	char *filepath = filepaths[argc - 1];
-	assert(filesize("../bin/kernel.elf") < 60 * 1024 && 
+	printf("elf size:%d\n", filesize("../bin/kernel.elf"));
+	assert(filesize("../bin/kernel.elf") < 120 * 1024 && 
 			"kernel.elf firstly loaded at 0x80000, take care of 0xA0000, and \
 			boot.asm only read 126 sectors.");
 	sprintf(cmd,"dd if=../bin/kernel.elf of=%s bs=512 conv=notrunc seek=%u", filepath, kernel_image_start_sector-1);
