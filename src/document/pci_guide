@@ -1,0 +1,568 @@
+
+Let it be!
+
+    管理
+
+[转]PCI配置空间简介
+PCI配置空间简介 作者：敏行
+PCI有三个相互独立的物理地址空间：设备存储器地址空间、I/O地址空间和配置空间。配置空间是PCI所特有的一个物理空间。由于PCI支持设备即插即用，所以PCI设备不占用固定的内存地址空间或I/O地址空间，而是由操作系统决定其映射的基址。
+系统加电时，BIOS检测PCI总线，确定所有连接在PCI总线上的设备以及它们的配置要求，并进行系统配置。所以，所有的PCI设备必须实现配置空间，从而能够实现参数的自动配置，实现真正的即插即用。
+PCI总线规范定义的配置空间总长度为256个字节，配置信息按一定的顺序和大小依次存放。前64个字节的配置空间称为配置头，对于所有的设备都一样，配置头的主要功能是用来识别设备、定义主机访问PCI卡的方式（I/O访问或者存储器访问，还有中断信息）。其余的192个字节称为本地配置空间，主要定义卡上局部总线的特性、本地空间基地址及范围等。
+ 
+访问PCI配置空间方法一
+访问PCI配置空间可通过两个访问寄存器，CONFIG_ADDRESS寄存器和CONFIG_DATA寄存器。这两个寄存器在PC中分别对应着CF8h和CFCh端口，并且是32位端口，即读写要用的32为IN和OUT汇编指令。
+每个PCI设备可应用三个信息进行定位，即Bus Number、Device Number和Function Number。另外，PCI配置空间一共是256个字节，被分割成64个4字节的寄存器，从0-63编号。
+每次要访问PCI配置空间时，先设置CONFIG_ADDRESS寄存器，这时CONFIG_DATA存储器的内容就对应着该PCI配置空间中的相应的寄存器。
+ 
+访问PCI配置空间方法二
+第二种访问配置空间的方法是通过HalGetBusData和HalSetBusData两个内核函数。这两个函数将方法进行了封装，不需要程序员对PCI空间进行直接读取。
+DDK提供了两个内核函数HalGetBusData和HalSetBusData，分别用于读取PCI设备的配置空间和设置PCI配置空间。
+ULONG HalGetBusData(
+IN BUS_DATA_TYPE BusDataType,
+IN ULONG BusNumber,
+IN ULONG SlotNumber,
+IN PVOID Buffer,
+IN ULONG Length
+);
+注解：
+＊ BusDataType：该参数指定总线类型。HalGetBusData函数可以查询各个总线的情况，对于PCI总线，这里设置为PCIConfiguration。
+＊ BusNumber：该参数指定Bus的总线号.
+＊ SlotNumber：该参数由Device号和功能号共同组成。
+＊ Buffer：该参数是得到的PCI配置空间的首地址。
+＊ Length：该参数是PCI配置空间的大小。
+ 
+访问PCI配置空间方法三（本例仅限于WDM驱动，比较广泛使用）
+方法二适用于NT式驱动，但并不适用于WDM驱动。WDM中使用IRP获得PCI配置空间。此方法不需要了解PCI具体的配置空间结构，WDM驱动程序已经帮助程序员从PCI配置空间中分析出有用信息，并通知给程序员。
+WDM会为不同总线上的设备提供一个PDO设备，当程序员所写的功能驱动挂接在PDO之上的时候，就可以将IRP_MN_START_DEVICE传递给底层的PDO去处理。PCI总线的PDO就会得到PCI配置空间，并从中得到有用信息，如中断号、设备物理内存及I/O端口等信息。
+在处理完IRP_MN_START_DEVICE后，驱动程序会将处理结果存储在IRP的设备堆栈中，从I/O堆栈可以取出CM_FULL_RESOURCE_DESCRIPTOR数据结构，从CM_FULL_RESOURCE_DESCRIPTOR中可以取出CM_PARTIAL_RESOURCE_LIST数据结构，而在CM_PARTIAL_RESOURCE_LIST中又可以取出CM_PARTIAL_RESOURCE_DESCRIPTOR数据结构。
+CM_FULL_RESOURCE_DESCRIPTOR数据结构就是PDO帮助程序员从256字节的PCI配置空间中获取的有用信息，这其中包括终端号、设备物理内存、I/O端口等信息。
+ 
+访问PCI配置空间方法四（本例仅限于WDM驱动）
+方法三没有完整的的获取到256字节的PCI配置空间，需要自己创建IRP_MN_READ_CONFIG或者IRP_MN_WRITE_CONFIG，然后将创建好的即插即用IRP发送到底层的PDO，并等待PDO的处理。该方法获取完整的PCI配置空间。
+ 
+ 配置空间 操作系统
+     PCI总线推出以来，以其独有的特性受到众多厂商的青睐，已经成为计算机扩展总线的主流。目前，国内的许多技术人员已经具备开发PCI总线接口设备的能力。但是PCI总线的编程技术，也就是对PCI总线设备的操作技术，一直是一件让技术人员感到头疼的事情。PCI总线编程的核心技术是对相应板卡配置空间的理解和访问。一般软件编程人员基于对硬件设备原理的生疏，很难理解并操作配置空间，希望硬件开发人员直接告诉他们怎样操作；而PCI总线硬件开发人员虽深刻地理解了其意义，在没有太多编程经验地前提下，也难于轻易地操作PCI板卡。结果大多是硬件技术人员花费大量时间和精力去学习DDK、WINDRVER等驱动程序开发软件。
+     作者在开发PCI总线接口设备时，经过对PCI总线协议的深入研究，从协议本身的角度出发，找到一种方面而快捷的PCI配置空间操作方法，只使用简单的I/O命令即可找到特定的PCI总线设备并对其所有的配置空间进行读写操作。一旦读得其配置空间的内容，即可中得到担任系统对该PCI总线设备的资源分配。
+     1 PCI总线配置空间及配置机制
+     为避免各PCI设备在资源的占用上发生冲突，PCI总线采用即插即用协议。即在系统建立时由操作系统按照各设备的要求统一分配资源，资源分配的信息由系统写入各PCI设备的配置空间寄存器，并在操作系统内部备份。各PCI设备有其独自的配置空间，设计者通过对积压设备（或插槽）的ISDEL引脚的驱动区分不同设备的配置空间。配置空间的前64个字节称为配置空间的预定自区，它对每个设备都具有相同的定义且必须被支持；共后的空间称为设备关联区，由设备制造商根据需要定义。与编程有关的配置空间信息主要有：
+     （1）设备号（Device ID）及销售商号（Vendor
+     ID），配置空间偏移量为00h，用于对各PCI设备的区分和查找。为了保证其唯一性，Vendor
+     ID应当向PCI特别兴趣小组（PCI SIG）申请而得到。
+     （2）PCI基地址（PCI Base Address），配置空间偏移量为10～24h，设备通过设定可读写的高位数值来向操作系统指示所需资源空间的大小。比如，某设备需要64K字节的内存空间，可以将配置空间的某基地址寄存器的高16位设成可读写的，而将低16位置为0（只可读）。操作系统在建立时，先向所有位写1，实际上只有高16位被接收而被置成了1，低16位仍为0.这样操作系统读取该寄存器时，返回值为FFFF0000h，据此操作系统可以断定其需要的空间大小是64K字节，然后分配一段空闲的内存空间并向该寄存器的高16位填写其地址。
+     其它可能与编程有关的配置空间的定义及地址请参阅参考文献[1]。
+     由于PC-AT兼容系统CPU只有内存和I/O两种空间，没有专用的配置空间，PCI协议规定利用特定的I/O空间操作驱动PCI桥路转换成配置空间的操作。目前存在两种转换机制，即配置机制1#和配置机制2#。配置机制2#在新的设计中将不再被采用，新的设计应使用配置机制1#来产生配置空间的物理操作。这种机制使用了两个特定的32位I/O空间，即CF8h和CFCh。这两个空间对应于PCI桥路的两个寄存器，当桥路看到CPU在局部总线对这两个I/O空间进行双字操作时，就将该I/O操作转变为PCI总线的配置操作。寄存器CF8h用于产生配置空间的地址（CONFIG-ADDRESS），寄存器CFCh用于保存配置空间的读写数据（CONFIG-DATA）。
+     配置空间地址寄存器的格式如图1。
+     CF8H（局部总线）：
+     当CPU发出对I/O空间CFCh的操作时，PCI桥路将检查配置空间地址寄存器CF8h的31位。如果为1，就在PCI总线上产生一个相应的配置空间读或写操作，其地址由PCI桥路根据配置空间地址寄存器的内容作如图2所示的转换。
+     CFCh (局部总线)：
+     设备号被PCI桥路译码产生PCI总线地址的高位地址，它们被设计者用作IDSEL信号来区分相应的PCI设备。6位寄存器号用于寻址该PCI设备配置空间62个双字的配置寄存器（256字节）。功能号用于区分多功能设备的某特定功能的配置空间，对常用的单功能设备为000。某中PCI插槽的总线号随系统（主板）的不同稍有区别，大多数PC机为1，工控机可能为2或3。为了找到某设备，应在系统的各个总线号上查找，直到定位。如果在0～5号总线上不能发现该设备，即可认为该设备不存在。
+     理解了上述PCI协议里的配置机制后，就可以直接对CF8h和CFCh两个双字的I/O空间进行操作，查找某个PCI设备并访问其配置空间，从而得到操作系统对该PCI设备的资源分配。
+     2 用I/O命令访问PCI总线配置空间
+     要访问PCI总线设备的配置空间，必须先查找该设备。查找的基本根据是各PCI设备的配置空间里都存有特定的设备号（Device
+     ID）及销售商号（Vendor ID），它们占用配置空间的00h地址。而查找的目的是获得该设备的总线号和设备号。查找的基本过程如下：用I/O命令写配置空间的地址寄存器CF8h，使其最高位为1，总线号及设备为0，功能号及寄存器号为0，即往I/O端口CF8h80000000h；然后用I/O命令读取配置空间的数据寄存器CFCh。如果该寄存器值与该PCI设备的Device
+     ID及Vendor ID不相符，则依次递增设备号/总线号，重复上述操作直到找到该设备为止。如果查完所有的设备号/总线号（1～5）仍不能找到该设备，则应当考虑硬件上的问题。对于多功能设备，只要设备配置寄存器相应的功能号值，其余步骤与单功能设备一样。
+     如查找设备号为9054h，销售商号为10b5的单功能PCI设备，用VC++6.0编写的程序如下：
+     char bus;char device;
+     unsigned int ioa0,iod;
+     int scan( )
+     {
+     bus=0;device=0;
+     for(char i=0;i<5;i++) {
+     for(char j=0;j<32;j++) {
+     bus=i; device=j;
+     ioa0=0x80000000+bus*0x10000
+     +(device*8)*0x100;
+     _outpd(0xcf8,ioa0);
+     iod=_inpd(0xcfc);
+     if (iod0= =0x905410b5) return 0;
+     }
+     }
+     retrn -1
+     }
+     调用子程序scan( )，如果返回值为-1，则没有找到该PCI设备。如果返回值为0，则找到了该PCI设备。该设备的总线号和设备号分别在全局变量bus和device中，利用这两个变量即可轻易对该设备的配置空间进行访问，从而得到分配的资源信息。假设该PCI设备占用了4个资源空间，分别对应于配置空间10h～1ch，其中前两个为I/O空间，后两个为内存空间，若定义其基地址分别为ioaddr1,ioaddr2,memaddr1,memaddr2,相应的程序如下：
+     unsigned short ioaddr1,ioaddr2;
+     unsigned int memaddr1,memaddr2;
+     unsigned int iobase,ioa;
+     void getbaseaddr(char bus,char device);
+     {
+     iobase=0x80000000+bus*0x10000+(device*8)*0x100;
+     ioa=iobase+0x10;/*寻址基地址寄存器0*/
+     _outpd(0xcf8,ioa);
+     ioaddr1=(unsigned
+     short)_inpd(0xcfc)&0xfffc;
+     /*屏蔽低两位和高16位*/
+     ioa=iobase+0x14; /*寻址基地址寄存器1*/
+     _outpd(0xcf8,ioa);
+     ioaddr2=(unsigned
+     short)_inpd(0xcfc)&0xfffc;
+     ioa=iobase+0x18;/*寻址基地寄存器2*/
+     _outpd(0xcf8,ioa);
+     memaddr1=_inpd(0xcfc) & 0xfffffff0;
+     /*屏蔽低4位*/
+     ioa=iobase+0x1c; /*寻址基地址寄存器3*/
+     _outpd(0xcf8,ioa);
+     memaddr2=_inpd(0xcfc) & 0xfffffff0;
+     }
+     对于I/O基地址，最低两位D0、D1固定为01，对地址本身无效，应当被屏蔽。对PC-AT兼容机，I/O有效地址为16位，因此高位也应被屏蔽。对于内存地址，最低位D0固定为0，而D1～D3用于指示该地址的一些物理特性[1]，因此其低4位地址应当被屏蔽。需要指出的是该内存地址是系统的物理地址，在WINDOWS运行于保护模式时，需要经过转换得到相应的线性地址才能对该内存空间进行直接读写。介绍该转换方法的相关文章较为常见，此处不再赘述。
+     上述程序给出了读取配置空间里的基地址的方法。另有相当多PCI设备通过配置空间的设备关联区来设置该设备的工作状态，可轻易地用I/O命令进行相应的设置，无须编写繁杂的驱动程序。在开发PCI视频图像采集卡的过程中，该方法得到了实际应用。
+ 
+如何访问PCI配置空间
+1. 配置事务的产生
+   PCI协议指出，一般情况下，系统都是通过主桥来实现软件产生配置事务的，CF8和CFC端口对应主桥的两个32位寄存器，
+对CF8 和 CFC进行32位读写操作，即可产生PCI配置事务。
+2. PCI两类配置命令：类型0和类型1
+   类型0：用于选择总线上的一个设备
+   命令格式：
+ 31      11 10              8 7               2  1   0
+| reserve  | function number | register number | 0 | 0 | 
+  
+   类型1：用于向下级总线传递配置请求
+   命令格式：
+ 31      24 23         16 15            11 10              8 7               2  1   0
+| reserve  | bus number  | device number  | function number | register number | 0 | 1 |
+3. PCI配置空间访问流程
+   所有PCI主桥和PCI-PCI桥都必须能够产生这两类配置命令，当发生cf8寄存器32位写操作时，根据Bus Number，若为0
+，主桥则产生类型0配置命令，否则产生类型1配置命令。假设产生类型0配置命令，主桥将其（产生的32位命令数据）放在其
+局部总线上，在其局部总线上寻找选择目标设备，找到目标设备将其IDSEL#有效，所有的PCI设备都要相应类型0配置命令，
+在其IDSEL#有效情况下，使其DEVSEL#有效，告诉桥设备自己就是目标设备，再根据寄存器索引来访问具体的配置寄存器；若
+其局部总线上没有目标设备，则产生类型1配置命令并将其（产生的32位命令数）放在其局部总线上，所有的PCI设备（除
+PCI-PCI桥）都要忽略类型1配置命令，只有桥设备响应类型1命令，桥设备译码总线号判断配置事务的目标总线是否在其后，
+若目标总线不在其后，忽略该配置事务，否则，它将声明目标总线就在其后，若总线号不是该桥所挂接的总线，则原封不变
+的向下传递，否则，将类型1配置命令转换成类型0配置命令放在其挂接的总线上选择设备。
+如何在DOS中枚举PCI设备(作者zyl910)
+07-01-07 12:55  发表于：《VC的梦,VC的结》　分类：B)唧唧复唧唧
+http://blog.csdn.net/xqd2006/articles/914267.aspx
+File:      zEnumPCI
+Name:      如何在DOS中枚举PCI设备
+Author:    zyl910
+Blog:      http://blog.csdn.net/zyl910/
+Version:   V1.0
+Updata:    2006-6-30
+下载（注意修改下载后的扩展名）
+
+前言
+~~~~
+　　学计算机这么多年了，PCI这个名词不知道叫了几百遍了。可是，我一直不知道PC机是如何使用PCI总线的、PCI总线设备到底是如何工作的。可是以前我从来没意识到这个问题，只是麻木的、带着虚伪的自信活着。
+　　直到前段时间在书店看到《PCI Express 系统体系结构标准教材》，才突然感受到——我对PCI还一无所知，可现在 PCI Express 的时代都快到来了。我很受震撼，所以毫不犹豫地买下了那本书。
+　　回家打开书一看，发现绝大东西看不太懂。当年学接口技术时，那时只有ISA。ISA很简单，是直接采用电路连线方式将设备与地址总线、各个IRQ及其他控制线路连接起来。而现在PCI-E就很复杂了，而我跳过了PCI，存在着知识断层。
+　　于是我又跑到书店，去查PCI或接口技术上面的书。后来发现，这十年来，接口技术的书的确更新了，但只为PCI写个寥寥几页简介，有的书甚至连引脚定义、配置空间等PCI最核心内容都没有。那样子还不如不说，浪费了纸张。典型只为了教学大纲，而不考虑学生是否能学会、理解。
+　　我费了好大功夫，才找了几本关于PCI的书，但主要是英文的。特别是找到了《PCI Express 系统体系结构标准教材》的英文版，这样就可以对照参考，理解那些英文资料。
+　　看了一段时间之后，发现那些书主要是讲硬件电气特性、通信协议细节，面向的读者是设计PCI设备的工程师。而我的学习目的是如果在PC机上编程控制PCI设备。还好在网络上找了一些关于PCI小程序，填补了知识空白。
+
+正文
+~~~~
+一、PCI配置空间
+　　PCI设备有三个空间——内存地址空间、IO地址空间和配置空间。由于PCI支持即插即用，所以PCI设备不是占用固定的内存地址空间或I/O地址空间，而是可以由操作系统决定其映射的基址。怎么配置呢？这就是配置空间的作用。
+DW |    Byte3    |    Byte2    |    Byte1    |     Byte0     | Addr
+---+---------------------------------------------------------+-----
+ 0 | 　　　　Device ID 　　　　| 　　　　Vendor ID 　　　　　|　00
+---+---------------------------------------------------------+-----
+ 1 | 　　　　　Status　　　　　| 　　　　 Command　　　　　　|　04
+---+---------------------------------------------------------+-----
+ 2 | 　　　　　　　Class Code　　　　　　　　|　Revision ID　|　08
+---+---------------------------------------------------------+-----
+ 3 | 　　BIST　　| Header Type | Latency Timer | Cache Line  |　0C
+---+---------------------------------------------------------+-----
+ 4 | 　　　　　　　　　　Base Address 0　　　　　　　　　　　|　10
+---+---------------------------------------------------------+-----
+ 5 | 　　　　　　　　　　Base Address 1　　　　　　　　　　　|　14
+---+---------------------------------------------------------+-----
+ 6 | 　　　　　　　　　　Base Address 2　　　　　　　　　　　|　18
+---+---------------------------------------------------------+-----
+ 7 | 　　　　　　　　　　Base Address 3　　　　　　　　　　　|　1C
+---+---------------------------------------------------------+-----
+ 8 | 　　　　　　　　　　Base Address 4　　　　　　　　　　　|　20
+---+---------------------------------------------------------+-----
+ 9 | 　　　　　　　　　　Base Address 5　　　　　　　　　　　|　24
+---+---------------------------------------------------------+-----
+10 | 　　　　　　　　　CardBus CIS pointer　　　　　　　　　 |　28
+---+---------------------------------------------------------+-----
+11 |　　Subsystem Device ID　　| 　　Subsystem Vendor ID　　 |　2C
+---+---------------------------------------------------------+-----
+12 | 　　　　　　　Expansion ROM Base Address　　　　　　　　|　30
+---+---------------------------------------------------------+-----
+13 | 　　　　　　　Reserved(Capability List)　　　　　　　　 |　34
+---+---------------------------------------------------------+-----
+14 | 　　　　　　　　　　　Reserved　　　　　　　　　　　　　|　38
+---+---------------------------------------------------------+-----
+15 | 　Max_Lat　 | 　Min_Gnt　 | 　IRQ Pin　 | 　IRQ Line　　|　3C
+-------------------------------------------------------------------
+　　配置空间中最重要的有：
+Vendor ID：厂商ID。知名的设备厂商的ID。FFFFh是一个非法厂商ID，可它来判断PCI设备是否存在。
+Device ID：设备ID。某厂商生产的设备的ID。操作系统就是凭着 Vendor ID和Device ID 找到对应驱动程序的。
+Class Code：类代码。共三字节，分别是 类代码、子类代码、编程接口。类代码不仅用于区分设备类型，还是编程接口的规范，这就是为什么会有通用驱动程序。
+IRQ Line：IRQ编号。PC机以前是靠两片8259芯片来管理16个硬件中断。现在为了支持对称多处理器，有了APIC（高级可编程中断控制器），它支持管理24个中断。
+IRQ Pin：中断引脚。PCI有4个中断引脚，该寄存器表明该设备连接的是哪个引脚。
+　　关于配置空间的详细说明请参考《PCI Local Bus Specification》的第六章。
+二、如何访问配置空间
+　　如何访问配置空间呢？可通过访问CF8h、CFCh端口来实现（《PCI Local Bus Specification》的3.2.2.3.2）。
+CF8h: CONFIG_ADDRESS。PCI配置空间地址端口。
+CFCh: CONFIG_DATA。PCI配置空间数据端口。
+　　CONFIG_ADDRESS寄存器格式：
+　31　位：Enabled位。
+23:16 位：总线编号。
+15:11 位：设备编号。
+10: 8 位：功能编号。
+ 7: 2 位：配置空间寄存器编号。
+ 1: 0 位：恒为“00”。这是因为CF8h、CFCh端口是32位端口。
+
+　　现在有个难题——CF8h、CFCh端口是32位端口，可像TurboC之类的16位C语言编译器都不支持32位端口访问。怎么办？我们可以使用__emit__在程序中插入机器码。每次都__emit__一下肯定很麻烦，所以我们应该将它封装成函数。代码如下（注意66h是32位指令前缀）：
+
+/* 读32位端口 */DWORD	inpd(int	portid) {	DWORD	dwRet;	asm mov dx, portid;	asm lea bx, dwRet;	__emit__(		0x66,0x50,	// push EAX		0x66,0xED,	// in EAX,DX		0x66,0x89,0x07,	// mov [BX],EAX		0x66,0x58);	// pop EAX	return dwRet;}/* 写32位端口 */void	outpd(int	portid, DWORD	dwVal){	asm mov dx, portid;	asm lea bx, dwVal;	__emit__(		0x66,0x50,	// push EAX		0x66,0x8B,0x07,	// mov EAX,[BX]		0x66,0xEF,	// out DX,EAX		0x66,0x58);	// pop EAX	return;}
+
+
+三、枚举PCI设备
+　　怎么枚举PCI设备呢？我们可以尝试所有的 bus/dev/func 组合，然后判断得到的厂商ID是否为FFFFh。
+　　下面这个程序就是使用该方法枚举PCI设备的。同时为了便于分析数据，将每个设备的配置空间信息保存到文件，这样可以慢慢分析。
+ 
+
+/*
+File:      epcip.c
+Name:      访问CF8h、CFCh端口来枚举PCI设备
+Author:    zyl910
+Blog:      http://blog.csdn.net/zyl910/
+Version:   V1.0
+Updata:    2006-6-30
+
+*/
+
+#include <stdio.h>
+#include <conio.h>
+
+
+typedef unsigned char BYTE;
+typedef unsigned int WORD;
+typedef unsigned long DWORD;
+
+
+/* PCI设备索引。bus/dev/func 共16位，为了方便处理可放在一个WORD中 */
+#define PDI_BUS_SHIFT   8
+#define PDI_BUS_SIZE    8
+#define PDI_BUS_MAX     0xFF
+#define PDI_BUS_MASK    0xFF00
+
+#define PDI_DEVICE_SHIFT   3
+#define PDI_DEVICE_SIZE    5
+#define PDI_DEVICE_MAX     0x1F
+#define PDI_DEVICE_MASK    0x00F8
+
+#define PDI_FUNCTION_SHIFT   0
+#define PDI_FUNCTION_SIZE    3
+#define PDI_FUNCTION_MAX     0x7
+#define PDI_FUNCTION_MASK    0x0007
+
+#define MK_PDI(bus,dev,func) (WORD)((bus&PDI_BUS_MAX)<<PDI_BUS_SHIFT | (dev&PDI_DEVICE_MAX)<<PDI_DEVICE_SHIFT | (func&PDI_FUNCTION_MAX) )
+
+
+/* PCI配置空间寄存器 */
+#define PCI_CONFIG_ADDRESS      0xCF8
+#define PCI_CONFIG_DATA         0xCFC
+
+
+/* 填充PCI_CONFIG_ADDRESS */
+#define MK_PCICFGADDR(bus,dev,func) (DWORD)(0x80000000L | (DWORD)MK_PDI(bus,dev,func)<<8)
+
+
+/* 读32位端口 */
+DWORD inpd(int portid) 
+{
+ DWORD dwRet;
+ asm mov dx, portid;
+ asm lea bx, dwRet;
+ __emit__(
+  0x66,0x50, // push EAX
+  0x66,0xED, // in EAX,DX
+  0x66,0x89,0x07, // mov [BX],EAX
+  0x66,0x58); // pop EAX
+ return dwRet;
+}
+
+/* 写32位端口 */
+void outpd(int portid, DWORD dwVal)
+{
+ asm mov dx, portid;
+ asm lea bx, dwVal;
+ __emit__(
+  0x66,0x50, // push EAX
+  0x66,0x8B,0x07, // mov EAX,[BX]
+  0x66,0xEF, // out DX,EAX
+  0x66,0x58); // pop EAX
+ return;
+}
+
+
+int main(void)
+{
+ int bus, dev, func;
+ int i;
+ DWORD dwAddr;
+ DWORD dwData;
+ FILE* hF;
+ char szFile[0x10];
+
+ printf("\n");
+ printf("Bus#\tDevice#\tFunc#\tVendor\tDevice\tClass\tIRQ\tIntPin\n");
+
+ /* 枚举PCI设备 */
+ for(bus = 0; bus <= PDI_BUS_MAX; ++bus) {
+  for(dev = 0; dev <= PDI_DEVICE_MAX; ++dev) {
+   for(func = 0; func <= PDI_FUNCTION_MAX; ++func) {
+    /* 计算地址 */
+    dwAddr = MK_PCICFGADDR(bus, dev, func);
+    
+    /* 获取厂商ID */
+    outpd(PCI_CONFIG_ADDRESS, dwAddr);
+    dwData = inpd(PCI_CONFIG_DATA);
+
+    /* 判断设备是否存在。FFFFh是非法厂商ID */
+    if ((WORD)dwData != 0xFFFF) {
+     /* bus/dev/func */
+     printf("%2.2X\t%2.2X\t%1X\t", bus, dev, func);
+
+     /* Vendor/Device */
+     printf("%4.4X\t%4.4X\t", (WORD)dwData, dwData>>16);
+
+     /* Class Code */
+     outpd(PCI_CONFIG_ADDRESS, dwAddr | 0x8);
+     dwData = inpd(PCI_CONFIG_DATA);
+     printf("%6.6lX\t", dwData>>8);
+
+     /* IRQ/intPin */
+     outpd(PCI_CONFIG_ADDRESS, dwAddr | 0x3C);
+     dwData = inpd(PCI_CONFIG_DATA);
+     printf("%d\t", (BYTE)dwData);
+     printf("%d", (BYTE)(dwData>>8));
+
+     printf("\n");
+
+     /* 写文件 */
+     sprintf(szFile, "PCI%2.2X%2.2X%X.bin", bus, dev, func);
+     hF = fopen(szFile, "wb");
+     if (hF != NULL) {
+      /* 256字节的PCI配置空间 */
+      for (i = 0; i < 0x100; i += 4) {
+       /* Read */
+       outpd(PCI_CONFIG_ADDRESS, dwAddr | i);
+       dwData = inpd(PCI_CONFIG_DATA);
+
+       /* Write */
+       fwrite(&dwData, sizeof(dwData), 1, hF);
+      }
+      fclose(hF);
+     }
+    }
+   }
+  }
+ }
+
+ return 0;
+}
+
+
+　　对于我的电脑的枚举结果是：
+ 
+Bus# 	Device# 	Func# 	Vendor 	Device 	Class 	IRQ 	IntPin 	类代码的说明
+0 	0 	0 	1106 	3189 	60000 	0 	0 	Host bridge
+0 	1 	0 	1106 	B168 	60400 	0 	0 	PCI-to-PCI bridge（实际上是PCI/AGP桥，AGP可看成一种特殊的PCI设备）
+0 	9 	0 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	9 	1 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	9 	2 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	9 	3 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	9 	4 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	9 	5 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	9 	6 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	9 	7 	14F1 	2013 	78000 	11 	1 	Simple communication controllers
+0 	10 	0 	1106 	3038 	0C0300 	11 	1 	USB controller: Universal Host Controller Specification
+0 	10 	1 	1106 	3038 	0C0300 	5 	2 	USB controller: Universal Host Controller Specification
+0 	10 	2 	1106 	3038 	0C0300 	5 	3 	USB controller: Universal Host Controller Specification
+0 	10 	3 	1106 	3104 	0C0320 	11 	4 	USB2 controller: Intel Enhanced Host Controller Interface
+0 	11 	0 	1106 	3177 	60100 	0 	0 	ISA bridge
+0 	11 	1 	1106 	571 	01018A 	255 	1 	IDE controller
+0 	11 	5 	1106 	3059 	40100 	5 	3 	Audio device
+0 	12 	0 	1106 	3065 	20000 	11 	1 	Ethernet controller
+1 	0 	0 	10DE 	110 	30000 	11 	1 	VGA-compatible controller
+
+　　总线编号为0的都是主板上固有的芯片（主要是南桥），非主板设备的典型是——显卡。
+　　WindowsXP的设备管理器中也可以看到PCI信息。启动“设备管理器”，最好将查看方式设为“依连接查看设备(V)”。找到我的显卡，双击查看属性。切换到“详细信息”页，定位组合框为“硬件 Id”。可看到其中一行为“PCI/VEN_10DE&DEV_0110&CC_030000”，表示厂商ID为“10DE”、设备ID为“0110”、类代码为“030000”，与程序得到的结果一致。
+[Display.gif]
+
+四、PCI BIOS
+　　直接访问CF8h、CFCh端口的方法太底层。为了提高兼容性，我们可以使用PCI BIOS。PCI BIOS的中断号是1Ah，AH为B1，AL为功能号。其功能列表为：
+01h: INSTALLATION CHECK
+02h: FIND PCI DEVICE
+03h: FIND PCI CLASS CODE
+06h: PCI BUS-SPECIFIC OPERATIONS
+08h: READ CONFIGURATION BYTE
+09h: READ CONFIGURATION WORD
+0Ah: READ CONFIGURATION DWORD
+0Bh: WRITE CONFIGURATION BYTE
+0Ch: WRITE CONFIGURATION WORD
+0Dh: WRITE CONFIGURATION DWORD
+0Eh: GET IRQ ROUTING INFORMATION
+0Fh: SET PCI IRQ
+81h: INSTALLATION CHECK (32-bit)
+82h: FIND PCI DEVICE (32-bit)
+83h: FIND PCI CLASS CODE (32-bit)
+86h: PCI BUS-SPECIFIC OPERATIONS (32-bit)
+88h: READ CONFIGURATION BYTE (32-bit)
+89h: READ CONFIGURATION WORD (32-bit)
+8Ah: READ CONFIGURATION DWORD (32-bit)
+8Bh: WRITE CONFIGURATION BYTE (32-bit)
+8Ch: WRITE CONFIGURATION WORD (32-bit)
+8Dh: WRITE CONFIGURATION DWORD (32-bit)
+8Eh: GET IRQ ROUTING INFORMATION (32-bit)
+8Fh: SET PCI IRQ (32-bit)
+
+　　由于像Turbo C这样的16位编译器访问32位寄存器很麻烦，所以建议使用WORD方式来访问PCI配置空间。以下是09h号功能的详细说明（摘自Ralf Brown's Interrupt List）：
+--------X-1AB109-----------------------------
+INT 1A - PCI BIOS v2.0c+ - READ CONFIGURATION WORD
+ AX = B109h
+ BH = bus number
+ BL = device/function number (bits 7-3 device, bits 2-0 function)
+ DI = register number (0000h-00FFh, must be multiple of 2) (see #00878)
+Return: CF clear if successful
+     CX = word read
+ CF set on error
+ AH = status (00h,87h) (see #00729)
+ EAX, EBX, ECX, and EDX may be modified
+ all other flags (except IF) may be modified
+Notes: this function may require up to 1024 byte of stack; it will not enable
+   interrupts if they were disabled before making the call
+ the meanings of BL and BH on entry were exchanged between the initial
+   drafts of the specification and final implementation
+BUG: the Award BIOS 4.51PG (dated 05/24/96) incorrectly returns FFFFh for
+   register 00h if the PCI function number is nonzero
+SeeAlso: AX=B108h,AX=B10Ah,AX=B189h,INT 2F/AX=1684h/BX=304Ch
+　　代码如下：
+ 
+/*
+File:      epcib.c
+Name:      使用PCI BIOS来枚举PCI设备
+Author:    zyl910
+Blog:      http://blog.csdn.net/zyl910/
+Version:   V1.0
+Updata:    2006-6-30
+*/
+#include <stdio.h>
+#include <conio.h>
+#include <dos.h>
+
+typedef unsigned char BYTE;
+typedef unsigned int WORD;
+typedef unsigned long DWORD;
+
+/* PCI设备索引。bus/dev/func 共16位，为了方便处理可放在一个WORD中 */
+#define PDI_BUS_SHIFT   8
+#define PDI_BUS_SIZE    8
+#define PDI_BUS_MAX     0xFF
+#define PDI_BUS_MASK    0xFF00
+#define PDI_DEVICE_SHIFT   3
+#define PDI_DEVICE_SIZE    5
+#define PDI_DEVICE_MAX     0x1F
+#define PDI_DEVICE_MASK    0x00F8
+#define PDI_FUNCTION_SHIFT   0
+#define PDI_FUNCTION_SIZE    3
+#define PDI_FUNCTION_MAX     0x7
+#define PDI_FUNCTION_MASK    0x0007
+#define MK_PDI(bus,dev,func) (WORD)((bus&PDI_BUS_MAX)<<PDI_BUS_SHIFT | (dev&PDI_DEVICE_MAX)<<PDI_DEVICE_SHIFT | (func&PDI_FUNCTION_MAX) )
+int main(void)
+{
+ int bus, dev, func;
+ int i;
+ union REGS regs;
+ WORD wAddr;
+ FILE* hF;
+ char szFile[0x10];
+ printf("\n");
+ printf("Bus#\tDevice#\tFunc#\tVendor\tDevice\tClass\tIRQ\tIntPin\n");
+ /* 枚举PCI设备 */
+ for(bus = 0; bus <= PDI_BUS_MAX; ++bus) {
+  for(dev = 0; dev <= PDI_DEVICE_MAX; ++dev) {
+   for(func = 0; func <= PDI_FUNCTION_MAX; ++func) {
+    /* 计算地址 */
+    wAddr = MK_PDI(bus, dev, func);
+    
+    /* 获取厂商ID */
+    regs.x.ax = 0xB109; // PCI BIOS v2.0c+ - READ CONFIGURATION WORD
+    regs.x.bx = wAddr;
+    regs.x.di = 0; // Vendor ID
+    regs.x.cx = 0xFFFF; // 非法的Vendor ID
+    int86(0x1A, &regs, &regs);
+    /* 判断设备是否存在。FFFFh是非法厂商ID */
+    if (regs.x.cx != 0xFFFF) {
+     /* bus/dev/func */
+     printf("%2.2X\t%2.2X\t%1X\t", bus, dev, func);
+     /* Vendor */
+     printf("%4.4X\t", regs.x.cx);
+     /* Device */
+     regs.x.ax = 0xB109; // PCI BIOS v2.0c+ - READ CONFIGURATION WORD
+     regs.x.bx = wAddr;
+     regs.x.di = 2; // Device ID
+     int86(0x1A, &regs, &regs);
+     printf("%4.4X\t", regs.x.cx);
+     /* Class Code */
+     regs.x.ax = 0xB109; // PCI BIOS v2.0c+ - READ CONFIGURATION WORD
+     regs.x.bx = wAddr;
+     regs.x.di = 0xA; // Class/SubClass
+     int86(0x1A, &regs, &regs);
+     printf("%4.4X\t", regs.x.cx);
+     /* IRQ/intPin */
+     regs.x.ax = 0xB109; // PCI BIOS v2.0c+ - READ CONFIGURATION WORD
+     regs.x.bx = wAddr;
+     regs.x.di = 0x3C; // IRQ/IntPin
+     int86(0x1A, &regs, &regs);
+     printf("%d\t", (BYTE)regs.x.cx);
+     printf("%d", (BYTE)(regs.x.cx>>8));
+     printf("\n");
+     /* 写文件 */
+     sprintf(szFile, "PCI%2.2X%2.2X%X.bin", bus, dev, func);
+     hF = fopen(szFile, "wb");
+     if (hF != NULL) {
+      /* 256字节的PCI配置空间 */
+      for (i = 0; i < 0x100; i += 2) {
+       /* Read */
+       regs.x.ax = 0xB109; // PCI BIOS v2.0c+ - READ CONFIGURATION WORD
+       regs.x.bx = wAddr;
+       regs.x.di = i;
+       int86(0x1A, &regs, &regs);
+       /* Write */
+       fwrite(&regs.x.cx, 2, 1, hF);
+      }
+      fclose(hF);
+     }
+    }
+   }
+  }
+ }
+ return 0;
+}
+
+五、保护模式下的PCI BIOS
+　　刚才所说的1Ah中断是实模式下的BIOS，保护模式下怎么办？
+　　在BIOS内存区（E0000h ~ FFFFFh）可以找到PCI BIOS保护模式入口。其格式为：
+0h(dw): “_32_”标志
+4h(dw): PCI BIOS保护模式入口
+8h(by): Rev Level
+9h(by): 长度
+Ah(by): 校检和
+Bh ~ Fh: 保留
+
+　　关于保护模式下PCI BIOS的具体用法可参考《PCI Bus Demystified》的第七章。
+　　由于切换到保护模式的代码比较复杂，所以就没有编程测试了。
+六、总结
+　　本文章中的代码能在纯DOS下或Windows9X中正常运行，但是不能在WindowsXP等NT平台下运行：对于访问端口方式，厂商ID均返回FFFFh；对于调用 PCI BIOS 方式，貌似根本没有实现该功能。这可能与WindowsXP设计有关——不再使用V86方式执行DOS程序，而是专门做了个DOS虚拟机。而且还有许多这样的兼容性问题，比如VBE。我都有点怀疑这不是微软故意这么做，让我们不能接触底层，只能使用高层的.Net，这样不可能对像微软这样掌握核心技术的公司造成威胁。
+
+参考文献
+~~~~~~~~
+[1] PCI-SIG. PCI Local Bus Specification Revision 3.0. 2002.8.12
+[2] Doug Abbott. PCI Bus Demystified. LLH Technology Publishing, 2000
+[3] 李贵山、戚德虎. PCI 局部总线开发者指南. 西安电子科技大学出版社, 1997.1
+[4] MindShare, Inc , Ravi Budruk, Don Anderson, Tom Shanley. PCI Express System Architecture. Addison Wesley, 2003.9.4
+[5] MindShare公司. 田玉敏,王崧,张波 译. PCI Express 系统体系结构标准教材. 电子工业出版社, 2005.11
+[6] Ralf Brown's Interrupt List. http://www.cs.cmu.edu/~ralf/
+posted @ 2012-05-10 22:47 Let it be! 阅读(8719) 评论(0) 编辑 收藏
+搜索
+ 
+Copyright ©2016 Let it be!
+About
+

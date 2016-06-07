@@ -8,6 +8,7 @@ all:
 	make -C fs/
 	make -C fs/cell/
 	make -C mm/
+	make -C drivers/pci/
 	make -f makefile2
 
 clean:
@@ -19,6 +20,8 @@ clean:
 	rm  drivers/block/.*.swp -f
 	rm drives/ide/*.o -f
 	rm drives/ide/.*.swp -f
+	rm drivers/pci/*.o -f
+	rm drivers/pci/.*.swp -f
 	rm fs/*.o -f
 	rm fs/.*.swp -f
 	rm fs/cell/*.o -f

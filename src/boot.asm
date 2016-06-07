@@ -9,15 +9,17 @@ DAP_SECTOR_COUNT equ  64
 DAP_SECTOR_LIMIT equ 254 ;知道了，这应该是IDE端口的限制，一次最多255个扇区
 DAP_MEM_COUNT equ (DAP_SECTOR_COUNT * 512)
 org 0x7c00
-
+addr_mbr_loaded equ (_base_kernel_loaded - 512 * 3)
 [bits 16]
 ;用int 13h，要担心硬盘的磁头号大于1吗？
 mbrHead:
 	mov ax, 0xb800
 	mov gs, ax
 	read_floppy_side_o_sector_total_destsa_destea 0x80,0,0,2,(_bootbin_occupy_sectors-1),0,0x7e00	;'-1' because bios has alreay load the first sector
-	read_floppy_side_o_sector_total_destsa_destea 0x80, 0,0,1,63,(_base_kernel_loaded - 512 * 3) >> 4, 0
-	read_floppy_side_o_sector_total_destsa_destea 0x80, 1,0,1,63,(_base_kernel_loaded - 512 * 3) >> 4, 63*512
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 0,0,1,63,(addr_mbr_loaded) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 1,0,1,63,(addr_mbr_loaded + 512 * 63) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 2,0,1,63,(addr_mbr_loaded + 512 * 63 * 2) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 3,0,1,63,(addr_mbr_loaded + 512 * 63 * 3) >> 4, 0
     jmp entrance
 
 ;[section .gdt]

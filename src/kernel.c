@@ -11,6 +11,7 @@
 #include<linux/blkdev.h>
 #include<linux/ide.h>
 #include<linux/slab.h>
+#include<linux/pci.h>
 char testbuf[512*200];
 char *bigbuf;
 int avoid_compiler_warning;
@@ -119,6 +120,8 @@ void kernel_c(){
 			);	
 
 /*	oprintf("usr_func_addr:%x\n", usr_func);*/
+	pci_init();
+	spin("pci spin");
 	mm_init();
 	kmem_cache_init();	
 	//kmem_cache_test();
