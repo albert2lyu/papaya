@@ -31,7 +31,6 @@ clean:
 	rm ../cmd/.*.swp -f
 
 git:
-	mv book* ~/Documents/tmp_for_git/
 	mv ../cmd/400m.img ~/Documents/tmp_for_git/
 	mv ../cmd/cell.img ~/Documents/tmp_for_git/
 	mv ../cmd/dimg ~/Documents/tmp_for_git/
@@ -41,6 +40,5 @@ git:
 	rm ../cmd/*.o
 
 tig:
-	mv ~/Documents/tmp_for_git/book* ./
 	mv ~/Documents/tmp_for_git/* ../cmd/
 
