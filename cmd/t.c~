@@ -1,6 +1,0 @@
-how do you deal with PCI-VENDOR-DEVICE text in your kernel?
-
-  during the system initialization, we usually need to scan the pci bus and print all devices to screen with format like:
-  Realtek 8139d Ethernet adapter
-  Thus, we need a pci_vendor_device text table to record informations of all PCI device all over the world. I download such a C header file from internet:
-  

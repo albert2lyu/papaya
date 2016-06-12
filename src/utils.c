@@ -165,6 +165,21 @@ void memtest(void *start, int len){
 
 
 
+#define LPJ 0x242000
+#define HZ 100
+static int x_udelay;
+void udelay(unsigned long usecs)
+{
+	for(int i = 0; i < usecs; i++){
+		for(unsigned j = 0; j < 0x10000; j++){
+			__asm__ __volatile__("add %1, %1\n\t"
+								 "movl %1, %0\n\t"
+								 : "=m"(x_udelay)
+								 :"r"(123) );
+		}
+	}
+}
+
 
 
 

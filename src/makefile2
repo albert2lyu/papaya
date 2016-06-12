@@ -19,7 +19,7 @@ co= kernel.o   utils.o proc.o  disp.o video_drv.o schedule.o\
 ku_utils.o mm.o func_table.o pmm.o kbd_drv.o mmzone.o irq.o time.o i8259.o\
 ramdisk.o elf.o fork.o 
  
-kernelrelyo=$(asmo)  $(co)	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o ../src/fs_cell.o ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o
+kernelrelyo=$(asmo)  $(co)	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o ../src/fs_cell.o ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o
 include $(co:.o=.d)
 
 boot.bin:boot.asm

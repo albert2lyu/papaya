@@ -63,7 +63,11 @@ typedef struct{
 	u32 eip,cs,eflags,esp,ss;	/**auto pushed by hardware*/
 }stack_frame;
 
-
+#define EFLAGS_STACK_LEN 7
+struct eflags_stack{
+				int base[EFLAGS_STACK_LEN + 1];	
+				int esp;	
+};
 #define PCB_SIZE 0x2000
 /**process control block. all information and property of a process.
  **/
@@ -92,6 +96,8 @@ struct pcb{
 			struct fs_struct *fs;
 			struct files_struct *files;
 			struct rlimit rlimits[RLIMIT_MAX];
+			struct eflags_stack fstack;
+			u32 magic;		/*for debug*/
 			u32 __task_struct_end;
 		};
 		char padden[PCB_SIZE-sizeof(stack_frame)];
@@ -142,6 +148,43 @@ struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name,int rin
 void obuffer_init(OBUFFER* pt_obuffer);
 void obuffer_push(OBUFFER* pt_obuffer,char c);
 unsigned char obuffer_shift(OBUFFER* pt_obuffer);
+
+/* 暂时让fstack附属于进程，来解决因进程切换引起的push/pop混乱。但应该还是会有特殊情形，
+   会使的push/pop混乱 小心
+   另外，下面的函数只能在进程里调用
+   */
+#define __fstack (current->fstack)
+static inline void cli_push(void){
+	__asm__ __volatile__("pushfl\n\t"
+						 "cli\n\t"
+						 "pop  %0\n\t"
+						 :"=r"(__fstack.base[++__fstack.esp])
+						 );
+	if(__fstack.esp == EFLAGS_STACK_LEN) spin("eflags stack overflow !");
+}
+
+static inline void sti_push(void){
+	int esp = __fstack.esp;
+	__asm__ __volatile__("pushfl\n\t"
+						 "sti\n\t"
+						 "pop  %0\n\t"
+						 :"=r"(__fstack.base[++esp])
+						 );
+	if(esp == EFLAGS_STACK_LEN) spin("eflags stack overflow !");
+	__fstack.esp = esp;
+}
+
+static inline void flagi_pop(void){
+	if(__fstack.esp == -1) spin("eflags stack bottom boundary!");
+	__asm__ __volatile__("pushfl\n\t"
+						 "andl $0xfffffdff, (%%esp)\n\t"
+						 "or %0, (%%esp)\n\t"
+						 "popfl\n\t"
+						 :
+						 :"r"(__fstack.base[__fstack.esp--] & (1<<9) )
+						 );
+	
+}
 #endif
 
 

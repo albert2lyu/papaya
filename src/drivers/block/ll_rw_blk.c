@@ -2,6 +2,7 @@
 //TODO queue atomic operation
 #include <linux/blkdev.h>
 #include <schedule.h>
+#include<utils.h>
 
 static struct request rq_arr[MAX_REQUEST];
 static struct queue_getter queue_getters[MAX_BLKDEV];
@@ -41,7 +42,7 @@ static struct request *get_free_request(void){
  * their 'make_request_fn' points here
  */
 void generic_mk_request(u16 dev_id, int rw, unsigned start, int count, char *buf){
-	__asm__ ("cli");
+	cli_push();
 	int major = MAJOR(dev_id);
 	struct request * rq = get_free_request();
 	rq->dev_id = dev_id;
@@ -60,7 +61,7 @@ void generic_mk_request(u16 dev_id, int rw, unsigned start, int count, char *buf
 		blk_devs[major].do_request(dev_id);
 	}
 	*/
-	__asm__ ("sti");
+	flagi_pop();
 }
 
 
@@ -77,7 +78,7 @@ void blkdev_layer_init(void){
 //not correctly, we can't take partation as device, now.
 int ll_rw_block(u16 dev_id, int rw, unsigned start, int count, char *buf){
 //	struct request_queue *queue = 	blk_get_queue(dev_id);
-	oprintf("\nmake request:%u, %u, %u, %u, %x\n", dev_id, rw, start, count, buf);
+	//oprintf("\nmake request:%u, %u, %u, %u, %x\n", dev_id, rw, start, count, buf);
 	generic_mk_request(dev_id, rw, start, count, buf);
 	return 0;
 }
@@ -90,8 +91,18 @@ int ll_rw_block2(u16 dev_id, int rw, unsigned start, int count, char *buf){
 	while(curr <= start + count - 1){
 		int left = count - (curr - start);
 		//1 block = 2 sectors
+		/*TODO need more elegant code. 
+		 * the following is critical area.
+		 * we must ensure the disk IRQ won't issue before 'kp_sleep'.
+		 * real machine can tolerate here without 'cli', but QEMU can not.
+		 * In Qemu, the disk IRQ occurs before 'kp_sleep' done', so bugs occur.
+		 */
+		cli_push();
 		ll_rw_block(dev_id, rw, curr, left < 256/2 ? left:128, buf);
 		kp_sleep(0, 0);
+		flagi_pop();
+		/*-----critical area, end----- TODO use irq push pop */
+
 		curr +=  128;
 		buf+= 512;
 	}

@@ -9,6 +9,7 @@ all:
 	make -C fs/cell/
 	make -C mm/
 	make -C drivers/pci/
+	make -C drivers/net/
 	make -f makefile2
 
 clean:
@@ -22,13 +23,18 @@ clean:
 	rm drives/ide/.*.swp -f
 	rm drivers/pci/*.o -f
 	rm drivers/pci/.*.swp -f
+	rm drivers/net/*.o -f
+	rm drivers/net/.*.swp -f
 	rm fs/*.o -f
 	rm fs/.*.swp -f
 	rm fs/cell/*.o -f
 	rm fs/cell/.*.swp -f
 	rm mm/*.o -f
 	rm mm/.*.swp -f
+	rm arch/x86/mm/*.o -f
+	rm arch/x86/mm/.*.swp -f
 	rm ../cmd/.*.swp -f
+	rm ../cmd/*.o
 
 git:
 	mv ../cmd/400m.img ~/Documents/tmp_for_git/
@@ -38,6 +44,7 @@ git:
 	mv ../cmd/cell ~/Documents/tmp_for_git/
 	mv ../cmd/bochsout.txt ~/Documents/tmp_for_git/
 	rm ../cmd/*.o
+	rm ../cmd/*~
 
 tig:
 	mv ~/Documents/tmp_for_git/* ../cmd/

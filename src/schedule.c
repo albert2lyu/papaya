@@ -72,6 +72,7 @@ void do_timer(void){
 
 /**schedule 流程之后的代码都不能用Ｃ了，要用汇编。因为schedule之后的堆栈已经
  * 切换到pregs指示的stack_frame，尽量不要再操作堆栈了.
+ * 2, 考虑eflags在切换前后是否需要保持保存，恢复。以及能否保存，恢复。
  */
 void schedule(void){
 /*	oprintf("begin schedule\n");*/
@@ -127,8 +128,11 @@ void schedule(void){
 	 * 2, linux没有保存ebx，按理说，ebx属于callee-saved，应该保存。----应该是
 	 * ebx从这一步就开始存储current指针了。
 	 * 3, 为什么要保护ebp指针呢。
+	 * 4, 参考2.6.26 保存eflags。 2.4里是没有保存的。
 	 */
-	__asm__ __volatile__("pushl %%esi\n\t"
+	__asm__ __volatile__(
+						"pushfl\n\t"
+						"pushl %%esi\n\t"
 						"pushl %%edi\n\t"
 						"pushl %%ebp\n\t"
 						"movl %%esp, %0\n\t"
@@ -146,6 +150,7 @@ void schedule(void){
 						"popl %%ebp\n\t"
 						"popl %%edi\n\t"
 						"popl %%esi\n\t"
+						"popfl\n\t"
 						:"=m"(current->thread.esp),"=m"(current->thread.eip)
 						:"m"(next->thread.esp), "m"(next->thread.eip),"b"(current)
 						);

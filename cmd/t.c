@@ -1,12 +1,46 @@
-how do you deal with PCI-VENDOR-DEVICE text in your kernel?
+static inline unsigned readb(void *addr){
+	unsigned value;
+	__asm__ __volatile__("xor %0, %0\n\t"
+						 "movb (%%ebx), %b0\n\t"
+						 :"=r"(value)
+						 :"b"(addr)
+						 );
+	return value;
+}
 
-  during the system initialization, we usually need to scan the pci bus and print all devices to screen with format like:
-  Realtek 8139d Ethernet adapter
-  Thus, we need a pci_vendor_device text table to record informations of all PCI device all over the world. I download such a C header file from internet:
-  http://pcidatabase.com/reports.php?type=csv
-  It's more than 9000 lines, and will increase the size of my kernel image by at least 128K. I feel a little uncomfortable that my little kernel(no more than 64K)  will have to adopt such a large size text information . 
- 
-  How do you handle it in your kernel? seperate it into a disk file and read it during initialization? I considered that, but that means i have to produce ways of accessing filesystem in a very early phase of initialization. So i give up it.
-  But should we seperate it from the kernel  image? What is a kernel image in your eyes? only consisting of the core code rather than such messy text information?
-  Now, i still encode it into my kernel image, because i have got used to encod everything into it. I know it's where i am uncomfortable, then i feel better ^.^ )
-  
+#pragma pack (push)
+#pragma pack (1)
+struct pci_config_addr{
+	int always:2 ;		/* 0 ~ 1 */
+	unsigned reg: 6;	/* 2 ~ 7 */
+	union{
+		struct{
+			unsigned func: 3;	/* 8 ~ 10 */
+			unsigned dev: 5;	/* 11 ~ 15 */
+			unsigned bus: 8;	/* 16 ~ 23 */
+		};
+		unsigned short value;
+	};
+	unsigned reserved:	7;
+	int enabled:	1;
+};
+
+#pragma pack (pop)
+struct pci_config_addr2{
+	int always:2 ;		/* 0 ~ 1 */
+	unsigned reg: 6;	/* 2 ~ 7 */
+	union{
+		struct{
+			unsigned func: 3;	/* 8 ~ 10 */
+			unsigned dev: 5;	/* 11 ~ 15 */
+			unsigned bus: 8;	/* 16 ~ 23 */
+		};
+		unsigned short value;
+	};
+	unsigned reserved:	7;
+	int enabled:	1;
+};
+int main(void ){
+	int x = 0x67686970;
+	int a = 1 + 1;
+}

@@ -120,10 +120,11 @@ void kernel_c(){
 			);	
 
 /*	oprintf("usr_func_addr:%x\n", usr_func);*/
-	pci_init();
-	spin("pci spin");
 	mm_init();
 	kmem_cache_init();	
+	pci_init();
+	rtl8139_test();
+	//spin("pci spin");
 	//kmem_cache_test();
 	proc_init();
 	init_ISA_irqs();

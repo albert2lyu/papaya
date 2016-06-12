@@ -38,13 +38,24 @@ typedef struct pci_class_entry
 	char *		ProgDesc ;
 }  PCI_CLASSCODETABLE, *PPCI_CLASSCODETABLE ;
 
-
-
+/* 保证class code是32bit的结构体, 有效位在8~31位 */
+#pragma pack (push)
+#pragma pack (1)
 struct pci_classcode{
-	u8 base;
-	u8 sub;
-	u8 prog;
+	union{
+		struct {
+			u8 revision;
+			u8 prog;
+			u8 sub;
+			u8 base;
+		};
+		struct {
+			unsigned _revision: 8;
+			unsigned value: 24;
+		};
+	};
 };
+#pragma pack (pop)
 
 struct pci_info_entry * PciTable_Get(unsigned short vendor, unsigned short device);
 struct pci_vendor_entry *PciVendorTbl_Get(u16 vendor);

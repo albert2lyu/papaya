@@ -34,4 +34,7 @@ struct irqaction{
 };
 
 irq_desc_t irq_desc[NR_IRQS];
+
+
+
 #endif

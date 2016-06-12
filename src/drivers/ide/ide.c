@@ -61,7 +61,7 @@ static void read_intr(struct ide_hwif *hwif){
 	}
 	//如果是多扇区写，就是通过这个if和return来支持的。
 	struct request *cur_rq = hwif->cur_rq;
-	oprintf(" %u => %x @%s", cur_rq->count, cur_rq->buf, cur_rq->asker->p_name);
+	//oprintf(" %u => %x @%s", cur_rq->count, cur_rq->buf, cur_rq->asker->p_name);
 	port_read(hwif->io_ports[SLOT_REG_DATA], cur_rq->buf, 512);	
 	if(--cur_rq->count){
 		cur_rq->buf += 512;
@@ -183,9 +183,9 @@ static void add_request(struct request * rq){
 	struct request_queue *q = blk_get_queue(dev_id);
 	struct ide_hwif * hwif = ide_hwifs + channel_id(dev_id);
 
-	cli_safe();
+	cli_push();
 	list_add(&rq->tentacle, &q->queue_head);
-	sti_safe();
+	flagi_pop();
 	if(!hwif->cur_rq){
 		hwif->cur_rq = rq;
 		blk_devs[major].do_request(dev_id);

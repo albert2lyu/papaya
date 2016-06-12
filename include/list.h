@@ -62,6 +62,20 @@ static inline int list_meet_tail(list_head_t *first, list_head_t *entry){
 	return entry->next == first;
 }
 
+/* search from the 2th node, for many list, the 1th list_head isn't in a mother struct*/
+#define LIST_FIND2(stru_t, mb_t, root, key, value, result) 		\
+	do{													\
+		struct list_head * node = root->next;			\
+		stru_t *obj;									\
+		while(node != root){							\
+			 *obj = MB2STRU(stru_t, node, mb_t);		\
+			if( (obj)->key == value ) break;			\
+			node = node->next;							\
+		}												\
+		if(node == root) result = 0;					\
+		else result = obj;								\
+	} while(0);
+
 static inline void hashtable_add(list_head_t *hashtable, int hash, list_head_t *new){
 	list_add(new, hashtable + hash)	;
 }

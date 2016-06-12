@@ -4,15 +4,16 @@
 #include<mm.h>
 #include<utils.h>
 #include<schedule.h>
+#define PCB_MAGIC_NUMBER 0xaabbccdd
 /**process only run at ring0,ring1,ring3*/
 static int selector_plain_d[4]={(int)&selector_plain_d0,(int)&selector_plain_d1,0,(int)&selector_plain_d3};
 static int selector_plain_c[4]={(int)&selector_plain_c0,(int)&selector_plain_c1,0,(int)&selector_plain_c3};
-int eflags=0x1200;//IOPL=1,STI
+int __eflags=0x1200;//IOPL=1,STI	__prefix, 避免gdb犯晕:p eflags
 
 void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name,int ring){
 	baby->regs.ss=(selector_plain_d[ring]);
 	baby->regs.esp=(ring==0)?(u32)&(baby->regs):USR_STACK_BASE;/**ring 0 process never touch ss,esp when iretd*/
-	baby->regs.eflags=eflags;//IOPL=1,STI
+	baby->regs.eflags=__eflags;//IOPL=1,STI
 	baby->regs.cs=(selector_plain_c[ring]);
 	baby->regs.eip=addr;
 	baby->regs.gs=baby->regs.fs=baby->regs.es=baby->regs.ds=(selector_plain_d[ring]);
@@ -34,6 +35,8 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name,int 
 	baby->files->max_fds = sizeof(baby->files->__file_array) / 4;
 	baby->rlimits[RLIMIT_NOFILE].cur = 512;
 	baby->rlimits[RLIMIT_NOFILE].max = 1024;
+	baby->fstack.esp = -1;
+	baby->magic = PCB_MAGIC_NUMBER;
 	if(ring){
 		baby->cr3=(u32*)((alloc_pages(__GFP_DEFAULT,1) - mem_map) <<12);	/**note!cr3 use real physical 
 												  		address*/
@@ -103,7 +106,7 @@ unsigned char obuffer_shift(OBUFFER* pt_obuffer){
 struct pcb *get_current(void){
 	struct pcb *p;
 	__asm__ __volatile__("andl %%esp,%0":"=r"(p):"0"(~8191));
-	if((void *)p < (void *)0xc0000000) spin("get ill current");
+	if((void *)p < (void *)0xc0000000 || p->magic != PCB_MAGIC_NUMBER) spin("get ill current");
 	return p;
 }
 

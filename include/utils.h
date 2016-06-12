@@ -136,6 +136,7 @@ void info_heap(void);
 /* 0, 这一组函数不会在critical area用,所以cli_already默认是初始是false
  * 1, 这组函数是胆小的函数，just for debug usage
  */
+ /*
 int cli_already;		//we use this variable because we can't touch eflags
 static inline void cli_safe(){
 	if(cli_already) spin("cli already"); 
@@ -147,6 +148,7 @@ static inline void sti_safe(){
 	__asm__ __volatile__("sti");
 	cli_already = 0;
 }
+*/
 /**deleting node from an empty linked-list is forbidden.
  * you must specify the target list's root-node when you use these macros.
  */
@@ -268,4 +270,6 @@ static inline void sti_safe(){
 	(unsigned)&(((stru_type *)0)->member_name)
 
 void memtest(void *, int len);
+void udelay(unsigned long usecs);
+
 #endif
