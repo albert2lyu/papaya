@@ -90,7 +90,7 @@ struct pcb{
 			u32 prio;
 			u32 time_slice,time_slice_full;
 			u32 msg_type,msg_bind;
-			u32 *cr3;
+			u32 *cr3;	/*must be cr3, relied by pointer calculate*/
 			u32 ring;
 			struct thread thread;
 			struct fs_struct *fs;
@@ -148,6 +148,7 @@ struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name,int rin
 void obuffer_init(OBUFFER* pt_obuffer);
 void obuffer_push(OBUFFER* pt_obuffer,char c);
 unsigned char obuffer_shift(OBUFFER* pt_obuffer);
+
 
 /* 暂时让fstack附属于进程，来解决因进程切换引起的push/pop混乱。但应该还是会有特殊情形，
    会使的push/pop混乱 小心

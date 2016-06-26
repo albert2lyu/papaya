@@ -1,0 +1,8 @@
+1, mm_struct , vm_area, ioremap
+2, temporary equal map for mmio. proc.c TODO
+3,目前mmio隐射在0地址附近，创建进程之后，就访问不到了。
+
+已经解决了ｍｍｉｏ的映射，暂时的。　
+但回避了一点：对等映射0xfbxxxx段内存，会造成页错误。我怀疑是1M+4K处有内存缺陷。采用-3G的映射方式，把这部分页表放在1M处，就能访问了。就能访问到了。读出来的Mac地址看上去也没问题。
+
+4, sprious irq不光要处理，还要做counter，是EOI送的怎么不合适了。

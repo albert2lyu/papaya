@@ -1,6 +1,7 @@
 #ifndef UTILS_H
 #define UTILS_H
 #include<ku_utils.h>
+#include<linux/mylist.h>
 #include<valType.h>
 //杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
 static inline unsigned str_hash(const char *str, int len){
@@ -149,127 +150,75 @@ static inline void sti_safe(){
 	cli_already = 0;
 }
 */
-/**deleting node from an empty linked-list is forbidden.
- * you must specify the target list's root-node when you use these macros.
- */
-
-/**list: root node
- * location: the node you want to insert at
- * new: the node you want to inser
- * LL means linked-list
- */
-#define LL_INSERT(list,location,new)\
-	do{\
-		assert(new);\
-		if(!list && !location) {\
-			list = new;\
-			new->next = new->prev = 0;\
-			break;\
-		}\
-		new->next=location;\
-		new->prev=location->prev;\
-		if(location->prev) location->prev->next=new;\
-		location->prev=new;\
-		if(list==location) list=new;\
-	} while(0)
-
-/**insert a node to list in an ascending order by compare 'attr'
-* 这里用root备份list，而用list遍历，是取巧的方法。
-* 2, 相等时会插在既有节点后面。
-* 3, attr相等时不会停，会继续往后搜索，直到遇到比他大的，或者tail。所以进入
-* 插入操作时，只有两种情况:list iterator是tail，或list iterator的attr大。特殊
-* 情况是既为tail，attr又bigger。
-* 4, 插入时，不要认为遍历停下来的时候，如果new->attr >= list->attr，就是遇到了
-* tail。 这取决于你的遍历条件，如果条件是next when new->attr > list->attr，
-* 那就是说，attr相等时也会停下来。 所以插入时候，不要假定是在末端。（虽然，这样
-* 效率会低一些)
-* 5, 为了效率，可以遇到=就停下来，插入的时候，发现new->attr仍然>，那就判定是
-* tail。这样插入更快。 但随之而来的结果，attr=attr时，new会不断插在前面。
-*/
-#define LL_I_INCRE(list,new,attr)\
-	do{\
-		assert(new);\
-		if(!list){\
-			list=new;\
-			new->prev=new->next=0;\
-			break;\
-		}\
-		void*root=list;\
-		while(list->next &&  new->attr > list->attr) list=list->next;\
-		if(new->attr > list->attr){\
-			new->next = 0;\
-			new->prev=list;\
-			list->next = new;\
-			list=root;\
-		}\
-		else{\
-			new->next = list;\
-			new->prev = list->prev;\
-			if(list->prev) list->prev->next = new;\
-			list->prev=new;\
-			if(root==list) list=new;\
-		}\
-	} while(0)
-
-//DECRE INSERT在相等时的插入顺序待定
-#define LL_I_DECRE(list,new,attr)\
-	do{\
-		assert(new);\
-		if(!list){\
-			list=new;\
-			new->prev=new->next=0;\
-			break;\
-		}\
-		void*root=list;\
-		while(list->next && new->attr < list->attr) list=list->next;\
-		if(new->attr < list->attr){\
-			new->next = 0;\
-			list->next=new;\
-			new->prev=list;\
-			list=root;\
-		}\
-		else{\
-			new->next=list;\
-			new->prev=list->prev;\
-			if(list->prev) list->prev->next=new;\
-			list->prev=new;\
-			if(root==list) list=new;\
-		}\
-	} while(0)
-
-#define LL_DEL(list,location)\
-	do{\
-		assert(list&&location);\
-		assert(!(!location->next && !location->prev && (list!=location)));\
-		if(location->prev) location->prev->next=location->next;\
-		if(location->next) location->next->prev=location->prev;\
-		if(list==location) list=location->next;\
-	} while(0)
-
-#define LL_INFO(list,attr)\
-	do{\
-		void*root=list;\
-		while(list){\
-			printf("%d ",list->attr);\
-			list=list->next;\
-		}\
-		list=root;\
-	} while(0)
-
-#define LL_ASSIGN(list,attr,value)\
-	do{\
-		void *root = list;\
-		while(list){\
-			list->attr=value;\
-			list=list->next;\
-		}\
-		list = root;\
-	} while(0)
 
 #define MEMBER_OFFSET(stru_type, member_name) \
 	(unsigned)&(((stru_type *)0)->member_name)
 
 void memtest(void *, int len);
 void udelay(unsigned long usecs);
+
+/* by unit of MS */
+static inline unsigned __RDTSC(void){
+	unsigned tsc;
+	__asm__ __volatile__("rdtsc\n\t"
+						 "shr $21, %%eax\n\t"
+						 "shl $11, %%edx\n\t"
+						 "or %%eax, %%edx\n\t"
+						 :"=d"(tsc));
+	return tsc;
+}
+
+static inline void barrier(void){
+	__asm__ __volatile__("":::"memory");
+}
+
+static inline void mdelay(int ms){
+	int curr = __RDTSC();
+	int clock = curr + ms;
+	while(1){
+		barrier();
+		if(__RDTSC() >= clock) return;
+	}
+}
+
+static inline void cli(void){
+	__asm__ __volatile__("cli");
+}
+
+static inline void sti(void){
+	__asm__ __volatile__("sti");
+}
+
+static inline unsigned get_eflags(void){
+	unsigned eflags;
+	__asm__ __volatile__("pushfl\n\t"
+						 "pop  %0\n\t"
+						 :"=r"(eflags)
+						 );
+	return eflags;
+}
+
+static inline bool cli_already(void){
+	unsigned eflags = get_eflags();
+	return !(eflags & (1 << 9)) ;
+}
+
+static inline bool sti_already(void){
+	return !cli_already();
+}
+#define MAKE_IP(a, b, c, d) (((a)<<24) + ((b)<<16) + ((c)<<8) + d)
+
+#define ARR_CELLS(array, stru_t) ( sizeof(array) / sizeof(stru_t))
+unsigned read_imr_of8259(void);
+
+
+
+
+
+
+
+
+
+
 
 #endif

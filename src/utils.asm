@@ -1,6 +1,7 @@
 ;these functions are declared and commented(some basic explanation) in utils.h
 %include "utils.inc"
-global in_byte,out_byte,port_read,send_hd_eoi,port_write,detect_cpu,in_dw,out_dw,update_eflags,bitset,bitclear,bitsset,bitsclear,bitscan0, bitscan32,ap_init,ap_init_end
+global in_byte,out_byte,port_read,send_hd_eoi,port_write,detect_cpu,in_dw,out_dw,update_eflags,ap_init,ap_init_end, read_imr_of8259
+global __bt, __bts, __btr, __bsc, __bs0s
 extern cpu_string,oldeflags
 global init8259A
 global init8253
@@ -13,159 +14,7 @@ detect_cpu:;void detect_cpu(void);
 	mov [cpu_string+8],ecx
 	ret
 
-bitscan32:		;int bitscan32(u32 addr ,int num_111);
-	mov eax,[esp+4]
-	bsf ecx,[eax]
-	mov ebx,ecx	;backup promise return value
-	jz .fail
-.suspect:
-	mov edx,[eax]
-	shr edx,cl
-	mov ecx,[esp+8]
-	mov eax,0xffffffff
-	shl eax,cl
-	or edx,eax
-	cmp edx,0xffffffff
-	jz .success
-.fail:
-	mov eax,-1
-	ret
-.success:
-	mov eax,ebx
-	ret
-
-;this function has bugs now.	bug appears in such case:
-;char a[10000]; a[2048] = 7; int x=bitscan1111(a,3,513);  => return a bad value -1(should be 16384)
-bitscan111:		;int bitscan111(u32 addr, int num_111, int scope);   buggy
-	push ebp
-	mov ebp,esp
-	add ebp,8
-	push esi	;backup ecx
-	push ebx
 	
-	mov edx,[ebp]
-	mov ecx,[ebp+8]
-	;if(num_111 ==0 || scope == 0) just return
-	cmp dword [ebp+4],0
-	je .fail
-	cmp dword [ebp+8],0
-	je .fail
-.next_cell:
-	mov eax,[edx]
-	mov esi,ecx
-	bsf ecx,eax
-	jz .continue
-.suspect_cell:
-	shr eax,cl
-	mov ebx,0xffffffff
-	mov ecx,[ebp+4]
-	shl ebx,cl
-	or eax,ebx
-	cmp eax,0xffffffff
-	je .success
-.continue:
-	inc edx
-	mov ecx,esi
-	loop .next_cell
-.fail:
-	mov eax,-1
-	jmp .return
-.success:
-	bsf eax,[edx]
-	sub edx,[ebp]
-	shl edx,3
-	add eax,edx
-.return:
-	pop ebx
-	pop esi
-	pop ebp
-	ret
-
-bitset:;void bitset(char*addr,int bit_off);
-	mov ebx,[esp+4]
-	mov eax,[esp+8]
-	bts [ebx],eax
-	ret 
-
-bitclear:;void bitclear(char*addr,int bit_off);
-	mov ebx,[esp+4]
-	mov eax,[esp+8]
-	btr [ebx],eax
-	ret 
-
-bitsset:;void bitsset(u32 addr, int bit_off, int num);
-	;if(num == 0) just return
-	cmp dword [esp+12],0
-	je .return
-	mov ecx,[esp+12]
-	mov eax,[esp+8]
-	mov ebx,[esp+4]
-.loop:
-	bts [ebx],eax
-	inc eax
-	loop .loop
-.return:
-	ret
-
-bitsclear:;void bitsclear(u32 addr, int bit_off, int num);
-	;if(num == 0) just return
-	cmp  dword [esp+12],0
-	je .return
-	mov ecx,[esp+12]
-	mov eax,[esp+8]
-	mov ebx,[esp+4]
-.loop:
-	btr [ebx],eax
-	inc eax
-	loop .loop
-.return:
-	ret
-
-;the following two functions are not exported at present, more interfaces,more disorders.
-bitscan:;int bitscan(char*addr,int bits_scope);
-	jmp .entrance
-	.return:
-	add eax,edx
-	ret
-	.entrance:
-	mov ecx,[esp+8];ERR bits_scope must %8=0
-	shr ecx,5;ecx/=32,convert bit-scope to byte scope
-	mov edx,0
-	mov ebx,[esp+4]
-	.1:
-	bsf eax,[ebx]
-	jnz .return
-	add ebx,4
-	add edx,32
-	loop .1
-	;can not scan out a 1-bit
-	mov edx,0
-	mov eax,-1;is a special digit meaning can not find value-1-bit.
-	jmp .return
-
-bitscan0:;int bitscan0(char*addr,int bits_scope);
-	jmp .entrance
-	.return:
-	add eax,edx
-	ret
-	.entrance:
-	mov ecx,[esp+8];ERR bits_scope must %8=0
-	shr ecx,5;ecx/=32,convert bit-scope to byte scope
-	mov edx,0
-	mov esi,[esp+4]
-	.1:
-	mov ebx,[esi]
-	xor ebx,0xffffffff	
-;	xor ebx,0
-	bsf eax,ebx
-	jnz .return
-	add esi,4
-	add edx,32
-	loop .1
-	;can not scan out a 1-bit
-	mov edx,0
-	mov eax,-1;is a special digit meaning can not find value-1-bit.
-	jmp .return
 port_read:;void port_read(unsigned port,void*buf,unsigned byte);
 	mov edx,[esp+4]
 	mov edi,[esp+8]
@@ -243,9 +92,15 @@ init8259A:
 	mov al,[esp+4];ERR by default,all irq-port was masked
 	out 21h,al
 	iodelay
-	mov al,10111111b;		arg meaing:[AT hard-disk irq open]  
+	mov al,11110011b;		arg meaing:[AT hard-disk irq open]  
 	out 0a1h,al
 	iodelay
+	ret
+read_imr_of8259:		;unsigned read_imr_of8259(void);
+	xor eax,eax
+	in al, 0a1h 
+	mov ah, al 
+	in al, 21h 
 	ret
 
 init8253:
@@ -264,6 +119,55 @@ update_eflags:
 	pop dword [oldeflags]
 	ret
 
+;;;;;;;;;;;;;;;;;;;;;	int __bt(void *base, int m);
+__bt:	
+	mov edx, [esp + 4]	 ;eax = base 
+	mov ecx, [esp + 8]	 ;ebx = m
+	xor eax, eax
+	bt [edx], ecx
+	adc eax, 0
+	ret
+
+;;;;;;;;;;;;;;;;;;;;	int __bts(void *base, int m);
+__bts:	
+	mov edx, [esp + 4]	 ;eax = base 
+	mov ecx, [esp + 8]	 ;ebx = m
+	xor eax, eax
+	bts [edx], ecx
+	adc eax, 0
+	ret
+
+;;;;;;;;;;;;;;;;;;;;	int __btr(void *base, int m);	@DESC bit test and reset
+__btr:	
+	mov edx, [esp + 4]	 ;eax = base 
+	mov ecx, [esp + 8]	 ;ebx = m
+	xor eax, eax
+	btr [edx], ecx
+	adc eax, 0
+	ret
+
+;;;;;;;;;;;;;;;;;;	int __bsc(char *addr);	 @DESC bit scan and reset
+__bsr:
+	mov edx, [esp + 4]		;edx = addr
+	mov eax, [edx]			;eax = *addr, namely bit index
+	bsf eax, eax
+	jz .zero
+	btr [edx], eax
+	ret
+	.zero:
+	mov eax, -1
+	ret
+__bs0s:
+	mov edx, [esp + 4]		;edx = addr
+	mov eax, [edx]			;eax = *addr, namely bit index
+	not eax			;eax = ~eax
+	bsf eax, eax
+	jz .zero
+	bts [edx], eax
+	ret
+	.zero:
+	mov eax, -1
+	ret
 
 
 

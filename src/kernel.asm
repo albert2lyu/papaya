@@ -67,6 +67,7 @@ call init8253 ; init 8253
 
 
 add esp,4
+;push 11111000b
 push 11111000b
 call init8259A ; init 8259A
 add esp,4
@@ -201,27 +202,50 @@ exception_handler_step1:
 i20h:
 	push 0x20 - 256
 	jmp common_interrupt
-
-;	call do_timer	
-;	mov al,0x20
-;	out 0x20,al
-;	call schedule
-	;far away
-
 ; keyboard interrupt
 i21h:
-	;push sec_data.keyboard
-	;call spin
-	iret
-	push 0	;no err_code
-	save
-	mov al,0x20
-	out 0x20,al
-	call key_handler;
-	;far away
+	push 0x21 - 256
+	jmp common_interrupt
+i22h:
+	push 0x22 - 256
+	jmp common_interrupt
+i23h:
+	push 0x23 - 256
+	jmp common_interrupt
+i24h:
+	push 0x24 - 256
+	jmp common_interrupt
+i25h:
+	push 0x25 - 256
+	jmp common_interrupt
+i26h:
+	push 0x26 - 256
+	jmp common_interrupt
+i27h:
+	push 0x27 - 256
+	jmp common_interrupt
+i28h:
+	push 0x28 - 256
+	jmp common_interrupt
+i29h:
+	push 0x29 - 256
+	jmp common_interrupt
+i2ah:
+	push 0x2a - 256
+	jmp common_interrupt
+i2bh:
+	push 0x2b - 256
+	jmp common_interrupt
+i2ch:
+	push 0x2c - 256
+	jmp common_interrupt
+i2dh:
+	push 0x2d - 256
+	jmp common_interrupt
+i2eh:
+	push 0x2e - 256
+	jmp common_interrupt
 i2fh:
-	;push sec_data.IDE0
-	;call spin
 	push 0x2f - 256
 	jmp common_interrupt
 	
@@ -284,7 +308,7 @@ error_code:
 
 common_interrupt:
 	SAVE_ALL
-	SET_PREG
+	;SET_PREG
 
 	push ret_from_intr
 	jmp do_IRQ
@@ -313,8 +337,8 @@ ret_with_reschedule:
 	je signal_return
 
 restore_all:
-	GET_CURRENT(ebx)
-	mov esp, [ebx]	;对papaya内核，这是必要的，因为stackframe的位置不固定。
+	;GET_CURRENT(ebx)
+	;mov esp, [ebx]	;对papaya内核，这是必要的，因为stackframe的位置不固定。
 	RESTORE_ALL
 	
 
@@ -430,12 +454,21 @@ Gate selector_plain_c0, i80 - _start + base_text, 0, DA_386IGate
 
 .gate_i20h:Gate selector_plain_c0,i20h - _start + base_text, 0, DA_386IGate + DA_DPL3 ;ERR dpl3
 .gate_i21h:Gate selector_plain_c0,i21h - _start + base_text, 0, DA_386IGate
-
-%rep (0x2f-0x22)
-Gate selector_plain_c0, i2fh -_start + base_text, 0, DA_386IGate
-%endrep
-
+.gate_i22h:Gate selector_plain_c0,i22h - _start + base_text, 0, DA_386IGate
+.gate_i23h:Gate selector_plain_c0,i23h - _start + base_text, 0, DA_386IGate
+.gate_i24h:Gate selector_plain_c0,i24h - _start + base_text, 0, DA_386IGate
+.gate_i25h:Gate selector_plain_c0,i25h - _start + base_text, 0, DA_386IGate
+.gate_i26h:Gate selector_plain_c0,i26h - _start + base_text, 0, DA_386IGate
+.gate_i27h:Gate selector_plain_c0,i27h - _start + base_text, 0, DA_386IGate
+.gate_i28h:Gate selector_plain_c0,i28h - _start + base_text, 0, DA_386IGate
+.gate_i29h:Gate selector_plain_c0,i29h - _start + base_text, 0, DA_386IGate
+.gate_i2ah:Gate selector_plain_c0,i2ah - _start + base_text, 0, DA_386IGate
+.gate_i2bh:Gate selector_plain_c0,i2bh - _start + base_text, 0, DA_386IGate
+.gate_i2ch:Gate selector_plain_c0,i2ch - _start + base_text, 0, DA_386IGate
+.gate_i2dh:Gate selector_plain_c0,i2dh - _start + base_text, 0, DA_386IGate
+.gate_i2eh:Gate selector_plain_c0,i2eh - _start + base_text, 0, DA_386IGate
 .gate_i2fh:Gate selector_plain_c0,i2fh - _start + base_text, 0, DA_386IGate
+
 .gate_i30h:Gate selector_plain_c0,i30h - _start + base_text, 0, DA_386IGate
 
 %rep (0x80-0x31) ;0-0x2f,totally 0x30 gates,0-0x79,totally 0x80 gates,use (0x80-0x22)

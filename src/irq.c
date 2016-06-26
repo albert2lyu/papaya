@@ -1,6 +1,7 @@
 #include<linux/errno.h>
 #include<irq.h>
 #include<proc.h>
+#include<linux/bh.h>
 /**生成一个irqacion，并挂到中断服务队列里
 * @irq note! should sub by 0x20.
 * note, the status is marked IRQ_DISABLED, so you should clear this bit manually
@@ -41,11 +42,18 @@ int setup_irq(int irq, struct irqaction *new){
 unsigned do_IRQ(stack_frame regs){
 	int err_code = regs.err_code + 256;
 	int irq = err_code - 0x20;
+	//oprintf("irq:%u\n", irq);
 	irq_desc_t *desc = irq_desc + irq;
 	unsigned status = desc->status;
 /*	oprintf("status:%x,%x\n", status,desc->hw_handler->ack);*/
-	desc->hw_handler->ack(irq);
-	
+	switch(irq){
+		case 15:
+			out_byte(0x20, 0x20);
+		case 7:
+			return 0;
+		default:
+			desc->hw_handler->ack(irq);	
+	}
 	//若action队列是空的，或者INPROCESS，或者DISABLED，则置IRQ_PENDING位，这次
 	//中断也就早早结束了。就是这条语句避免了中断套嵌。
 	if(!desc->action || status & (IRQ_INPROCESS | IRQ_DISABLED)){
@@ -71,6 +79,11 @@ out:
 /*	oprintf("do_IRQ out\n");*/
 	desc->status &= ~IRQ_INPROCESS;
 	desc->hw_handler->end(irq);
+
+	//we don't cli() here, because code above runs in cli mode . TAKE CARE
+	if(bh_flags & BH_FLAG_DISABLE) oprintf(" #*& ");
+	else do_bh();
+
 	return 0;
 }
 

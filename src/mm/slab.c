@@ -188,11 +188,17 @@ struct cache_size{
 #define COMMON_CACHE_MIN 32
 struct cache_size malloc_sizes[COMMON_CACHE_NUM];
 
+/* optimization needed here, how to guarantee SLAB_FLAG won't be messed up with __GFPxx
+ * i want let kmem_cache_alloc do the memory cleaning when meet __GFP_ZERO 
+ */
 void *kmalloc2(unsigned size, unsigned flags){
 	for(int i = 0; i <COMMON_CACHE_NUM; i++ ){
-		if(malloc_sizes[i].size >= size)
-			return kmem_cache_alloc(flags & __GFP_DMA ?
+		if(malloc_sizes[i].size >= size){
+			void *obj =  kmem_cache_alloc(flags & __GFP_DMA ?
 					malloc_sizes[i].slabhead_dma : malloc_sizes[i].slabhead, flags);
+			if(obj && (flags & __GFP_ZERO)) memset(obj, 0, size);
+			return obj;
+		}
 	}
 	assert("too big size" && 0);
 	return NULL;

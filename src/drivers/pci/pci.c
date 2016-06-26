@@ -28,6 +28,7 @@ void pci_init(void){
 				}
 				list_add(&pcidev->node, &pcidevs_root);	
 
+				#if 0
 				struct pci_info_entry * info_ent = PciTable_Get(vendor, port0xcfc>>16);
 				struct pci_vendor_entry * vendor_ent = PciVendorTbl_Get(vendor);
 				if(vendor_ent){
@@ -45,6 +46,7 @@ void pci_init(void){
 				 * otherwise, some single-function devices will report details for
 				 * function 0" for every function.  */
 				 /*我在rtl8139上测的，确实有这个问题，加上这句，信息干净不少*/
+				 #endif
 				if(func == 0 && !(pcidev->headtype & 0x80)) break;
 			}
 		}

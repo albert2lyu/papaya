@@ -20,7 +20,7 @@ void init_zone(void){
 	 * all free physical pages shall be grouped by 'order' exp and linked
 	 * into buddy-system's free_list. 
 	 */
-	init_free_area(ZONE_DMA, 0x200000>>12);
+	init_free_area(ZONE_DMA, 0x300000>>12);	/*BUG 3M以上用作内核初始化堆栈，不要覆盖*/
 	init_free_area(ZONE_NORMAL, HEAP_SIZE>>12);
 	init_free_area(ZONE_HIGHMEM, 0);
 }

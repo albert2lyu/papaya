@@ -75,7 +75,7 @@ struct pci_dev{
 	u16 command;
 	u16 status;
 	char revision;
-	unsigned class: 28;
+	unsigned class: 24;
 	u8 cacheline;
 	u8 timer;
 	u8 headtype;

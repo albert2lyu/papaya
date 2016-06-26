@@ -41,6 +41,7 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name,int 
 		baby->cr3=(u32*)((alloc_pages(__GFP_DEFAULT,1) - mem_map) <<12);	/**note!cr3 use real physical 
 												  		address*/
 		memcpy((char*)(baby->cr3+256*3)+0xc0000000,(char*)0xc0100c00,224*4);
+		/*TODO eliminate such code later */
 		/**
 		u32 *dir = __va(baby->cr3);
 		for(int i = 0; i < PAGE_OFFSET/0x400000; i++){
@@ -106,7 +107,10 @@ unsigned char obuffer_shift(OBUFFER* pt_obuffer){
 struct pcb *get_current(void){
 	struct pcb *p;
 	__asm__ __volatile__("andl %%esp,%0":"=r"(p):"0"(~8191));
-	if((void *)p < (void *)0xc0000000 || p->magic != PCB_MAGIC_NUMBER) spin("get ill current");
+	if((void *)p < (void *)0xc0000000 || p->magic != PCB_MAGIC_NUMBER){
+		oprintf("\n at %x ", (unsigned)p);
+		spin("get ill current");
+	}
 	return p;
 }
 

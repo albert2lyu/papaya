@@ -1,5 +1,18 @@
 some bugs encountered:
 
+Sun Jun 26 17:04:03 CST 2016
+* 发现tx descriptor busy时，在nic_wake_queue里mdelay(2000)造成出去之后再没有中断了。我延迟了两秒，按理说出去就该有中断啊。
+
+* 为什么从来看不到tx_queue排队，永远都是立刻解决。
+
+Fri Jun 17 09:22:39 CST 2016
+quemu的15号中断
+1, 我确定IMR15号中断已经屏蔽。
+2, 这个15号中断，是在网卡do_IRQ里的do_bh是偶时候发生的。
+3, 导致第一层的regs(即stack frame)里的value被修改，但watch 那个regs的话，15号变量又消失。
+4, 真是机器上没有这个bug。
+5, 问题是，即使发生15号中断，我的内核也不会出个个问题。
+
 Sun Jun  5 01:58:03 EDT 2016
 1, struct slab_head里的objsize不能是u16类型。 没有任何约束限制objsize不能大于64K。
   今天的bug就出在这里。bug的起因是objsize是u16类型。

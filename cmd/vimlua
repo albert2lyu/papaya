@@ -1,0 +1,5 @@
+#!/bin/bash
+file=$1
+rm ~/.vim/tmp -f
+touch ~/.vim/tmp
+vim -e -s -c "luafile $file" -c "wq!" /home/wws/.vim/tmp

@@ -14,9 +14,10 @@ void init_memory(void){
 	/**detect pphysical memory: print memory information and init global variable 'gmemsize'*/
 	int memseg_num = realinfo->memseg_num;
 	struct memseg_info *memseg =realinfo->memseg_info;
-/*	oprintf("%12s%12s%10s\n","start","len","type");*/
+	oprintf("%12s%12s%10s\n","start","len","type");
 	for(int i=0; i<memseg_num; i++){
-//		oprintf("%12x%12x%10s\n",memseg[i].base_low,memseg[i].len_low,\									memseg[i].type==1?"free":"occupied");
+		oprintf("%12x%12x%10s\n",memseg[i].base_low,memseg[i].len_low,\
+								memseg[i].type==1?"free":"occupied");
 		if(memseg[i].type == 1 && memseg[i].base_low > gmemsize) \
 			gmemsize = memseg[i].base_low+memseg[i].len_low;
 	}
@@ -72,8 +73,9 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 	);
 	if(err_addr == 0) spin("attempt to access address 0");
 	//u32 err_code=current->pregs->err_code;
-	oprintf("sick process:%s,pcb:%x,err_code:%x, err_addr:%x,eip:%x,esp:%x\n",current->p_name,current, err_code, err_addr,current->pregs->eip,current->pregs->esp);
-/*		oprintf("%s: %c %c\n",(err_code&1)?"page protection error":"page not exist error",(err_code&B(0100))?'U':'S',(err_code&B(0010))?'W':'R');*/
+	oprintf("page error: err_code:%x, err_addr:%x,eip:%x,esp:%x\n", err_code, err_addr, preg->eip, preg->esp);
+		oprintf("%s: %c %c\n",(err_code&1)?"page protection error":"page not exist error",(err_code&B(0100))?'U':'S',(err_code&B(0010))?'W':'R');
+	oprintf("sick process:%s,pcb:%x\n",current->p_name,current);
 	if((err_code&B(0001)) == 0){
 	/**page fault:page not exist*/
 
@@ -141,7 +143,7 @@ struct page *alloc_pages(u32 gfp_mask, int order){
 	if(gfp_mask & __GFP_DMA){
 		page = (void *)__rmquene(&zone_dma, order);
 	}
-	else if(gfp_mask & __GFP_HIGHMEM){
+	else if(gfp_mask & __GFP_HIGHMEM){	/*BUG 高端内存区不能是全映射的，而且根本没页表*/
 		( page = (void *)__rmquene(&zone_highmem, order) ) ||
 		( page = (void *)__rmquene(&zone_normal, order) ) ||
 		( page = (void *)__rmquene(&zone_dma, order) ) 	;
@@ -151,9 +153,11 @@ struct page *alloc_pages(u32 gfp_mask, int order){
 		( page = (void *)__rmquene(&zone_dma, order) )	;
 		
 	assert(page);
-	unsigned ppg = page - mem_map;
-	char *vaddr = (char *)KV(ppg << 12);
-	memset(vaddr, 4096<<order, 0);
+	if(gfp_mask & __GFP_ZERO){
+		unsigned ppg = page - mem_map;
+		char *vaddr = (char *)KV(ppg << 12);
+		memset(vaddr, 0, 4096<<order);
+	}
 	return page;
 }
 
@@ -176,11 +180,27 @@ inline void map_pg(u32*dir,int vpg,int ppg,int us,int rw){
 	tbl[PG_L10(vpg)] = ppg<<12|us|rw|PG_P;
 	FLUSH_TLB;
 }
+
+/* for quick test, to be removed soon
+ * febd1000, febfxxxx, ...
+ */
+void temp_mmio_map(void){
+	/*we map from 0xfeb80000 ==> 0xfec00000-1, only 1M*/
+	oprintf(" temp mmio map begin >>>>>>>>>\n");
+	unsigned *dir = (unsigned *)0xc0100000;
+	for(unsigned i = 0xfeb80000; i < 0xfec00000; i+=1024*4){
+		int vpg = (i - PAGE_OFFSET) >> 12;
+		int ppg = i >> 12;
+		map_pg(dir, vpg, ppg, PG_USS, PG_RWW);	//equal map
+	}
+	oprintf(" temp mmio map done -----\n");
+}
 /**
  * |---kernel(1M)---|---kernel pgdir+kernel pgtbl(1M)---|---heap(14M)---|
  */
 void mm_init(void){
 	init_memory();
 	init_zone();
+	temp_mmio_map();
 }
 

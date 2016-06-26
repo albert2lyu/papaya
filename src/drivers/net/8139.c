@@ -1,25 +1,43 @@
-//注意mmio时的gcc的寄存器缓冲和eliminate优化和硬件的cache缓冲。
+//1, TODO 4G DESC overflow bug
+//2, 注意mmio时的gcc的寄存器缓冲和eliminate优化和硬件的cache缓冲。
+//3, TODO 清除IMR的不需要的位（似乎需要的多）
+//4, TODO 通过写bit，清除status register的一些位。
+//5, TODO ACK.
+//6, 怎么实现nic_wake_queue(),我没有软中断。拿就要在收包中断里调用发包函数，这样会引入cli-sti的复杂性，我不想在网卡驱动层引入irq_push/pop。那样容易ｇｅｔ_illcurrent(). 看来要实现soft-irq了。
+//7, ack 8139(clear ISR bit x)
+//8, EOI (ack 8259A)
 #include<linux/pci.h>
 #include<asm/io.h>
 #include<linux/netdevice.h>
 #include<irq.h>
 #include<linux/slab.h>
 #include<mm.h>
-#define __priv(netdev) ((struct rtl8139_private *)netdev->priv)
+#include<linux/skbuff.h>
+#define PRIV(netdev) ((struct rtl8139_private*)(netdev->private))
+#define __priv(netdev) ((struct rtl8139_private *)netdev->private)
+#define ETH_MIN_LEN 60
 #define NUM_TX_DESC 4
+#define TX_BUF_SIZE 1762
+static struct net_device *testnd;
 struct rtl8139_private{
 	struct pci_dev *pcidev;
 	void *mmio_addr;			/* memory mapped I/O addr */
 	unsigned long regs_len;		/*length of I/O or MMI/O region */
 	unsigned tx_flags;
-	unsigned cur_tx;
-	unsigned dirty_tx;
-	unsigned char *tx_buf[NUM_TX_DESC];	
-	unsigned char *tx_bufs;
+	unsigned touse_desc;
+	unsigned bsy_desc;
+	unsigned char *tx_bufs[NUM_TX_DESC];		/* 跟linux正好相反*/
+	unsigned char *tx_buf;
+	unsigned char *tx_buf_dma;
+	u16 txbuf_size;
+	
 
 	u8 *rx_ring;
 	void *rx_ring_dma;
-	unsigned cursor_toread;		/* a copy of cursor_toread */
+	int rx_ring_len;
+	unsigned cursor_r;		/* points to the first byte behind the package we 
+							 * read just now, in another word, it always points
+							 * to the package we are going to read */
 };
 
 static inline void RTL_maskb(struct net_device *netdev, int offset, unsigned mask){
@@ -89,8 +107,8 @@ enum RTL8139_registers {
 	TxAddr0		= 0x20,	 /* Tx descriptors (also four 32bit). */
 	RBSTART		= 0x30,
 	ChipCmd		= 0x37,
-	cursor_toread	= 0x38,
-	cursor_torecv	= 0x3A,
+	CursorToRead	= 0x38,
+	CursorToRecv	= 0x3A,
 	IMR	= 0x3C,
 	ISR	= 0x3E,
 	TxConfig	= 0x40,
@@ -213,7 +231,7 @@ enum RxConfigBits {
 static inline void rtl8139_reset(struct net_device *netdev){
 	RTL_writeb(netdev, ChipCmd, CmdReset);
 	for(int i = 0; i < 1000; i++){
-		if((RTL_readb(netdev, ChipCmd) & CmdReset)) return;
+		if((RTL_readb(netdev, ChipCmd) & CmdReset) == 0) return;
 		udelay(10);
 	}
 	spin("8139 reset failed");
@@ -221,78 +239,331 @@ static inline void rtl8139_reset(struct net_device *netdev){
 }
 
 
-void on_recv(int a, void *b){
-	spin(" WE GOT A PACKAGE!\n");
-}
-int rtl8139_open(struct net_device *netdev){
-	rtl8139_reset(netdev);
-	RTL_writeb(netdev, ChipCmd, CmdRxEnb | CmdTxEnb);
-	RTL_writel(netdev, RBSTART, (unsigned)__priv(netdev)->rx_ring_dma);
-	RTL_writel(netdev, RxConfig, AcceptAllPhys | AcceptMyPhys | AcceptBroadcast | AcceptMulticast
-	  					 |RxNoWrap | RxCfgRcv32K);
-	/*register IRQ handler, open IMR */
-	request_irq(netdev->irq, on_recv, SA_INTERRUPT, 0);	
-	irq_desc[(int)netdev->irq].status &= ~IRQ_DISABLED;
-	enable_8259A_irq(netdev->irq);
-	RTL_writeb(netdev, IMR, 1 | 4);
-	return 0;
-}
 
+/* 不需要，4个tx_buf的长度不需要指定，　只是在发送数据时，用来指定本次含数据的长度。
+static inline void RTL8139_config_txbuf_len(struct net_device *netdev, int bitfield){
+	int size = bitfield == 0 ? 8 : 32*bitfield ;
+	assert(size < 1792);
+	netdev->txbuf_size;
+}
+*/
 int rtl8139_stop(struct net_device *netdev){
 	return 0;
 }
 
-int rt18139_start_xmit(struct sk_buff *skbuff, struct net_device *netdev){
-	return 0;	
+#pragma pack(push)
+#pragma pack(1)
+struct TxStatusReg{
+	union{
+		unsigned value;
+		struct {
+			int size: 13;
+			int OWN: 1;
+			int TUN: 1;
+			int TOK: 1;
+			int threshold: 6;
+			int reserved: 2;
+			int ncc: 4;
+			int CDH: 1;
+			int OWC: 1;
+			int TABT: 1;
+			int CRS: 1;
+		};
+	};
+};	
+
+struct raw_package{
+	u16 rx_status;
+	u16 size;
+	char data[0];
+};
+#pragma pack(pop)
+
+void info_regs(struct net_device *netdev){
+	u16 intr_status = RTL_readw(netdev, ISR);
+	u32 tx_status = RTL_readl(netdev, TxStatus0);
+	oprintf("TxStatus0: %x, ISR: %x, IMR: %x \n", tx_status, intr_status, \
+													RTL_readw(netdev, IMR));
+}
+
+static int tx_bottomhalf( void *_netdev){
+	struct net_device *netdev = _netdev;
+	nic_wake_queue(netdev);
+	//oprintf(" TX bottom half ");
+	//mdelay(500);
+	return 0;
+}
+
+/* 1, 一旦有“发包中断”，就扫描４个DESC,从而forward bsy_desc
+ * 2, 必须要在发包中断里free sk_buff,因为这时才能确定其相应的数据已经送上网线了
+ * 3, by default, the transmitter will re-transmit a number of 16 times before aborting
+ *	  due to excessive collisions. If failed finally, bit TER in ISR will be set.
+ */
+static void on_tx(struct net_device *netdev){
+	oprintf(" ------!T!------ ");
+	struct rtl8139_private *private = netdev->private;
+    int frozen_desc = private->touse_desc + 4;
+	assert( private->bsy_desc < frozen_desc);
+
+	struct TxStatusReg TSR;
+	int vdesc = private->bsy_desc;
+	while(private->bsy_desc != frozen_desc){
+		int realdesc = private->bsy_desc % NUM_TX_DESC;
+		TSR.value = RTL_readl(netdev, TxStatus0 + realdesc * 4);
+		if(!TSR.TOK && !TSR.TUN && !TSR.TABT){
+			if(vdesc == private->bsy_desc){
+					netdev->debug.count_drop_tok++;
+					return;
+			}
+			break;
+		}
+		if(TSR.TOK){
+			RTL_maskw(netdev, ISR, TxOK);
+		}
+		else{
+			oprintf(" TSR NOT TOK: %u, bsy_desc: %u, touse_desc:%u\n", TSR.value, private->bsy_desc, private->touse_desc);	
+			spin("spin");
+		}
+
+		private->bsy_desc ++;
+	}
+
+	/* all the four decriptors free again, we wake tx-queue later */
+	if(private->bsy_desc - private->touse_desc == 4){
+		//oprintf(" wake tx_queue in bh");
+		//mdelay(2000);
+		mark_bh(netdev->on_tx_bh);
+	}
 }
 
 
-static struct net_device *onend;
+static int rx_bottomhalf( void *_netdev){
+	process_rx_queue(_netdev);
+	return 0;
+}
+static void on_rx(struct net_device *netdev){
+	struct rtl8139_private *private = netdev->private;
+	while(!( RTL_readb(netdev, ChipCmd) & RxBufEmpty )){
+		struct raw_package *raw = (void *)(private->rx_ring + private->cursor_r);
+		//int rbstart = RTL_readl(netdev, RBSTART);
+		//int toread = RTL_readw(netdev, CursorToRead);	
+		//int torecv = RTL_readw(netdev, CursorToRecv);	
+		oprintf("raw->size :%x\n", raw->size);
+		spin("on_rx");
+		int data_size = raw->size - 4;
+		struct sk_buff *skb = dev_alloc_skb(data_size);
+		skb->dev = netdev;
+		memcpy(skb->data, raw->data, data_size);
+		LL2_A(&netdev->rx_queue, skb);
+		mark_bh(netdev->on_rx_bh);
+
+		/* word aligned feature of RTL8139 Chip. Not documented */
+		private->cursor_r = (private->cursor_r + raw->size +3) & ~3;
+		RTL_writew(netdev, CursorToRead, private->cursor_r);
+		if(private->cursor_r > private->rx_ring_len) 
+					private->cursor_r %= private->rx_ring_len;
+		
+	}
+}
+static void on_intr(int irq, void *dev, void *regs){
+	struct net_device *netdev = dev;
+	/* the interupt Status Register reflects all current pending interrupts, regardless of
+	 * the state of the corresponding mask bit in the IMR.
+	 */
+	unsigned isr = RTL_readw(netdev, ISR);
+	if(isr & TxOK){
+	    on_tx(netdev);	
+	}
+	//else spin("&&&&&&&&&&&&&&&&&&&&&\n");
+	//if(1);
+	else if(isr & TxErr){
+		spin("TxErr");
+	}
+	else if(isr & RxOK){
+       	on_rx( netdev ); 
+	}
+	else if(isr & RxErr){
+        spin("RxErr");
+	}
+	else if(isr & RxOverflow){
+		spin( "RxOverflow");
+	}
+	else if(isr & RxUnderrun){
+		spin( "CARP is written but Rx buffer is empty, or link status changed");
+	}
+	else{
+		spin("unknown interrupt reason, check your IMR");
+	}
+}
+
+/* 1, 无穷数组相对circle ring的好处，就看出来了：我们一下子就知道还有几个desc可用
+ * 2,　这个函数有问题，一次是只该发送一个包的。这儿却是循环用了几个。
+ * 1, 只能由net_wake_queue调用，它保证了这个函数在关中断模式下执行。
+ * @return 0, if any DESC avaliable;	-1, no avaliable DESC
+ * net_wake_queue() relies on it to stop Tx queue.
+ */
+static int rtl8139_start_xmit(struct sk_buff *skb, struct net_device *netdev){
+	struct rtl8139_private * private  = netdev->private;
+    assert(private->bsy_desc > private->touse_desc);
+	assert( cli_already() );
+	//cli();
+	int realdesc = private->touse_desc % NUM_TX_DESC;
+	if(skb->len < TX_BUF_SIZE){
+		/*ok, transmit it */
+		int size = skb->len < 61 ? 61 : skb->len;
+		memset( PRIV(netdev)->tx_bufs[realdesc], 0xcc, size );
+		memcpy( PRIV(netdev)->tx_bufs[realdesc], skb->data, skb->len );
+		dev_free_skb(skb);
+		//struct TxStatusReg tsr = {value: RTL_readl(netdev, TxStatus0 + realdesc * 4)};
+		struct TxStatusReg tsr = {value: 0};
+		//tsr.size = size;
+		tsr.size = 650;
+		tsr.OWN = 0;
+		tsr.threshold = 0;	/* 8 bytes */
+		//oprintf("size:%u\n", size);
+		RTL_writel(netdev, TxStatus0 + realdesc * 4, tsr.value);
+	}
+	else	assert(" too large package size ");
+	private->touse_desc ++;
+	/* the following two lines are strong ordered, because after 'sti()', a Tx Interupt
+	 * pobably occur, and on_tx() will call nic_wake_queue. We should not let 
+	 nic_stop_queue()  merge that.
+	 */
+	//if(private->bsy_desc == private->touse_desc) nic_stop_queue(netdev);
+	if(private->bsy_desc == private->touse_desc) return -1;
+	/* Transmit Interrupts may occur here, as soon as we 'sti'.
+	 * Since the Tx handler(i.e. on_tx) may change 'netdev->bsy_desc', we probably 
+	 * get free 'TSD' here, so.. */
+	 /*　还是不好，xmit函数的运行，应该由上层检测 ND_QUEUE_STOOPED标志来启动，只有那样
+	  * 一个启动契机，　而下层就负责维护这个 ND_QUEUE_STOOPED标志 
+	  * 说白了，就是不要贪图这一点好处：是，这里很可能收到发包中断。　但是，刚才启动的
+	  * 发包操作，并不是都能在这里就完成。有的发包中断还要等等才到。　所以，用一个统一
+	  * 的方式，处理这些发包中断。
+	  */
+	  return 0;
+}
+
+bool rtl8139_tx_busy(struct net_device *netdev){
+	return PRIV(netdev)->touse_desc == PRIV(netdev)->bsy_desc;
+}
+
+
+int rtl8139_open(struct net_device *netdev){
+	struct rtl8139_private *private = netdev->private;
+	private->rx_ring = kmalloc2((32 + 2) * 1024, __GFP_DMA);	/* 32K + 2K */	
+	private->rx_ring_dma = private->rx_ring - PAGE_OFFSET;
+	private->tx_buf = kmalloc2( TX_BUF_SIZE * NUM_TX_DESC, __GFP_DMA);
+	private->tx_buf_dma = private->tx_buf - PAGE_OFFSET;
+	for(int i = 0; i < NUM_TX_DESC; i++){
+		private->tx_bufs[i] = private->tx_buf + i * TX_BUF_SIZE;
+	}
+	//spin("spin1");	
+	private->bsy_desc = 4;
+	private->touse_desc = 0;
+	//netdev->flags |= ND_QUEUE_STOOPED;
+	netdev->tx_count = netdev->rx_count  = 0;
+	memset(&netdev->debug,  0, sizeof(netdev->debug));
+	private->cursor_r = 0;
+	private->rx_ring_len = 32 * 1024;
+
+	rtl8139_reset(netdev);
+	RTL_writeb(netdev, ChipCmd, CmdRxEnb | CmdTxEnb);
+	RTL_writel(netdev, RBSTART, (unsigned)__priv(netdev)->rx_ring_dma);
+	RTL_writel(netdev, RxConfig, AcceptAllPhys | AcceptMyPhys | AcceptBroadcast | AcceptMulticast |RxNoWrap | RxCfgRcv32K);
+	/*register IRQ handler, open IMR */
+	request_irq(netdev->irq, on_intr, SA_INTERRUPT, netdev);	
+	irq_desc[(int)netdev->irq].status &= ~IRQ_DISABLED;
+	RTL_writew(netdev, IMR, 1 | 4);
+
+
+	//spin("spin2");	
+	for(int i = 0; i < NUM_TX_DESC; i++){
+		RTL_writel(netdev, TxAddr0 + i*4, (unsigned)(private->tx_buf_dma + TX_BUF_SIZE*i));
+	}
+	netdev->on_tx_bh = alloc_bh(tx_bottomhalf, netdev);
+	netdev->on_rx_bh = alloc_bh(rx_bottomhalf, netdev);
+	netdev->tx_queue.root = netdev->tx_queue.tail = 0;
+	netdev->rx_queue.root = netdev->rx_queue.tail = 0;
+	return 0;
+}
+
+
 int rtl8139_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){
 	pci_enable_device(pcidev);
 	pci_set_master(pcidev);	/*多数BIOS会清除PCI网卡的master位，导致板卡不能往主存拷数据*/
 	struct net_device *netdev = kmalloc2( sizeof(struct net_device), 0 );
 	netdev->open = rtl8139_open;
 	netdev->stop = rtl8139_stop;
-	netdev->start_xmit = rt18139_start_xmit;
+	netdev->tx_busy = rtl8139_tx_busy;
+	netdev->start_xmit = rtl8139_start_xmit;
 
-	netdev->base_addr = (unsigned)ioremap( pcidev->address[1] & ~0xf, 256, 0);
-	netdev->irq = pcidev->irqline;
 	oprintf("irq pin: %u , line: %u\n", pcidev->irqpin, pcidev->irqline);
-	oprintf("base_addr:%x\n", netdev->base_addr);
+	/* TODO ioremap, remove hard code */
+	netdev->base_addr = (unsigned)( pcidev->address[1] & ~0xf) - PAGE_OFFSET;
+	//assert((netdev->base_addr >> 20) == 0xfeb);
+	netdev->irq = pcidev->irqline;
+	//oprintf("base_addr:%x\n", netdev->base_addr);
 	int mac[2] = {0};
 	mac[0] = RTL_readl(netdev, 0);
 	mac[1] = RTL_readl(netdev, 4);
+	memcpy(netdev->mac, (char *)mac, 6);
 	oprintf("MAC:%x %x\n", mac[0], mac[1]);
 
 	struct rtl8139_private *private = kmalloc2( sizeof(struct rtl8139_private), 0);
-	private->rx_ring = kmalloc2((32 + 2) * 1024, __GFP_DMA);	/* 32K + 2K */	
-	private->rx_ring_dma = private->rx_ring - PAGE_OFFSET;
 	private->pcidev = pcidev;
-	
-	netdev->priv = private;
-
+	netdev->private = private;
+	netdev->ipmask = ~0xff;
+	netdev->gateway_ip = MAKE_IP(192, 168, 1, 1);
+	extern u32 __local_ip;
+	netdev->ip = __local_ip;
 	/*TODO how we pick out the right bar */
 	//assert(!(pcidev->address[0] & 1));	/* port mapped address */
 	//assert( pcidev->address[0] & 1);	/* memory mapped address */
-	onend = netdev;
+	testnd = netdev;
 	return 0;
 }
-
-
 
 struct pci_driver rtl8139_driver = {
 	id_table: rtl8139_id_tbl,
 	probe:rtl8139_init_one,
 };
-/* The rest of these values should never change. */
+
+#include<net/arp.h>
+void send_data(char *data){
+	int total = 100;
+	for(int i = 0; i < total; i++){
+		struct sk_buff * skb = dev_alloc_skb( ARP_PACK_SIZE );	
+		skb->len = ARP_PACK_SIZE;
+		//waiting_for_transmit(skbarr[i]);
+		arp_inquire(0, 0, 0);
+	}
+	//nic_wake_queue(testnd);	
+}
 
 void rtl8139_test(void){
 	pci_register_driver(&rtl8139_driver);
-	onend->open(onend);
+	//spin("before testnd open");
+	//oprintf("testnd:%x", testnd);
+	testnd->open(testnd);
+	//spin("after testnd open");
+//	__asm__ __volatile__("sti");
+	//info_regs(testnd);
+	//oprintf("@8259  @before IMR %x\n", read_imr_of8259());	
+	char data[] = "this line come from papaya kernel";
+	send_data(data);
+	oprintf("\n quick_insert:%u", testnd->debug.quick_insert);
+	spin("  spin");
+	return;
+
+	for(int i = 0; i< 5; i++){
+		info_regs(testnd);
+		mdelay(1000);
+	}
+	oprintf("stop while sti-ing\n");
+	while(1);
 }
 
-
-
-
-
+/* TODO */
+struct net_device *pick_nic(void){
+	return testnd;	
+}

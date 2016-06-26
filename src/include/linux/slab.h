@@ -4,6 +4,8 @@
 struct slab_head;
 #define SLAB_HWCACHE_ALIGN 1
 #define SLAB_CACHE_DMA 2
+#define SLAB_ZERO 4
+
 #define L1_CACHLINE_SIZE 32
 #define BYTES_PER_WORD 4
 

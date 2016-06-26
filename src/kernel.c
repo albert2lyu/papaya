@@ -12,7 +12,8 @@
 #include<linux/ide.h>
 #include<linux/slab.h>
 #include<linux/pci.h>
-char testbuf[512*200];
+#include<linux/skbuff.h>
+char *testbuf;
 char *bigbuf;
 int avoid_compiler_warning;
 #define gpgdir ((u32*)0xc0100000)
@@ -55,6 +56,17 @@ struct pcb *idle;
 
 
 
+int scan_dirty_machine_words(unsigned start, unsigned end){
+	int count = 0;
+	for(int i = start; i < end; i += 4){
+		unsigned x  = *(unsigned *)(i+PAGE_OFFSET);
+		if( x ){
+			oprintf("%u ", x);
+			count++;
+		}
+	}
+	return count;
+}
 void kernel_c(){
 	k_screen_reset();
 	//init basic data&struct
@@ -122,13 +134,13 @@ void kernel_c(){
 /*	oprintf("usr_func_addr:%x\n", usr_func);*/
 	mm_init();
 	kmem_cache_init();	
+	net_init();
 	pci_init();
-	rtl8139_test();
-	//spin("pci spin");
 	//kmem_cache_test();
 	proc_init();
 	init_ISA_irqs();
 	init_time();
+
 	ide_init();
 	blkdev_layer_init();
 /*	init_fs();*/
@@ -221,6 +233,8 @@ void func0(void){
 		oprintf("?");
 		//ll_rw_block2(0x300, READ, 0, 2, bigbuf);
 		oprintf("@fun0: read block finished");
+
+		rtl8139_test();
 		kp_sleep(0,0);
 		//oprintf("func0: %u\n",counter++);
 		//schedule_timeout(2000);
@@ -255,9 +269,11 @@ void func_init(void){
 	//int err = pathwalk("/home/mnt/", &indir, 0);	avoid_compiler_warning = err;
 	mnt_stru = do_mount(0x305, "/home/mnt/", "cell");	
 	//int err = pathwalk("/home/mnt/5", &indir, 0);
+	testbuf = kmalloc(512 * 200);
 	int fd = sys_open("/home/mnt/5/dimg.c", 2, 0);
 	int rbytes = sys_read(fd, testbuf, sizeof(testbuf));
 	avoid_compiler_warning = rbytes = (unsigned)&indir;
+
 	assert("func init keep running" && 0);
 	kp_sleep(0, 0);
 }

@@ -1,4 +1,4 @@
-all:prepare_folder boot.bin kernel.elf ../cmd/dimg
+all:prepare_folder boot.bin kernel.elf ../cmd/_dimg
 #'make' will search target-file and rely-file according through VPATH,if she
 #failed under current directory.
 VPATH=../lib/ ../bin/
@@ -19,7 +19,7 @@ co= kernel.o   utils.o proc.o  disp.o video_drv.o schedule.o\
 ku_utils.o mm.o func_table.o pmm.o kbd_drv.o mmzone.o irq.o time.o i8259.o\
 ramdisk.o elf.o fork.o 
  
-kernelrelyo=$(asmo)  $(co)	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o ../src/fs_cell.o ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o
+kernelrelyo=$(asmo)  $(co)	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o ../src/fs_cell.o ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o ../src/net/core/dev.o ../src/net/core/skbuff.o  ../src/kernel/bh.o ../src/net/ipv4/arp.o ../src/net/ipv4/ip.o
 include $(co:.o=.d)
 
 boot.bin:boot.asm
@@ -28,9 +28,9 @@ kernel.elf:$(kernelrelyo)
 	cd ../lib/;\
 	ld -m elf_i386 -s -Ttext 0xc0030400 -o ../bin/kernel.elf $(kernelrelyo);\
 	ld -m elf_i386 -Ttext 0xc0030400 -o ../bin/g_kernel.elf $(kernelrelyo) 
-../cmd/dimg:../cmd/dimg.c bootinfo.asmo
-	gcc -c ../cmd/dimg.c -o ../cmd/dimg.o -std=c99 -Wno-implicit-function-declaration -g
-	gcc -o  ../cmd/dimg  ../cmd/dimg.o ../lib/bootinfo.asmo
+../cmd/_dimg:../cmd/_dimg.c bootinfo.asmo
+	gcc -c ../cmd/_dimg.c -o ../cmd/_dimg.o -std=c99 -Wno-implicit-function-declaration -g
+	gcc -o  ../cmd/_dimg  ../cmd/_dimg.o ../lib/bootinfo.asmo
 %.d:%.c
 	set -e;rm -f $@;\
 	gcc -M $< $(cheader_path) > this_is_a_tmp_file;\
@@ -48,7 +48,7 @@ clean:
 #replace your 400m.img to after using make git
 git:
 	rm  -f ../lib/*;rm -f ../bin/*;rm -f *.d;\
-	rm -f ../cmd/parport.out ../cmd/dimg;\
+	rm -f ../cmd/parport.out ../cmd/_dimg;\
 	rm -f usr/lib/*;\
 	rm -f usr/src/*.o;\
 	rm -f ../cmd/*.o;\

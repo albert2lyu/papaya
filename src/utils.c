@@ -4,6 +4,7 @@
 void dump_sys(){
 }
 
+#if 0
 int bitscan111(u32 addr, int num_111 ,int dw_cell){
 	if(num_111 <= 0) return -1;
 	u32 *cell = (u32*)addr;
@@ -57,6 +58,7 @@ bool  bitsset_long(u32 addr, int bit_off, int num){
 	for(int i=body_start; i <= body_end; i+=4) *(u32*)i=0xffffffff;
 	return true;
 }
+#endif
 
 void spin(char *msg){
 	__asm__ __volatile__ ("cli");

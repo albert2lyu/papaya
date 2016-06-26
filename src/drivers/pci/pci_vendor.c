@@ -1214,7 +1214,7 @@ char *	PciDevSelFlags [] =
 static unsigned short start_of_vseg[255];
 void PciDevTable_Mk_Fast_Access(void){
 	int i;
-	for(i = 0 ; i < sizeof(start_of_vseg); i++) 
+	for(i = 0 ; i < sizeof(start_of_vseg)/sizeof(short); i++) 
 												start_of_vseg[i] = 255;
 	int done = -1;
 	for(i = 0; i < sizeof(PciDevTable)/sizeof(struct pci_info_entry); i++){

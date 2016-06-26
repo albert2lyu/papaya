@@ -51,7 +51,6 @@ donothing:;
 	}\
 	(pt)+=x_len;
 char mem_entity[4];
-void memcp(char*dest,char*src,int byte);
 void memsetw(unsigned short *dest,int word,unsigned short value);
 void memset(void*dest,unsigned value,unsigned n);
 void chars_to_str(char*str,char*chars);

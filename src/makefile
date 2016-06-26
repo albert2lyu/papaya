@@ -10,31 +10,27 @@ all:
 	make -C mm/
 	make -C drivers/pci/
 	make -C drivers/net/
+	make -C net/core
+	make -C kernel
+	make -C net/ipv4
 	make -f makefile2
 
 clean:
 	rm *.d -f
 	rm *.o -f
-	rm .*.swp -f
 	rm ../lib/* -f
 	rm  drivers/block/*.o -f
-	rm  drivers/block/.*.swp -f
 	rm drives/ide/*.o -f
-	rm drives/ide/.*.swp -f
 	rm drivers/pci/*.o -f
-	rm drivers/pci/.*.swp -f
 	rm drivers/net/*.o -f
-	rm drivers/net/.*.swp -f
 	rm fs/*.o -f
-	rm fs/.*.swp -f
 	rm fs/cell/*.o -f
-	rm fs/cell/.*.swp -f
 	rm mm/*.o -f
-	rm mm/.*.swp -f
 	rm arch/x86/mm/*.o -f
-	rm arch/x86/mm/.*.swp -f
-	rm ../cmd/.*.swp -f
-	rm ../cmd/*.o
+	rm ../cmd/*.o -f
+	rm net/core/*.o -f
+	rm net/ipv4/*.o -f
+	rm kernel/*.o -f
 
 git:
 	mv ../cmd/400m.img ~/Documents/tmp_for_git/
