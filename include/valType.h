@@ -15,6 +15,8 @@ typedef signed char s8;
 typedef signed short s16;
 typedef signed int s32;
 
+typedef unsigned size_t;
+
 /**for ntfs.h*/
 typedef unsigned char byte;
 typedef unsigned long long uint64_t;

@@ -99,6 +99,8 @@ struct pci_dev{
 	u8 bus;
 	unsigned dev: 5;
 	unsigned func: 3;
+
+	void *core;	/* for network adapter, this is a net_device */
 };
 #pragma pack (pop)
 

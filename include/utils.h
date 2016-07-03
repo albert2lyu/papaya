@@ -3,6 +3,7 @@
 #include<ku_utils.h>
 #include<linux/mylist.h>
 #include<valType.h>
+#include<utils.h>
 //杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
 static inline unsigned str_hash(const char *str, int len){
     unsigned seed = 131; // 31 131 1313 13131 131313 etc..
@@ -12,7 +13,7 @@ static inline unsigned str_hash(const char *str, int len){
 	return hash;
 }
 /* @desc  round x to 2^n
- * e.g. given 65, got 128
+ * e.g. Given 65, got 128. Given 63, got 64.
  */
 static inline unsigned ceil2n(int x){
 	int highest;
@@ -207,6 +208,13 @@ static inline bool sti_already(void){
 	return !cli_already();
 }
 #define MAKE_IP(a, b, c, d) (((a)<<24) + ((b)<<16) + ((c)<<8) + d)
+char *MAKE_IP_STR(u32 ip);
+static inline void print_mac(u8 * mac){
+	oprintf(" %x %x %x %x %x %x ", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+}
+static inline void print_ip(u32 ip){
+	oprintf(" %u.%u.%u.%u ", ip>>24&0xff, ip>>16&0xff, ip>>8&0xff, ip&0xff);
+}
 
 #define ARR_CELLS(array, stru_t) ( sizeof(array) / sizeof(stru_t))
 unsigned read_imr_of8259(void);

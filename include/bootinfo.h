@@ -21,6 +21,8 @@ extern unsigned base_realmod_info;
 
 extern unsigned _kernel_image_start_sector;
 #define kernel_image_start_sector ((unsigned)&_kernel_image_start_sector)
+extern unsigned _fiximg_start_sector;
+#define fiximg_start_sector ((unsigned)&_fiximg_start_sector)
 
 extern unsigned _memseg_num;
 #define g_memseg_num (*(unsigned*)KV(&_memseg_num))

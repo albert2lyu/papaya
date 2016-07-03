@@ -14,13 +14,10 @@ struct net_device;
  *    after, for flexible usage.
  */
 struct sk_buff{
-	int len;			/* sizeof (data_area) */
-	int truesize;		/* sizeof (data_area + sk_buff) */
+	int pkgsize;			/* package length */
+	int bufsize;		/* buffer size */
 
-	char *head;			/* address of data-buffer */
-	char *data;			/* points to real data-area */
-	char *tail;			/* end of data-area */
-	char *end;			/* end of data-buffer */
+	char *data;			/* i.e. buffer */
 
 	struct sk_buff *next, *prev;
 	struct net_device *dev;
@@ -41,7 +38,7 @@ struct sk_buff{
 
 void dev_free_skb( struct sk_buff *skb);
 struct sk_buff * dev_alloc_skb( int len );
-struct sk_buff *dev_alloc_skb2(u32 msgtype, int len);
+struct sk_buff *dev_alloc_skb2(u32 msgtype, size_t len);
 void net_init(void);
 void skbuff_init(void);
 

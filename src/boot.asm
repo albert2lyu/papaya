@@ -9,13 +9,13 @@ DAP_SECTOR_COUNT equ  64
 DAP_SECTOR_LIMIT equ 254 ;知道了，这应该是IDE端口的限制，一次最多255个扇区
 DAP_MEM_COUNT equ (DAP_SECTOR_COUNT * 512)
 org 0x7c00
-addr_mbr_loaded equ (_base_kernel_loaded - 512 * 3)
+addr_mbr_loaded equ (_base_kernel_loaded - 512 * (_bootbin_occupy_sectors + _fiximg_occupy_sectors))
 [bits 16]
 ;用int 13h，要担心硬盘的磁头号大于1吗？
 mbrHead:
 	mov ax, 0xb800
 	mov gs, ax
-	read_floppy_side_o_sector_total_destsa_destea 0x80,0,0,2,(_bootbin_occupy_sectors-1),0,0x7e00	;'-1' because bios has alreay load the first sector
+	read_floppy_side_o_sector_total_destsa_destea 0x80,0,0,2,(_bootbin_occupy_sectors + _fiximg_occupy_sectors - 1),0,0x7e00	;'-1' because bios has alreay loaded the first sector
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 0,0,1,63,(addr_mbr_loaded) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 1,0,1,63,(addr_mbr_loaded + 512 * 63) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 2,0,1,63,(addr_mbr_loaded + 512 * 63 * 2) >> 4, 0
@@ -118,9 +118,35 @@ mov ax, selector_plain_d0
 mov ds,ax
 mov es,ax
 mov ss,ax
-jmp dword selector_plain_c0:reset_kernel	;'jmp'-operation necessary?
+jmp dword selector_plain_c0:fix_kernel	;'jmp'-operation necessary?
 
 [bits 32]
+fix_kernel:
+	mov edi, _base_kernel_loaded
+	mov esi, (_fiximg_start_sector - 1) * 512 + 0x7c00
+	xor eax, eax
+	mov ecx, 0	; !boolean, indicates the last sector to fix
+	.check_one:
+		cmp byte [edi], al		;check magic number
+		je fix_kernel.fix_it
+		;magic number check failed, we still have a chance
+		cmp byte [edi], 0xcc
+		jne fix_kernel.bad
+		;not the end, let us see how many sectors we fixed
+		mov ecx, 1		;有些早，但没事，因为如果count核对失败，就死循环了。
+		inc al		;assume have fixed this sector
+		cmp byte [esi + 1], al
+		je fix_kernel.fix_it
+		.bad: jmp $
+	.fix_it: 
+		mov ah, [esi]
+		mov [edi], ah
+		inc esi 
+		inc al
+		add edi, 512
+	jcxz fix_kernel.check_one	
+	.done:
+
 reset_kernel:
 ;clear RAM for .bss
 mov edi,base_kernel_reset

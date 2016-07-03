@@ -1,4 +1,4 @@
-all: clean skbuff.o dev.o
+all: clean skbuff.o dev.o testnet.o
 #'make' will search target-file and rely-file according through VPATH,if she
 #failed under current directory.
 VPATH=../lib/ ../bin/

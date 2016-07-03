@@ -226,6 +226,7 @@ void func1(void){
 	}
 }
 void func0(void){
+	sti();
 	//int counter = 0;
 	oprintf("func0 run..\n");
 	while(1){
@@ -234,8 +235,12 @@ void func0(void){
 		//ll_rw_block2(0x300, READ, 0, 2, bigbuf);
 		oprintf("@fun0: read block finished");
 
-		rtl8139_test();
-		kp_sleep(0,0);
+		testnet();
+		while(1){
+			mdelay(1000 * 2);
+			oprintf("+");
+		}
+		//kp_sleep(0,0);
 		//oprintf("func0: %u\n",counter++);
 		//schedule_timeout(2000);
 /*		if(counter-- == 0) kthread_sleep(MSGTYPE_TIMER, 100000000);*/
@@ -253,6 +258,7 @@ void func2(void){
 	}
 }
 void func_init(void){
+	sti();
 	oprintf("func init run..\n");
 	ide_read_partation(0x3, 0);
 

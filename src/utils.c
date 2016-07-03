@@ -4,6 +4,9 @@
 void dump_sys(){
 }
 
+char *MAKE_IP_STR(u32 ip){
+	return 0;	
+}
 #if 0
 int bitscan111(u32 addr, int num_111 ,int dw_cell){
 	if(num_111 <= 0) return -1;
@@ -67,6 +70,7 @@ void spin(char *msg){
 }
 void assert_func(char*exp,char*file,char*base_file,int line){
 //	dispStr("assert_failue:exp,file,base_file,line----",0x400);
+	cli();
 	oprintf("assert failure>>>exp:%s,file:%s,base_file:%s,line:%u\n",exp,file,base_file,line);
 	while(1);
 }

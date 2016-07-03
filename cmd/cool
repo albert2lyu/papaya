@@ -1,0 +1,2 @@
+pidof fcitx | xargs kill -9
+fcitx-autostart &

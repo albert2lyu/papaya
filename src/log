@@ -1,4 +1,14 @@
 
+Mon Jul  4 01:44:15 CST 2016
+Thu Jun 30 08:45:13 CST 2016
+* 原来8139的驱动“长满”了15号suprious irq。
+Wed Jun 29 18:14:59 CST 2016
+* e1000, bochs上的mmio的地址是0xc0000000, qemu上是0xfebc0000。后者还靠谱一些。
+  但不像RTL8139，是3ebd10000。
+  等芯片回来了再写把。
+
+Tue Jun 28 22:40:07 CST 2016
+* ne2k打开注释，但是检测不到。 另外bochs里似乎有把虚拟网卡连接到真实网卡的选项。
 Sat Jun 18 05:56:20 CST 2016
 * 从今天起，内核去除rng1进程。
   因为要支持无进程模式下，中断所带来的堆栈和返回。在restore_all的时候，就该单纯的restore all register。不要mov esp, [ebx]之类的。

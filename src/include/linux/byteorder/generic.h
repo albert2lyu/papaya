@@ -18,4 +18,7 @@ static inline u32 htonl(u32 hostlong){
 }
 #define ntohs(x) htons(x)
 #define ntohl(x) htonl(x)
+
+#define BYTE_ENDIAN_FLIP2(x) x = ntohs(x)
+#define BYTE_ENDIAN_FLIP4(x) x = ntohl(x)
 #endif

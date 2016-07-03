@@ -20,7 +20,7 @@ clean:
 	rm *.o -f
 	rm ../lib/* -f
 	rm  drivers/block/*.o -f
-	rm drives/ide/*.o -f
+	rm drivers/ide/*.o -f
 	rm drivers/pci/*.o -f
 	rm drivers/net/*.o -f
 	rm fs/*.o -f

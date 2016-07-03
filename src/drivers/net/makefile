@@ -1,4 +1,4 @@
-all: clean 8139.o
+all: clean 8139.o e1000.o
 #'make' will search target-file and rely-file according through VPATH,if she
 #failed under current directory.
 VPATH=../lib/ ../bin/

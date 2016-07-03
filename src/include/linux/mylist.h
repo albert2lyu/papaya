@@ -187,4 +187,16 @@ struct ll2{
 		}\
 		list = root;\
 	} while(0)
+
+#define LL_SCAN_ON_KEY(root, key, value, result)\
+	do{\
+		result = root;\
+		while(result){\
+			if( (result)->key == (value) ){\
+				break;\
+			}\
+			result = (result)->next;					\
+		}\
+	}while(0)
+
 #endif

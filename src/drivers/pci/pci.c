@@ -51,6 +51,7 @@ void pci_init(void){
 			}
 		}
 	}
+	//spin(" pci spin");
 }
 
 static inline 

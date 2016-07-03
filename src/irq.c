@@ -42,17 +42,41 @@ int setup_irq(int irq, struct irqaction *new){
 unsigned do_IRQ(stack_frame regs){
 	int err_code = regs.err_code + 256;
 	int irq = err_code - 0x20;
-	//oprintf("irq:%u\n", irq);
+	//if(irq != 0) oprintf(" !%u ", irq);
 	irq_desc_t *desc = irq_desc + irq;
 	unsigned status = desc->status;
-/*	oprintf("status:%x,%x\n", status,desc->hw_handler->ack);*/
+	oprintf(" !%u ", irq);
+
+	u16 isr = pic_get_isr();
+	u16 imr = read_imr_of8259();
+	oprintf("before ack, imr: %x, isr: %x\n", imr, isr);
+	desc->hw_handler->ack(irq);	
+	if(irq == 7 || irq == 15) assert(0);
+#if 1
+	isr = pic_get_isr();
+	imr = read_imr_of8259();
+	oprintf("after ack, imr: %x, isr: %x\n", imr, isr);
+	return 0;
+
 	switch(irq){
 		case 15:
+			assert(!(isr >> 15));
+			assert(imr >> 15);
 			out_byte(0x20, 0x20);
 		case 7:
+			assert(!(isr & 0x80));
+			assert(imr & 0x80);
+			oprintf("\n imr:%x, isr:%x\n", imr, isr);
 			return 0;
 		default:
+			break;
+			//oprintf("8159A ack:%u\n", irq);
 			desc->hw_handler->ack(irq);	
+	}
+#endif
+	if(irq == 1){
+		oprintf("\n a key pressed \n");
+		return 0;
 	}
 	//若action队列是空的，或者INPROCESS，或者DISABLED，则置IRQ_PENDING位，这次
 	//中断也就早早结束了。就是这条语句避免了中断套嵌。

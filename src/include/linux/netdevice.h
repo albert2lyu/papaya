@@ -9,6 +9,7 @@ struct skb_queue{
 	struct sk_buff *tail;
 };
 
+struct pci_dev;
 struct net_device{
 	int		(*open)(struct net_device *dev);
 	int		(*stop)(struct net_device *dev);
@@ -34,6 +35,7 @@ struct net_device{
 		u32 quick_insert;
 		u32 count_drop_tok;
 	}debug;
+	struct pci_dev *pcidev;
 };
 
 
@@ -47,4 +49,5 @@ struct net_device{
 
 void nic_wake_queue(struct net_device *netdev);
 struct net_device *pick_nic(void);
+void register_nic(struct net_device *netdev);
 #endif

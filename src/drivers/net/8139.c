@@ -313,12 +313,14 @@ static void on_tx(struct net_device *netdev){
 		if(!TSR.TOK && !TSR.TUN && !TSR.TABT){
 			if(vdesc == private->bsy_desc){
 					netdev->debug.count_drop_tok++;
+					oprintf(" T\\ ");
 					return;
 			}
 			break;
 		}
 		if(TSR.TOK){
-			RTL_maskw(netdev, ISR, TxOK);
+			//RTL_maskw(netdev, ISR, TxOK);
+			RTL_writew(netdev, ISR, 0xffff);
 		}
 		else{
 			oprintf(" TSR NOT TOK: %u, bsy_desc: %u, touse_desc:%u\n", TSR.value, private->bsy_desc, private->touse_desc);	
@@ -342,27 +344,31 @@ static int rx_bottomhalf( void *_netdev){
 	return 0;
 }
 static void on_rx(struct net_device *netdev){
+	//RTL_maskw(netdev, ISR, RxOK);
+	//u16 isr = RTL_readw(netdev, ISR);
+	RTL_writew(netdev, ISR, 0xffff);
+	oprintf(" !R! ");
+	return;
+
 	struct rtl8139_private *private = netdev->private;
 	while(!( RTL_readb(netdev, ChipCmd) & RxBufEmpty )){
 		struct raw_package *raw = (void *)(private->rx_ring + private->cursor_r);
-		//int rbstart = RTL_readl(netdev, RBSTART);
-		//int toread = RTL_readw(netdev, CursorToRead);	
-		//int torecv = RTL_readw(netdev, CursorToRecv);	
-		oprintf("raw->size :%x\n", raw->size);
-		spin("on_rx");
-		int data_size = raw->size - 4;
-		struct sk_buff *skb = dev_alloc_skb(data_size);
+		oprintf("Raw->Size :%x\n", raw->size);
+		//spin("on_rx");
+		int data_size = raw->size - 4;	/* trip CRC */
+		struct sk_buff *skb = dev_alloc_skb(data_size );
 		skb->dev = netdev;
-		memcpy(skb->data, raw->data, data_size);
+		memcpy(skb->ethhdr, raw->data, data_size);
 		LL2_A(&netdev->rx_queue, skb);
-		mark_bh(netdev->on_rx_bh);
+		//mark_bh(netdev->on_rx_bh);
 
 		/* word aligned feature of RTL8139 Chip. Not documented */
-		private->cursor_r = (private->cursor_r + raw->size +3) & ~3;
-		RTL_writew(netdev, CursorToRead, private->cursor_r);
+		//u16 cursor_r_old = private->cursor_r;
+		private->cursor_r = (private->cursor_r + raw->size + 4 + 3) & ~3;
 		if(private->cursor_r > private->rx_ring_len) 
 					private->cursor_r %= private->rx_ring_len;
-		
+		RTL_writew(netdev, CursorToRead, private->cursor_r - 0x10);
+		//oprintf("CBR:%x, CAPR:%x, cursor_r_old:%x, cursor_r_now:%x\n", RTL_readw(netdev, CursorToRecv), RTL_readw(netdev, CursorToRead), cursor_r_old, private->cursor_r);
 	}
 }
 static void on_intr(int irq, void *dev, void *regs){
@@ -408,16 +414,15 @@ static int rtl8139_start_xmit(struct sk_buff *skb, struct net_device *netdev){
 	assert( cli_already() );
 	//cli();
 	int realdesc = private->touse_desc % NUM_TX_DESC;
-	if(skb->len < TX_BUF_SIZE){
+	if(skb->pkgsize < TX_BUF_SIZE){
 		/*ok, transmit it */
-		int size = skb->len < 61 ? 61 : skb->len;
-		memset( PRIV(netdev)->tx_bufs[realdesc], 0xcc, size );
-		memcpy( PRIV(netdev)->tx_bufs[realdesc], skb->data, skb->len );
+		int size = skb->pkgsize < 60 ? 60 : skb->pkgsize;
+		memset( PRIV(netdev)->tx_bufs[realdesc], 0, size );
+		memcpy( PRIV(netdev)->tx_bufs[realdesc], skb->ethhdr, skb->pkgsize );
 		dev_free_skb(skb);
 		//struct TxStatusReg tsr = {value: RTL_readl(netdev, TxStatus0 + realdesc * 4)};
 		struct TxStatusReg tsr = {value: 0};
-		//tsr.size = size;
-		tsr.size = 650;
+		tsr.size = size;
 		tsr.OWN = 0;
 		tsr.threshold = 0;	/* 8 bytes */
 		//oprintf("size:%u\n", size);
@@ -473,7 +478,7 @@ int rtl8139_open(struct net_device *netdev){
 	/*register IRQ handler, open IMR */
 	request_irq(netdev->irq, on_intr, SA_INTERRUPT, netdev);	
 	irq_desc[(int)netdev->irq].status &= ~IRQ_DISABLED;
-	RTL_writew(netdev, IMR, 1 | 4);
+	RTL_writew(netdev, IMR, 0xffff);
 
 
 	//spin("spin2");	
@@ -492,6 +497,9 @@ int rtl8139_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){
 	pci_enable_device(pcidev);
 	pci_set_master(pcidev);	/*多数BIOS会清除PCI网卡的master位，导致板卡不能往主存拷数据*/
 	struct net_device *netdev = kmalloc2( sizeof(struct net_device), 0 );
+	pcidev->core = netdev;
+	netdev->pcidev = pcidev;
+	register_nic(netdev);
 	netdev->open = rtl8139_open;
 	netdev->stop = rtl8139_stop;
 	netdev->tx_busy = rtl8139_tx_busy;
@@ -523,47 +531,73 @@ int rtl8139_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){
 	return 0;
 }
 
-struct pci_driver rtl8139_driver = {
+static struct pci_driver rtl8139_driver = {
 	id_table: rtl8139_id_tbl,
 	probe:rtl8139_init_one,
 };
 
-#include<net/arp.h>
-void send_data(char *data){
-	int total = 100;
-	for(int i = 0; i < total; i++){
-		struct sk_buff * skb = dev_alloc_skb( ARP_PACK_SIZE );	
-		skb->len = ARP_PACK_SIZE;
-		//waiting_for_transmit(skbarr[i]);
-		arp_inquire(0, 0, 0);
-	}
-	//nic_wake_queue(testnd);	
-}
-
-void rtl8139_test(void){
+void register_rtl8139_driver(void){
 	pci_register_driver(&rtl8139_driver);
-	//spin("before testnd open");
-	//oprintf("testnd:%x", testnd);
-	testnd->open(testnd);
-	//spin("after testnd open");
-//	__asm__ __volatile__("sti");
-	//info_regs(testnd);
-	//oprintf("@8259  @before IMR %x\n", read_imr_of8259());	
-	char data[] = "this line come from papaya kernel";
-	send_data(data);
-	oprintf("\n quick_insert:%u", testnd->debug.quick_insert);
-	spin("  spin");
-	return;
+}
 
-	for(int i = 0; i< 5; i++){
-		info_regs(testnd);
-		mdelay(1000);
+#if 0
+
+BOOLEAN PacketOK(	PPACKETHEADER pPktHdr	)
+{
+	BOOLEAN BadPacket = pPktHdr->RUNT ||
+	pPktHdr->LONG ||
+	pPktHdr->CRC ||	pPktHdr->FAE;
+	if( ( !BadPacket ) && ( pPktHdr->ROK ) )
+	{
+		if ( (pPktHdr->PacketLength > RX_MAX_PACKET_LENGTH ) ||
+		(pPktHdr->PacketLength < RX_MIN_PACKET_LENGTH ))		return(FALSE); 	
+		PacketReceivedGood++;
+		ByteReceived += pPktHdr->PacketLength;
+		return TRUE ;
 	}
-	oprintf("stop while sti-ing\n");
-	while(1);
+	else	return FALSE;
 }
-
-/* TODO */
-struct net_device *pick_nic(void){
-	return testnd;	
+BOOLEAN	RxInterruptHandler()
+{
+	unsigned char TmpCMD;
+	unsigned int PktLength;
+	unsigned char *pIncomePacket, *RxReadPtr;
+	PPACKETHEADER	pPacketHeader;
+	while (TRUE)
+	{
+		TmpCMD = inportb(IOBase + CR);
+		if (TmpCMD & CR_BUFE)	break;
+	do
+	{
+		RxReadPtr	= RxBuffer + RxReadPtrOffset;
+		pPacketHeader = (PPACKETHEADER)RxReadPtr;
+		pIncomePacket = RxReadPtr + 4;
+		PktLength = pPacketHeader->PacketLength;
+		//this length include CRC
+		if ( PacketOK( pPacketHeader ) )
+		{
+			if ( (RxReadPtrOffset + PktLength) > RX_BUFFER_SIZE )
+				//wrap around to end of RxBuffer
+				memcpy( RxBuffer + RX_BUFFER_SIZE , RxBuffer, 
+							(RxReadPtrOffset + PktLength - RX_BUFFER_SIZE) );
+			//copy the packet out here
+			CopyPacket(pIncomePacket,PktLength - 4);//don't copy 4 bytes CRC
+			//update Read Pointer
+			RxReadPtrOffset = (RxReadPtrOffset + PktLength + 4 + 3) & RX_READ_POINTER_MASK;
+			//4:for header length(PktLength include 4 bytes CRC)
+			//3:for dword alignment
+			outport( IOBase + CAPR, RxReadPtrOffset - 0x10); //-4:avoid overflow
+		}
+		else
+		{
+			ResetRx();
+			break;
+		}
+		TmpCMD = inportb(IOBase + CR);
+	}
+	while (!(TmpCMD & CR_BUFE));
+	}
+	return (TRUE);
+//Done
 }
+#endif

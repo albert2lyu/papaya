@@ -37,7 +37,7 @@ static void init_arp_msg(struct sk_buff *arpmsg,
 							u8 *mymac, u32 myip, 
 							u8 *yourmac,  u32 yourip)
 {
-	assert( arpmsg->len == 14 + 28 && arpmsg->dev);
+	assert( arpmsg->pkgsize == 14 + 28 && arpmsg->dev);
 
 	//struct arp_packet packet = kmalloc2( sizeof( struct arp_packet), 0)
 	struct ethhdr *ethhdr = arpmsg->ethhdr;
@@ -75,6 +75,8 @@ static u8 *arp_lookup(u32 ip){
  *
  */
 static struct arp_record * arp_learn(u8 *comer_mac, u32 comer_ip){
+	assert(0);
+	#if 0
 	int index = comer_ip % ARP_TBL_LEN;
 	struct arp_record *record = arptbl[index];
 	while(record){
@@ -91,8 +93,14 @@ static struct arp_record * arp_learn(u8 *comer_mac, u32 comer_ip){
 		memcpy( record->his_mac, comer_mac, 6);
 		
 		LL_I( arptbl[index], record);
+		oprintf("ARP Learn:" );
+		print_mac(comer_mac);
+		oprintf("<==");
+		print_ip(comer_ip);
+		oprintf("\n");
 	}
 	return record;
+	#endif
 }
 
 void arp_inquire(u32 yourip, u8 *mymac, u32 myip ){
@@ -109,7 +117,7 @@ static void arp_respond(struct sk_buff *msg, u8 *mymac, u32 myip){
 	waiting_for_transmit(msg);	
 }
 
-/* when we receive a ARP reply on operation 1 */
+/* when we receive an ARP reply on operation 1 */
 static void arp_act(struct sk_buff *skb){
 	struct arphdr *arphdr = skb->arphdr;
 	assert(arphdr->operation == 2 &&
@@ -138,6 +146,8 @@ static void arp_act(struct sk_buff *skb){
  * to Gateway)
  */
 void arp_down(struct sk_buff *skb){
+	assert(0);
+	#if 0
 	memcpy(skb->ethhdr->mymac, skb->dev->mac, 6);
 
 	struct iphdr * iphdr = skb->iphdr;
@@ -164,13 +174,27 @@ void arp_down(struct sk_buff *skb){
 		LL_I( later_down[index], skb);
 		sti();
 	}
+	#endif
 }
 
 
 
 void arp_layer_receive( struct sk_buff *comer_skb ){
-	struct arphdr *arphdr = (void *)(comer_skb->data + sizeof(struct ethhdr));
+	assert(comer_skb->pkgsize = 14 + 28);
+
+	struct arphdr *arphdr = (void *)(comer_skb->ethhdr + 1);
 	comer_skb->arphdr = arphdr;
+	////////////Entry here !!
+	///////////network byte order to host order, only performed on arp header
+	BYTE_ENDIAN_FLIP2(arphdr->hardware);
+	BYTE_ENDIAN_FLIP2(arphdr->protocol);
+	BYTE_ENDIAN_FLIP2(arphdr->operation);
+	BYTE_ENDIAN_FLIP4(arphdr->myip);
+	BYTE_ENDIAN_FLIP4(arphdr->yourip);
+
+	//////////done
+	u8 *mac = arphdr->mymac;
+	oprintf("arp layer receive: operation=%u, from mac(%x %x %x %x %x %x)", arphdr->operation, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	if(arphdr->operation == 1){		/* it's an inquiry */
 		arp_respond(comer_skb, 0, 0);
 	}	
@@ -178,4 +202,6 @@ void arp_layer_receive( struct sk_buff *comer_skb ){
 		arp_act(comer_skb);
 	}
 	else spin("unknown operation");
+	
+	oprintf(" ARP layer exit\n");
 }

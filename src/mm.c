@@ -183,6 +183,8 @@ inline void map_pg(u32*dir,int vpg,int ppg,int us,int rw){
 
 /* for quick test, to be removed soon
  * febd1000, febfxxxx, ...
+ * 8139网卡的寄存器群是映射在1G左右的地方的，我们把它映射到4G附近的地方来访问。
+ * 它是memory mapped IO, 我们访问就用mov,当然是经过MMU的。
  */
 void temp_mmio_map(void){
 	/*we map from 0xfeb80000 ==> 0xfec00000-1, only 1M*/

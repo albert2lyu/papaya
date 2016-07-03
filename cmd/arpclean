@@ -1,0 +1,1 @@
+ip neigh flush dev eth0

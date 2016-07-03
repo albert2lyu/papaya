@@ -1,3 +1,4 @@
+5, 8139的txbuf[4],后三个可能没有4字节对齐。会引起芯片word aligned的bug吗。
 1, mm_struct , vm_area, ioremap
 2, temporary equal map for mmio. proc.c TODO
 3,目前mmio隐射在0地址附近，创建进程之后，就访问不到了。

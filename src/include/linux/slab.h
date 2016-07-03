@@ -22,4 +22,8 @@ void * kmem_cache_alloc(struct slab_head *slabhead, unsigned flags);
 void kmem_cache_free(struct slab_head *slabhead, void *obj);
 void kmem_cache_init(void);
 void kmem_cache_test(void);
+
+void *static_alloc(int objsize, int objnum);
+// 这个函数更底层，static_alloc就是包装它。提供对齐，是否清零。
+#define static_cursor_up
 #endif

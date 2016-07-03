@@ -2,7 +2,28 @@
 #include<linux/mylist.h>
 #include<utils.h>
 #include<linux/if_ether.h>
+#include<linux/byteorder/generic.h>
 #define IN_WAKE_QUEUE 1
+
+#define YOUR_NIC_NUM 8
+static struct net_device *__all_your_nic[YOUR_NIC_NUM];
+/* just return a nic for usage, we handle multiple network-adapters in future */
+struct net_device *pick_nic(void){
+	for(int i = 0; i < YOUR_NIC_NUM; i++){
+		if(__all_your_nic[i]) return __all_your_nic[i];
+	}
+	return 0;
+}
+
+void register_nic(struct net_device *netdev){
+	for(int i = 0; i < YOUR_NIC_NUM; i++){
+		if(!__all_your_nic[i]){
+			__all_your_nic[i] = netdev;
+			return;
+		}
+	}
+	assert(0);
+}
 
 void net_init(void){
 	skbuff_init();
@@ -38,9 +59,6 @@ void waiting_for_transmit(struct sk_buff *skb){
 		sti();
 		*/
 	}
-	/* TODO 其实应该检测一下running状态，再wake,但nic_wake_queue()在最开始会
-	 * 检测。 暂时不考虑性能.
-	 */
 }
 
 /* FIXME consider race conditions with skb_queue 
@@ -119,14 +137,17 @@ void process_rx_queue( struct net_device *netdev){
 		struct sk_buff *one = rx_queue->root;
 		LL2_POP(rx_queue);
 		sti();
-		switch(one->ethhdr->protocol){
+		switch( ntohs(one->ethhdr->protocol) ){
 			case 0x0806:
 				arp_layer_receive(one);
 				break;
 			case 0x0800:
 				ip_layer_receive(one);
 				break;
+			case 0x86dd:
+				spin("ipv6 message");
 			default:
+				oprintf("protocol id:%x ", ntohs(one->ethhdr->protocol) );
 				spin("unknown protocol");
 		}
 		cli();

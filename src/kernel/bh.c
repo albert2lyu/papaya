@@ -33,7 +33,7 @@ void do_bh(void){
 	}
 	cli();
 	if(active){
-		oprintf(" repeat for pending\n");
+		oprintf(" active again during just bh routine, do it\n");
 		goto repeat;
 	}
 	bh_enable();

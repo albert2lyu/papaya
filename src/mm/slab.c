@@ -283,6 +283,11 @@ void kmem_cache_test(void){
 	}
 }
 
+// TODO: 将来单独实现这个函数；  foo heap； size和objnum分开，是为了顺便对齐
+void * static_alloc(int objsize, int objnum){
+	assert(objsize %4 == 0 && objnum > 0 && objnum < 2048);	//2048, just ...
+	return kmalloc2(objsize * objnum, __GFP_ZERO);
+}
 
 
 

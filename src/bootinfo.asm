@@ -15,8 +15,19 @@ endstruc
 gequ _memseg_num,base_realmod_info + _mmemseg_num
 gequ _base_meminfo,base_realmod_info + _bbase_meminfo
 
+;扇区是从1开始计数的，到了dimg.c里要减1，因为dd是从0开始计数的。
+;这个示意图要随着下面数据的变动及时同步。
+;+------------------------------------------------------------------------+
+;      _______________________________________________________________________
+;sector|  1   |  2   |  3   |   4  |   5  |  6   |   7  |      |      |      |
+;      |______boot.bin______|_fix__|_____kernel.elf__________________________| 
+;+------------------------------------------------------------------------+
+
+gequ _bootbin_start_sector, 1
 gequ _bootbin_occupy_sectors,3
-gequ _kernel_image_start_sector,4
+gequ _fiximg_start_sector, (_bootbin_start_sector + _bootbin_occupy_sectors)
+gequ _fiximg_occupy_sectors, 1
+gequ _kernel_image_start_sector, (_fiximg_start_sector + _fiximg_occupy_sectors)
 
 gequ _gpgdir_base,0x100000
 
