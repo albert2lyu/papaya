@@ -75,8 +75,6 @@ static u8 *arp_lookup(u32 ip){
  *
  */
 static struct arp_record * arp_learn(u8 *comer_mac, u32 comer_ip){
-	assert(0);
-	#if 0
 	int index = comer_ip % ARP_TBL_LEN;
 	struct arp_record *record = arptbl[index];
 	while(record){
@@ -100,7 +98,6 @@ static struct arp_record * arp_learn(u8 *comer_mac, u32 comer_ip){
 		oprintf("\n");
 	}
 	return record;
-	#endif
 }
 
 void arp_inquire(u32 yourip, u8 *mymac, u32 myip ){
@@ -147,7 +144,7 @@ static void arp_act(struct sk_buff *skb){
  */
 void arp_down(struct sk_buff *skb){
 	assert(0);
-	#if 0
+	#if 1
 	memcpy(skb->ethhdr->mymac, skb->dev->mac, 6);
 
 	struct iphdr * iphdr = skb->iphdr;

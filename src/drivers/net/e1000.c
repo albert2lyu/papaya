@@ -146,6 +146,7 @@ static struct pci_device_id e1000_id_tbl[] = {
 
 static int tx_bottomhalf( void *_netdev){
 	return 0;
+    //
 }
 
 static void on_tx(struct net_device *netdev){

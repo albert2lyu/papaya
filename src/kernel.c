@@ -16,25 +16,6 @@
 char *testbuf;
 char *bigbuf;
 int avoid_compiler_warning;
-#define gpgdir ((u32*)0xc0100000)
-#define gpgtbl ((u32*)0xc0101000)
-#define build_equal_map(paddr,tbladdr)	/**tbladdr use physical addr*/\
-	do{\
-		u32 dir_ent = paddr/0x400000;\
-		gpgdir[dir_ent] = tbladdr|PG_P|PG_RWW|PG_USS; /**note: gpgdir is 'int*' type,so we use dir_ent as index directly*/\
-		u32 tbl_ent = (paddr%0x400000)>>12;\
-		((u32*)KV(tbladdr))[tbl_ent] = paddr|PG_P|PG_RWW|PG_USS;\
-	} while(0)
-struct cpuid_family{
-	u32 stepping_id:4;
-	u32 model:4;
-	u32 family:4;
-	u32 type:2;
-	u32 :2;
-	u32 model_extend:4;
-	u32 family_extend:8;
-	u32 :4;
-};
 extern int p1,p2,sec_data;
 extern void tty(void);
 extern void tty1(void);
@@ -52,86 +33,12 @@ void func0(void);
 void func_init(void);
 void usr_func(void);
 struct pcb *idle;
-//char a[1024*8];
+static void probe(void);
 
-
-
-int scan_dirty_machine_words(unsigned start, unsigned end){
-	int count = 0;
-	for(int i = start; i < end; i += 4){
-		unsigned x  = *(unsigned *)(i+PAGE_OFFSET);
-		if( x ){
-			oprintf("%u ", x);
-			count++;
-		}
-	}
-	return count;
-}
 void kernel_c(){
 	k_screen_reset();
-	//init basic data&struct
-	assert(sizeof(struct cpuid_family) == 4);
-/*	oprintf("&list_active:%x,list_active:%x\n",&list_active,list_active);*/
-	struct cpuid_family cpuid_family;
-	int cpuid_input_max=0;
-	int xapic_support=0;
-	int x2apic_support=0;
-	int multi_thread_support=0;
-	int addressable_core_num=0;
-	int addressable_logic_num=0;
-	__asm__ __volatile__(
-			"mov $0,%%eax\n\t"
-			"cpuid\n\t"
-			"movl %%eax,%3\n\t"
+	probe();
 
-			"movl $1,%%eax\n\t"
-			"cpuid\n\t"
-			"movl %%eax,%6\n\t"
-			"bt $9,%%edx\n\t"
-			"setc %0\n\t"
-			"bt $21,%%ecx\n\t"
-			"setc %1\n\t"
-			"bt $28,%%edx\n\t"
-			"setc %2\n\t"
-
-			"shl $8,%%ebx\n\t"
-			"shr $24,%%ebx\n\t"
-			"mov %%ebx,%4\n\t"
-
-			"movl $4,%%eax\n\t"
-			"movl $0,%%ecx\n\t"
-			"cpuid\n\t"
-			"shr $26,%%eax\n\t"
-			"inc %%eax\n\t"
-			"movl %%eax,%5\n\t"
-			"end:nop"
-			:"=m"(xapic_support),"=m"(x2apic_support),"=m"(multi_thread_support),"=m"(cpuid_input_max),"=m"(addressable_logic_num),\
-			"=m"(addressable_core_num), "=m"(cpuid_family)
-			:
-			:"memory"
-			);
-	oprintf("cpu family:%x model:%x\n",cpuid_family.family+(cpuid_family.family_extend<<4), cpuid_family.model+(cpuid_family.model_extend<<4));
-	/*
-	if(!xapic_support ) spin("xapic not support");
-	oprintf("apic/xapic_support support:%s\n",xapic_support ? "yes" : "no");
-	oprintf("x2apic_support support:%s\n",x2apic_support ? "yes" : "no");
-	oprintf("multi-threading support:%s\n",multi_thread_support ? "yes" : "no");
-	oprintf("cpuid input max:%u\n",cpuid_input_max);
-	oprintf("addressable cores:%u\n",addressable_core_num);
-	oprintf("addressable logics:%u\n",addressable_logic_num);
-	*/
-	build_equal_map(0xfee00000,(0x200000-0x2000));
-	__asm__ __volatile__(
-		"movl $0xc4500,0xfee00300\n\t"
-		"mov $0xffffffff,%ecx\n\t"
-		"shr $10,%ecx\n\t"
-		"delay:inc %eax\n\t"
-		"loop delay\n\t"
-		"movl $(0xc4600+0x8),%eax\n\t"
-		"movl %eax,0xfee00300\n\t"	
-			);	
-
-/*	oprintf("usr_func_addr:%x\n", usr_func);*/
 	mm_init();
 	kmem_cache_init();	
 	net_init();
@@ -144,10 +51,6 @@ void kernel_c(){
 	ide_init();
 	blkdev_layer_init();
 /*	init_fs();*/
-	mem_entity[0]='G';
-	mem_entity[1]='M';
-	mem_entity[2]='K';
-	mem_entity[3]='B';
 	/*
 	 * 1, 用内核函数生成一个ring1进程没问题，ring1进程的好处是，有大多数系统权限
 	 * 在访问内核空间时（例如它的eip就跑在内核空间的代码区),但它又是作为普通
@@ -205,15 +108,7 @@ void kernel_c(){
 /*	oprintf("%s", testbuf);*/
 /*	spin("ss");*/
 	fire(f_init);
-	/**用ebx存储current是linux里的通例，后面的流程，像restore_all是直接取用
-	 * ebx当作current的。ret_from_intr和ret_from_sys_call都设置了ebx。
-	 */
-	__asm__ __volatile("movl %0, %%cr3\n\t"
-						"movl %1, %%esp\n\t"
-						"jmp *restore_all\n\t"
-						:
-						:"a"(idle->cr3), "m"(idle->pregs)
-						);
+	assert(0);
 }
 
 
@@ -226,7 +121,6 @@ void func1(void){
 	}
 }
 void func0(void){
-	sti();
 	//int counter = 0;
 	oprintf("func0 run..\n");
 	while(1){
@@ -258,7 +152,10 @@ void func2(void){
 	}
 }
 void func_init(void){
-	sti();
+	while(0){
+		mdelay(2000);
+		oprintf("/");
+	}
 	oprintf("func init run..\n");
 	ide_read_partation(0x3, 0);
 
@@ -298,3 +195,83 @@ void idle_func(void){
 	}
 }
 
+struct cpuid_family{
+	u32 stepping_id:4;
+	u32 model:4;
+	u32 family:4;
+	u32 type:2;
+	u32 :2;
+	u32 model_extend:4;
+	u32 family_extend:8;
+	u32 :4;
+};
+static void probe(void){
+	struct cpuid_family cpuid_family;
+	int cpuid_input_max=0;
+	int xapic_support=0;
+	int x2apic_support=0;
+	int multi_thread_support=0;
+	int addressable_core_num=0;
+	int addressable_logic_num=0;
+	__asm__ __volatile__(
+			"mov $0,%%eax\n\t"
+			"cpuid\n\t"
+			"movl %%eax,%3\n\t"
+
+			"movl $1,%%eax\n\t"
+			"cpuid\n\t"
+			"movl %%eax,%6\n\t"
+			"bt $9,%%edx\n\t"
+			"setc %0\n\t"
+			"bt $21,%%ecx\n\t"
+			"setc %1\n\t"
+			"bt $28,%%edx\n\t"
+			"setc %2\n\t"
+
+			"shl $8,%%ebx\n\t"
+			"shr $24,%%ebx\n\t"
+			"mov %%ebx,%4\n\t"
+
+			"movl $4,%%eax\n\t"
+			"movl $0,%%ecx\n\t"
+			"cpuid\n\t"
+			"shr $26,%%eax\n\t"
+			"inc %%eax\n\t"
+			"movl %%eax,%5\n\t"
+			"end:nop"
+			:"=m"(xapic_support),"=m"(x2apic_support),"=m"(multi_thread_support),"=m"(cpuid_input_max),"=m"(addressable_logic_num),\
+			"=m"(addressable_core_num), "=m"(cpuid_family)
+			:
+			:"memory"
+			);
+	oprintf("cpu family:%x model:%x\n",cpuid_family.family+(cpuid_family.family_extend<<4), cpuid_family.model+(cpuid_family.model_extend<<4));
+	#if 1
+	if(!xapic_support ) spin("xapic not support");
+	oprintf("apic/xapic_support support:%s\n",xapic_support ? "yes" : "no");
+	oprintf("x2apic_support support:%s\n",x2apic_support ? "yes" : "no");
+	oprintf("multi-threading support:%s\n",multi_thread_support ? "yes" : "no");
+	oprintf("cpuid input max:%u\n",cpuid_input_max);
+	oprintf("addressable cores:%u\n",addressable_core_num);
+	oprintf("addressable logics:%u\n",addressable_logic_num);
+	#endif
+	/* 删掉了一个（宏调用）,build_equal_map和一段汇编码。
+	   这个函数是映射0xfee00000这个页，用(0x200000-0x2000)处的page做页表。
+	   这个函数好丑
+	  *后面的一段汇编吗操作了0xfee00300，这段地址应该是：illustrates the 
+	   interrupt command register mapped to two, contiguous 16-byte-aligned
+	   memory regions with addresses “FEE0—0300” and “FEE0—0310.”
+	  */
+
+}
+
+static int scan_dirty_machine_words(unsigned start, unsigned end){
+	int count = 0;
+	for(int i = start; i < end; i += 4){
+		unsigned x  = *(unsigned *)(i+PAGE_OFFSET);
+		if( x ){
+			oprintf("%u ", x);
+			count++;
+		}
+	}
+	return count;
+}

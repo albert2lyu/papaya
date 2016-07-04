@@ -180,21 +180,26 @@ doNothing:
 loop search_ph_typeLoaded
 kernel_pg_map:
 cld
-mov edi,_gpgdir_base+0xc00
-mov ecx,224
-mov eax,0x101000|PG_P|PG_USS|PG_RWW
+mov edi,_gpgdir_base+0xc00		;page directory, 对应了3G开始的内存
+mov ecx,224						;初始化224个entry，对应3G~3G+896M的内存
+mov eax,0x101000|PG_P|PG_USS|PG_RWW		;entry value，即页表地址，从0x101000递增
 .filldir:
 	stosd
 	add eax,0x1000
 	loop .filldir
-mov ecx,0x400*224
-mov eax,0|PG_P|PG_USS|PG_RWW
+mov ecx,0x400*224				;224个page table,每个page table有1024个entry
+mov eax,0|PG_P|PG_USS|PG_RWW	;填充这些entry,从0递增。表示从0地址开始map.
 mov edi,0x101000
 .filltbl:
 	stosd
 	add eax,0x1000
 	loop .filltbl
 ;map 0x7000~0x8fff now
+;1~2M都是page table(最开始是一个pagedir,最末尾有一段没用)，为您成了3G-3G,896M 
+;向0~896M的映射。 我们从最末尾分配4K（这个page肯定还没用，很安全)当作页表，
+;然后把这个页表注册在page directory的entry 0，它就能映射虚拟地址的0~4M了，我
+;们想映射的是虚存地址的7c00~8fff,因为boot.bin的代码分布在(7c00+)。因为接下来
+;MMU打开，我们要赶紧完成这个对等映射。
 tmp_tbl_addr equ 0x200000-0x1000
 mov dword [_gpgdir_base],tmp_tbl_addr|PG_P|PG_USS|PG_RWW
 mov dword [tmp_tbl_addr+7*4],0x7000|PG_P|PG_USS|PG_RWW

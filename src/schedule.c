@@ -35,7 +35,7 @@ void sleep_expire(struct pcb *p){
 void do_timer(void){
 	ticks++;
 	//if(ticks % 100 == 0) oprintf("-----clock %u-------------current:%s\n", ticks/100, current->p_name);
-	if(ticks % 100 == 0) oprintf("^");
+	if(ticks % 300 == 0) oprintf("^");
 
 /*	oprintf("now reduce timeslice of process :%s\n",current->p_name);*/
 	if(--current->time_slice == 0){

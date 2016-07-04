@@ -59,12 +59,15 @@ void magic_color(void){
 
 		lseek(fd_kernel, color_pos, SEEK_SET);
 		assert( read(fd_kernel, &byte, 1) == 1 );	// fetch byte data
+		if(byte == 0 && i == 0) assert(0 && "kernel.elf seems old, try 'make'\n");
 		lseek(fd_kernel, color_pos, SEEK_SET);		//rewind for writing
 		assert( 
 		write(fd_kernel, &magic_x, 1) == 1 );//write magic number
 		assert( write(fd_fix, &byte, 1) == 1 );		//send byte data to fix.img
 	}
 	assert( write(fd_fix, (char *)&i, 1) == 1);
+	fsync(fd_kernel);
+	fsync(fd_fix);
 	close(fd_kernel);
 	close(fd_fix);
 }

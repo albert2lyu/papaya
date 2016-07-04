@@ -4,7 +4,7 @@
 
 #include<net/arp.h>
 void send_data(char *data){
-	int total = 3;
+	int total = 1;
 	for(int i = 0; i < total; i++){
 		//struct sk_buff * skb = dev_alloc_skb( ARP_PACK_SIZE );	
 		//skb->len = ARP_PACK_SIZE;
@@ -29,7 +29,7 @@ void testnet(void){
 	//oprintf("@8259  @before IMR %x\n", read_imr_of8259());	
 	char data[] = "this line come from papaya kernel";
 	//mdelay(1000 * 60);
-	//send_data(data);
+	send_data(data);
 	return;
 
 }

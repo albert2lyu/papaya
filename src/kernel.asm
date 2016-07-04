@@ -60,9 +60,7 @@ jmp selector_plain_c0:newcs ;update cs
 
 newcs:nop
 ;{init
-;push  65535;1193181/18
 push  11931 ;1193180/100
-;push 1193;1193180/1000
 call init8253 ; init 8253
 
 

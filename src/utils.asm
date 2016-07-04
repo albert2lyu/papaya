@@ -1,6 +1,6 @@
 ;these functions are declared and commented(some basic explanation) in utils.h
 %include "utils.inc"
-global in_byte,out_byte,port_read,send_hd_eoi,port_write,detect_cpu,in_dw,out_dw,update_eflags,ap_init,ap_init_end, read_imr_of8259
+global in_byte,out_byte,port_read,port_write,detect_cpu,in_dw,out_dw,update_eflags,ap_init,ap_init_end, read_imr_of8259
 global __bt, __bts, __btr, __bsc, __bs0s
 extern cpu_string,oldeflags
 global init8259A
@@ -53,13 +53,6 @@ out_dw: ;void out_dw(int port,u32 value)
 	out dx,eax
 	ret
 ;void init8259A(int mask);
-send_hd_eoi:
-	mov al,20h
-	out 20h,al
-	out 0xa0,al
-	iodelay
-	ret
-
 init8259A:
 	mov al,11h
 	out 20h,al		;send icw1 to 0x20		arg meaning:[icw4 needed]

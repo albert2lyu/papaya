@@ -1,3 +1,4 @@
+6, papaya shouldn't respond to IP datagram when self's ip not mentioned.
 5, 8139的txbuf[4],后三个可能没有4字节对齐。会引起芯片word aligned的bug吗。
 1, mm_struct , vm_area, ioremap
 2, temporary equal map for mmio. proc.c TODO
@@ -7,3 +8,6 @@
 但回避了一点：对等映射0xfbxxxx段内存，会造成页错误。我怀疑是1M+4K处有内存缺陷。采用-3G的映射方式，把这部分页表放在1M处，就能访问了。就能访问到了。读出来的Mac地址看上去也没问题。
 
 4, sprious irq不光要处理，还要做counter，是EOI送的怎么不合适了。
+
+bug
+400m.img的分区表被破坏了，以后启用磁盘模块就会崩溃。

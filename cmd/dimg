@@ -1,0 +1,10 @@
+#!/bin/bash 
+if [ $# == 0 ]
+then
+	./_dimg ../cmd/400m.img && exit 0 || exit 1
+fi
+
+# convention: if more than 1 argument we got, write to real usb device
+ls /dev/sdb -la  || exit 1
+./_dimg /dev/sdb && exit 0 || echo "_dimg failed" && exit 2
+

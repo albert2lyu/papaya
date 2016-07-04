@@ -1,3 +1,5 @@
+1, func_init里加了代码之后，反而kernel.elf变小，因为加的是while(1),导致后面的都被优化掉了。
+2, 就是加了这个while(1){oprintf(); msleep();}之后，减小为210+1,立刻崩溃。当关中断不崩溃。
 
 Mon Jul  4 01:44:15 CST 2016
 Thu Jun 30 08:45:13 CST 2016

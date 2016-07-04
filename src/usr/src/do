@@ -1,4 +1,0 @@
-#!/bin/bash
-nasm -o sys_call.o sys_call.asm -felf
-gcc -c -o init.o init.c
-ld -o init init.o sys_call.o -einit

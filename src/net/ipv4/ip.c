@@ -2,7 +2,7 @@
 #include<linux/if_ether.h>
 #include<linux/skbuff.h>
 
-#if 0
+#if 1
 /* collector[FRAG_TBL_LEN]
  * This is a hash table organised as an array of link-list, to collect all 
  * ip fragments for reassemble.  
@@ -21,10 +21,11 @@ void ip_layer_receive(struct sk_buff *skb){
 	struct iphdr *iphdr = skb->iphdr;
 
 	//BYTE_ENDIAN_FLIP(skb)
-	spin(" OK, ip layer receive");
+	oprintf(" OK, ip layer received, just ignore and return\n");
+	return;
 }
 
-#if 0
+#if 1
 void ip_layer_init(void){
 	collector = static_alloc(sizeof(void *), FRAG_TBL_LEN);
 }

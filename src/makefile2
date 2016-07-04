@@ -5,13 +5,11 @@ VPATH=../lib/ ../bin/
 #header_path will be used when 'gcc -M'.you can not use '$(cflags)' instead of
 #'$(head_path)' under this case,because other unrelated cflags may affect the 
 #operation of 'gcc -M',according to by test.
-cheader_path=-I../include/ -I./usr/include/	-I./include/ -I./arch/x86/include/
+cheader_path=-I../include/ 	-I./include/ -I./arch/x86/include/
 cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -Wno-implicit-function-declaration -g -fno-stack-protector
-asmflags=-i../include/ -i./usr/include/
+asmflags=-i../include/ 
 ldpath=-L../lib/
 
-usro= ../src/usr/lib/asmtask.o ../src/usr/lib/sys_call.o ../src/usr/lib/utils.o\
-	  ../src/usr/lib/unistd.o
 #the target of a rule matchs in a stiff way,kernel.a will match '%.a:%.asm' but
 #../lib/kernel.a won't.
 asmo=kernel.asmo utils.asmo bootinfo.asmo
@@ -43,17 +41,17 @@ kernel.elf:$(kernelrelyo)
 
 %.asmo: %.asm ../include/*.inc
 	nasm -felf -o ../lib/$@ $< $(asmflags)
+
 clean:
 	rm  -rf ../lib/;\
 	rm  ../cmd/*.o;\
 	rm ../cmd/_dimg;\
 	rm -f *.d;
 #replace your 400m.img to after using make git
+
 git:
 	rm  -f ../lib/*;rm -f ../bin/*;rm -f *.d;\
 	rm -f ../cmd/parport.out ../cmd/_dimg;\
-	rm -f usr/lib/*;\
-	rm -f usr/src/*.o;\
 	rm -f ../cmd/*.o;\
 	rm ../cmd/bochsout.txt;\
 	mv ../cmd/test ../../yanqi_test;\

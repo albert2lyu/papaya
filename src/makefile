@@ -1,5 +1,10 @@
-#在源码树里新建一个目录时，需要在这里添加相应的编译行和clean行。clean行很重要，因为总的
-#不是通过递归的make -C clean完成的。
+#1, 在源码树添加目录时，要在这里添加相应的编译行和clean行。clean行很重要，
+#   因为总的不是通过递归的make -C clean完成的。
+# 增加一个新的C文件时要做的：
+# 1, 如果要顺便给它分配目录，就拷过去一个makefile。
+# 2, 在那个makefile的target里添加xx.o。
+# 3, 在这个makefile里添加make -C行和clean行。
+# 4, 在makefile2里添加xxx.o用于链接。
 ROOT=/home/wws/lab/yanqi
 export ROOT
 all:

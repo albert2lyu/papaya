@@ -17,7 +17,8 @@
 #define __priv(netdev) ((struct rtl8139_private *)netdev->private)
 #define ETH_MIN_LEN 60
 #define NUM_TX_DESC 4
-#define TX_BUF_SIZE 1762
+#define TX_BUF_SIZE (1762 & ~3) /* MTU of 8139 should be 1762, but 4 bytes 
+								 * aligned is required for this chip */
 static struct net_device *testnd;
 struct rtl8139_private{
 	struct pci_dev *pcidev;
@@ -348,7 +349,6 @@ static void on_rx(struct net_device *netdev){
 	//u16 isr = RTL_readw(netdev, ISR);
 	RTL_writew(netdev, ISR, 0xffff);
 	oprintf(" !R! ");
-	return;
 
 	struct rtl8139_private *private = netdev->private;
 	while(!( RTL_readb(netdev, ChipCmd) & RxBufEmpty )){
@@ -360,7 +360,7 @@ static void on_rx(struct net_device *netdev){
 		skb->dev = netdev;
 		memcpy(skb->ethhdr, raw->data, data_size);
 		LL2_A(&netdev->rx_queue, skb);
-		//mark_bh(netdev->on_rx_bh);
+		mark_bh(netdev->on_rx_bh);
 
 		/* word aligned feature of RTL8139 Chip. Not documented */
 		//u16 cursor_r_old = private->cursor_r;
@@ -417,7 +417,7 @@ static int rtl8139_start_xmit(struct sk_buff *skb, struct net_device *netdev){
 	if(skb->pkgsize < TX_BUF_SIZE){
 		/*ok, transmit it */
 		int size = skb->pkgsize < 60 ? 60 : skb->pkgsize;
-		memset( PRIV(netdev)->tx_bufs[realdesc], 0, size );
+		memset( PRIV(netdev)->tx_bufs[realdesc], 0xbb, size );
 		memcpy( PRIV(netdev)->tx_bufs[realdesc], skb->ethhdr, skb->pkgsize );
 		dev_free_skb(skb);
 		//struct TxStatusReg tsr = {value: RTL_readl(netdev, TxStatus0 + realdesc * 4)};
