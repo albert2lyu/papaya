@@ -1,17 +1,11 @@
+; The memory layout diagram is in bootinfo.asm
 ;1 single segment should be smaller than 64KB
-;old 2 the LOAD-TYPE segment of kernel.elf should be smaller than (0x80000-0x30400=)300KB...for kernel-cache-room starts at 0x80000 and kernel-entry locates at 0x30400
-;old 3 kernel-cache-room should be never merged...because debug-module will use .stab&.strstab section
-;4 extend 13h can only load 120*2 sectors for temprory(i don't know why),so kernel-size is limited within 120KB		--确实，大概是128KB的样子，而且是１个dap128K,想读更多扇区，只好再用一个dap.
 %include "bootinfo.asm"
 %include "../include/pm.inc"
 %include "../include/utils.inc"
-DAP_SECTOR_COUNT equ  64
-DAP_SECTOR_LIMIT equ 254 ;知道了，这应该是IDE端口的限制，一次最多255个扇区
-DAP_MEM_COUNT equ (DAP_SECTOR_COUNT * 512)
 org 0x7c00
 addr_mbr_loaded equ (_base_kernel_loaded - 512 * (_bootbin_occupy_sectors + _fiximg_occupy_sectors))
 [bits 16]
-;用int 13h，要担心硬盘的磁头号大于1吗？
 mbrHead:
 	mov ax, 0xb800
 	mov gs, ax
@@ -73,7 +67,7 @@ show_elf:
 	mov es, ax
 	get_memory_information:
 	mov ebx,0
-	mov di,_base_meminfo
+	mov di,mem_seginfo_arr
 .loop:
 	mov eax,0E820h
 	mov ecx,20
@@ -81,7 +75,7 @@ show_elf:
 	int 15h
 	jc .fail
 	add di,20
-	inc dword [_memseg_num]
+	inc dword [mem_segnum]
 	cmp ebx,0
 	jne .loop
 	jmp .done
@@ -128,15 +122,15 @@ fix_kernel:
 	mov ecx, 0	; !boolean, indicates the last sector to fix
 	.check_one:
 		cmp byte [edi], al		;check magic number
-		je fix_kernel.fix_it
+		je .fix_it
 		;magic number check failed, we still have a chance
 		cmp byte [edi], 0xcc
-		jne fix_kernel.bad
+		jne .bad
 		;not the end, let us see how many sectors we fixed
 		mov ecx, 1		;有些早，但没事，因为如果count核对失败，就死循环了。
 		inc al		;assume have fixed this sector
 		cmp byte [esi + 1], al
-		je fix_kernel.fix_it
+		je .fix_it
 		.bad: jmp $
 	.fix_it: 
 		mov ah, [esi]
@@ -144,8 +138,7 @@ fix_kernel:
 		inc esi 
 		inc al
 		add edi, 512
-	jcxz fix_kernel.check_one	
-	.done:
+	jcxz .check_one	
 
 reset_kernel:
 ;clear RAM for .bss

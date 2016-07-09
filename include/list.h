@@ -2,6 +2,7 @@
 #define LIST_H
 /*the host structures will be organised into a circle link-list */
 
+#include<linux/assert.h>
 typedef struct list_head{
 	struct list_head *prev;
 	struct list_head *next;
@@ -14,6 +15,8 @@ typedef struct list_head{
 
 static inline void __list_add(list_head_t *new, list_head_t *prev,
 												list_head_t *next){
+		assert( new && prev && next\
+				&& prev->prev && prev->next && next->prev && next->next);
 		new->next = next;
 		next->prev = new;
 		new->prev = prev;
@@ -40,6 +43,7 @@ static inline void list_add_tail(list_head_t *new, list_head_t *head){
  * initialized list-head.
  */
 static inline void __list_del(list_head_t *prev, list_head_t *next){
+	assert(prev && next && prev->next && prev->prev && next->prev && next->next);
 	prev->next = next;
 	next->prev = prev;
 }
@@ -80,11 +84,6 @@ static inline void hashtable_add(list_head_t *hashtable, int hash, list_head_t *
 	list_add(new, hashtable + hash)	;
 }
 
-/* not necessary
-static inline void hashtable_del(list_head_t *hashtable, int hash, list_head_t *todel){
-	list_del(todel);
-}
-*/
 #define MB2STRU(stru_type, mb_addr, mb_name)\
 			(stru_type *)( (u32)(mb_addr)-  (u32)&((stru_type *)0)->mb_name )	
 #endif

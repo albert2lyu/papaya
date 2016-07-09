@@ -1,3 +1,12 @@
+12, push eflags; cli; pop eax 尤其前两句应该仅连在一起,这样能把被split 中断的机会降到最低。
+11, 尽快把函数声明警告打开。
+10, assert.h分离出来，好多头文件只需要访问它。却不得不包含utils.h。
+9, ip.c里的dev_free_skb被注释掉了，因为会页错误。
+8, 写一个打印函数堆栈的程序。
+7, ntohs,htons这样的，在内核逐渐取消，就用byte_flip，字节反转，not bit flip。
+   因为我的内核在layer入口和出口都要搞一次像IP_HDRFLIP，那这个宏的实现到底
+   是用ntohs还是htonx呢。所以要增加一个byteflip函数。
+6, 搞清楚nasm次级标签跳转，如果直接jmp .xxx，而本block的.xxx在jmp行下方，而block之上还有一个.xxx。那往哪儿跳。 记得有一次调试，好像是往上跳的。
 6, papaya shouldn't respond to IP datagram when self's ip not mentioned.
 5, 8139的txbuf[4],后三个可能没有4字节对齐。会引起芯片word aligned的bug吗。
 1, mm_struct , vm_area, ioremap
@@ -11,3 +20,5 @@
 
 bug
 400m.img的分区表被破坏了，以后启用磁盘模块就会崩溃。
+
+* printf现在是栈上分配“写前缓存“，小心溢出。

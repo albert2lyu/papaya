@@ -85,7 +85,7 @@ void obuffer_init(OBUFFER* pt_obuffer){
 }
 
 void obuffer_push(OBUFFER* pt_obuffer,char c){
-	assert(pt_obuffer->num<size_buffer)
+	assert(pt_obuffer->num<size_buffer);
 	int next=(pt_obuffer->tail+1)%size_buffer;
 	pt_obuffer->c[next]=c;
 	
@@ -166,6 +166,8 @@ void syscall_soft_ret_to(struct pcb *pcb,int return_val,int return_errno){
 
 
 void fire(struct pcb *p){
+	extern bool task_available;
+	task_available = true;
 /*	assert(p == idle);*/
 	//BUG HERE
 	//设置tss的esp0，不是为了马上的iret，是为了iretd之后的进程再陷入ring0时

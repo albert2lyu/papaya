@@ -3,7 +3,7 @@
 #include<ku_utils.h>
 #include<linux/mylist.h>
 #include<valType.h>
-#include<utils.h>
+#include<linux/assert.h>
 //杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
 static inline unsigned str_hash(const char *str, int len){
     unsigned seed = 131; // 31 131 1313 13131 131313 etc..
@@ -74,7 +74,6 @@ u32 in_dw(int port);
 extern void out_byte(int port,unsigned value);
 void out_dw(int port,u32 value);
 extern int ring,path_ring0,ienter,stack_position,crack_eip;
-void assert_func(char*exp,char*file,char*base_file,int line);
 void port_read(unsigned port,void*buf,unsigned byte);
 void port_write(unsigned port,void*buf,unsigned byte);
 void send_hd_eoi(void);
@@ -123,8 +122,6 @@ char*strcpy(char*dest,char*src);
 char*strncpy(char*dest, const char*src, int n);
 int strcmp(const char *str1, const char *str2);
 int strncmp(const char *str1, const char *str2, int n);
-#define assert(exp)\
-do{if(!(exp)) assert_func(#exp,__FILE__,__BASE_FILE__,__LINE__);} while(0);
 
 #define DSI(str,i)\
 dispStr(str,0x400);\
@@ -132,7 +129,8 @@ dispInt(i);
 
 //留着以后测吧
 #define POINTER_SHIFT(pt,type,len) (type*)((u32)pt+len) 
-#define EXCHG_U32(a,b) do{void *c=a;a=b;b=c;} while(0)
+#define EXCHG_U32(a,b) do{unsigned c=a;a=b;b=c;} while(0)
+#define EXCHG_PTR(a, b) do { void *tmp = a; a = b; b = tmp; } while(0)
 boolean strmatch(char*seg,char*whole);
 void info_heap(void);
 /* 0, 这一组函数不会在critical area用,所以cli_already默认是初始是false
@@ -190,6 +188,21 @@ static inline void sti(void){
 	__asm__ __volatile__("sti");
 }
 
+/* @return 		cli already ? 
+ * 这个函数可以用cli_already和if组合完成，我暂时用它，是因为可以把pushf和cli
+ * 指令的间隔做到最近。但它俩之间，仍然可能会被中断。再看。
+ */
+static inline bool cli_ex(void){
+	int IF;
+	__asm__ __volatile__("pushf\n\t"
+						 "cli\n\t"
+						 "pop %0\n\t"
+						 "andl $0x200, %0\n\t"
+						 :"=r"(IF)
+						 :);
+	return IF;
+}
+
 static inline unsigned get_eflags(void){
 	unsigned eflags;
 	__asm__ __volatile__("pushfl\n\t"
@@ -209,6 +222,7 @@ static inline bool sti_already(void){
 }
 #define MAKE_IP(a, b, c, d) (((a)<<24) + ((b)<<16) + ((c)<<8) + d)
 char *MAKE_IP_STR(u32 ip);
+void oprintf(char*format,...);
 static inline void print_mac(u8 * mac){
 	oprintf(" %x %x %x %x %x %x ", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }
@@ -219,14 +233,15 @@ static inline void print_ip(u32 ip){
 #define ARR_CELLS(array, stru_t) ( sizeof(array) / sizeof(stru_t))
 unsigned read_imr_of8259(void);
 
+/* CRC16, for memory area on big endian */
+u16 crc16_compute_be(void *area, int len);
 
+static inline u16 crc16_write_be(void *area, int len, u16 *chksum){
+	*chksum = 0;
+	*chksum = crc16_compute_be(area, len);
+	return *chksum;
+}
 
-
-
-
-
-
-
-
+void __less(void *buf, int len);
 
 #endif

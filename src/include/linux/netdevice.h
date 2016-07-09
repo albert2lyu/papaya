@@ -36,6 +36,7 @@ struct net_device{
 		u32 count_drop_tok;
 	}debug;
 	struct pci_dev *pcidev;
+	u32 ip_identifier;
 };
 
 

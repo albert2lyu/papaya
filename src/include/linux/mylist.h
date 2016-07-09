@@ -95,6 +95,24 @@ struct ll2{
 			new->prev = new->next = 0;					\
 		}												\
 	}while(0)
+
+#define LL_I2(root, new)								\
+	do{													\
+		assert(root);									\
+		if(root->next) root->next->prev = new;			\
+		new->next = root->next;							\
+		new->prev = root;								\
+		root->next = new;								\
+	}while(0)
+
+#define LL_REPLACE(root, old, new)						\
+	do{													\
+		new->prev = old->prev;							\
+		new->next = old->next;							\
+		if(new->prev) new->prev->next = new;			\
+		if(new->next) new->next->prev = new;			\
+		if(root == old) root = new;					\
+	}while(0)
 /**insert a node to list in an ascending order by compare 'attr'
 * 这里用root备份list，而用list遍历，是取巧的方法。
 * 2, 相等时会插在既有节点后面。
@@ -199,4 +217,36 @@ struct ll2{
 		}\
 	}while(0)
 
+
+/* 检查node是否在root指示的list里 */
+#define LL_CHECK(root, node)									\
+	do{															\
+		void *backup = root;									\
+		while(root){											\
+			if(root == node) break;								\
+			root = root->next;									\
+		}														\
+		assert(root && "can not find node in that list");		\
+		root = backup;											\
+	}while(0)
+
+
+
+
+
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

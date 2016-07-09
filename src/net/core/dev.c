@@ -28,6 +28,7 @@ void register_nic(struct net_device *netdev){
 void net_init(void){
 	skbuff_init();
 	arp_init();
+	ip_layer_init();
 }
 
 /* 必须在sti()的外环境调用它

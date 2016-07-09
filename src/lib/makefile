@@ -1,4 +1,4 @@
-all: clean slab.o
+all: clean vsprintf.o printf.o
 
 %.o:%.c
 	@gcc -c -o $@ $< $(cflags)

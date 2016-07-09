@@ -63,7 +63,11 @@ unsigned do_IRQ(stack_frame regs){
 			desc->hw_handler->ack(irq);	
 	}
 	if(irq == 1){
-		oprintf("\n a key pressed \n");
+		//oprintf("\n a key pressed \n");
+		int key_code=in_byte(0x60);
+		oprintf(" *%x* ", key_code);	
+		extern int __less_go;
+		if(key_code <= 0x34) __less_go = true;		//igonre break code
 		return 0;
 	}
 	//若action队列是空的，或者INPROCESS，或者DISABLED，则置IRQ_PENDING位，这次

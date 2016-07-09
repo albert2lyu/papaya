@@ -11,8 +11,10 @@ u32 oldeflags;
 /* number of bytes in one page ,a char variable shuould be represented by two bytes */
 #undef PAGE_SIZE
 #define PAGE_SIZE (80*25*2)
+#define MASK_L_NR 4			//下部“指示窗口”的行数
+#define L_SIZE 160				//每一行对应的显存bytes
 /*byte offset in the end*/
-#define BOUND (PAGE_SIZE*2-2)
+#define BOUND (PAGE_SIZE*2-2 - L_SIZE * MASK_L_NR)
 /**i don't want to to translate this part
 1,k_show_chars函数的主体实现，这个代码块没有通用功能，只是让k_show_chars函数更好看一些
 2,目前是唯一的写屏接口，要具备upsend_page,滚屏，光标跟随，转义符识别功能
@@ -113,7 +115,7 @@ void k_show_var(unsigned x,int val_type){
 
 /**scroll up if text fall out of last line on screen(line 79)*/
 void k_scroll(void){
-	int new_start_line=(edi/160)-25+1;
+	int new_start_line=(edi/160)-21+1;
 	if(new_start_line>start_line){
 		set_start(new_start_line*80);
 		start_line=new_start_line;
@@ -206,7 +208,7 @@ void write_asciis_buffer(unsigned x,unsigned val_type){
 			asciis_buffer[offset-2]='0';
 			break;
 		default:
-			assert(0)
+			assert(0);
 			break;
 	}
 }
@@ -218,8 +220,15 @@ void k_screen_reset(void){
 	edi=0;
 }
 
-
-
+////////////////////////////////////////////////////////////////
+//             bottom window                                 //
+////////////////////////////////////////////////////////////////
+#if 0
+#define WINDOW_H MASK_L_NR
+struct 
+static char window[WINDOW_H][]
+void write_window()
+#endif
 
 
 

@@ -508,7 +508,7 @@ int rtl8139_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){
 	oprintf("irq pin: %u , line: %u\n", pcidev->irqpin, pcidev->irqline);
 	/* TODO ioremap, remove hard code */
 	netdev->base_addr = (unsigned)( pcidev->address[1] & ~0xf) - PAGE_OFFSET;
-	//assert((netdev->base_addr >> 20) == 0xfeb);
+	assert(( (netdev->base_addr + PAGE_OFFSET) >> 20) == 0xfeb);
 	netdev->irq = pcidev->irqline;
 	//oprintf("base_addr:%x\n", netdev->base_addr);
 	int mac[2] = {0};

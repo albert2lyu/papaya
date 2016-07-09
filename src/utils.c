@@ -1,67 +1,13 @@
 #include"../include/utils.h"
 #include<proc.h>
 #include<disp.h>
+#include<linux/byteorder/generic.h>
 void dump_sys(){
 }
 
 char *MAKE_IP_STR(u32 ip){
 	return 0;	
 }
-#if 0
-int bitscan111(u32 addr, int num_111 ,int dw_cell){
-	if(num_111 <= 0) return -1;
-	u32 *cell = (u32*)addr;
-	for(int i=0; i<dw_cell; i++){
-		if((u32*)cell[i] != 0){
-			int bitoffset = bitscan32(cell+i, num_111);
-			if(bitoffset == -1) continue;
-			return (i*32 + bitoffset);
-		}
-}
-	return -1;
-}
-bool  bitsclear_long(u32 addr, int bit_off, int num){
-	if(num <=0 || bit_off<0 ) return false;
-	if(num <= 32){
-		bitsclear(addr,bit_off,num);
-		return true;
-	} 
-	/**adjust bit_off to 0~31*/
-	addr+=4* (bit_off/32);
-	bit_off%= 32;
-
-	u32 head_addr = (bit_off == 0?0:addr);
-	u32 tail_addr = ((bit_off + num)%32 == 0?0:(addr + (bit_off+num)/32*4));
-	u32 body_start = (bit_off == 0?addr:(addr+4));
-	u32 body_end = addr + (bit_off+num)/32*4 -4;
-
-	if(head_addr) bitsclear(head_addr,bit_off,32-bit_off);
-	if(tail_addr) bitsclear(tail_addr,0, (bit_off+num)%32);
-	for(int i=body_start; i <= body_end; i+=4) *(u32*)i=0;
-	return true;
-}
-
-bool  bitsset_long(u32 addr, int bit_off, int num){
-	if(num <=0 || bit_off<0 ) return false;
-	if(num <= 32){
-		bitsset(addr,bit_off,num);
-		return true;
-	} 
-	/**adjust bit_off to 0~31*/
-	addr+=4* (bit_off/32);
-	bit_off%= 32;
-
-	u32 head_addr = (bit_off == 0?0:addr);
-	u32 tail_addr = ((bit_off + num)%32 == 0?0:(addr + (bit_off+num)/32*4));
-	u32 body_start = (bit_off == 0?addr:(addr+4));
-	u32 body_end = addr + (bit_off+num)/32*4 -4;
-
-	if(head_addr) bitsset(head_addr,bit_off,32-bit_off);
-	if(tail_addr) bitsset(tail_addr,0, (bit_off+num)%32);
-	for(int i=body_start; i <= body_end; i+=4) *(u32*)i=0xffffffff;
-	return true;
-}
-#endif
 
 void spin(char *msg){
 	__asm__ __volatile__ ("cli");
@@ -185,6 +131,38 @@ void udelay(unsigned long usecs)
 		}
 	}
 }
+
+
+/* crc16 for big endian memory area*/
+u16 crc16_compute_be(void *area, int len){
+	u16 *_area = area;
+	u32 sum = 0;
+	for(int i = 0; i < len/2; i++){
+		//oprintf("%u: %x\n", i, ntohs(_area[i]));
+		u16 field = ntohs(_area[i]);
+		sum += field;
+	}
+
+	struct{ u16 ax, carry; } *eax = (void *)&sum;
+	while(eax->carry){
+		sum = eax->ax + eax->carry;	
+	}
+	//oprintf(" sum:%x\n",   sum);
+	return ~sum;
+}
+
+int __less_go = 1;
+void __less(void *buf, int len){
+	char *str = buf;
+	int pressnum = 80*12;
+	for(int i = 0; i < len; i += pressnum){
+		int left = len - i;
+		oprintf(" %*s ",   pressnum < left ? pressnum : left, str + i);
+		__less_go = false;
+		while(!__less_go);
+	}
+}
+
 
 
 

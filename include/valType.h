@@ -2,6 +2,8 @@
 #ifndef VALTYPE_H
 #define VALTYPE_H
 
+#define __DEBUG
+
 #define NULL 0
 #define true 1
 #define false 0
@@ -47,7 +49,6 @@ typedef struct descriptorr{
 typedef struct{
 	volatile int counter;
 }atomic_t;
-
 
 
 

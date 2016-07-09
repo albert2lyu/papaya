@@ -93,7 +93,7 @@ void schedule(void){
 			p->time_slice=p->time_slice_full;
 			p=p->next;
 		}
-		EXCHG_U32(list_active,list_expire);
+		EXCHG_PTR(list_active,list_expire);
 	}
 
 	if (list_active) next = list_active;

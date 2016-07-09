@@ -5,8 +5,13 @@
 # 2, 在那个makefile的target里添加xx.o。
 # 3, 在这个makefile里添加make -C行和clean行。
 # 4, 在makefile2里添加xxx.o用于链接。
+
 ROOT=/home/wws/lab/yanqi
-export ROOT
+cheader_path=-I$(ROOT)/src/include/ -I$(ROOT)/include/ -I$(ROOT)/src/arch/x86/include/ 
+
+cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -Wno-implicit-function-declaration -g -fno-stack-protector -nostdinc
+
+export cflags
 all:
 	make -C drivers/block/
 	make -C drivers/ide/
@@ -18,6 +23,7 @@ all:
 	make -C net/core
 	make -C kernel
 	make -C net/ipv4
+	make -C lib/
 	make -f makefile2
 
 clean:
@@ -36,10 +42,10 @@ clean:
 	rm net/core/*.o -f
 	rm net/ipv4/*.o -f
 	rm kernel/*.o -f
+	rm lib/*.o -f
 
 git:
-	mv ../cmd/400m.img ~/Documents/tmp_for_git/
-	mv ../cmd/cell.img ~/Documents/tmp_for_git/
+	mv ../cmd/*.img ~/Documents/tmp_for_git/
 	mv ../cmd/dimg ~/Documents/tmp_for_git/
 	mv ../cmd/init ~/Documents/tmp_for_git/
 	mv ../cmd/cell ~/Documents/tmp_for_git/

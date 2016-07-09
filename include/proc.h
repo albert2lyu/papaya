@@ -154,6 +154,10 @@ unsigned char obuffer_shift(OBUFFER* pt_obuffer);
    会使的push/pop混乱 小心
    另外，下面的函数只能在进程里调用
    */
+///////////////////////////////////////////////////////////////////////////
+// 我感觉这对push/pop操作有问题。 尤其是irq_pop的时候，可能修改别的flag。
+// 你弄这么复杂，只是为了避免if,else。单其实不一定更快。 
+///////////////////////////////////////////////////////////////////////////
 #define __fstack (current->fstack)
 static inline void cli_push(void){
 	__asm__ __volatile__("pushfl\n\t"

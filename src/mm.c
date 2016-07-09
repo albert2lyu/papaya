@@ -12,10 +12,10 @@ char testbuf[1024];
 void init_memory(void){
 	heap_init();
 	/**detect pphysical memory: print memory information and init global variable 'gmemsize'*/
-	int memseg_num = realinfo->memseg_num;
-	struct memseg_info *memseg =realinfo->memseg_info;
+	int mem_segnum = realmod_info->mem_segnum;
+	struct mem_seginfo *memseg =realmod_info->mem_seginfo;
 	oprintf("%12s%12s%10s\n","start","len","type");
-	for(int i=0; i<memseg_num; i++){
+	for(int i=0; i<mem_segnum; i++){
 		oprintf("%12x%12x%10s\n",memseg[i].base_low,memseg[i].len_low,\
 								memseg[i].type==1?"free":"occupied");
 		if(memseg[i].type == 1 && memseg[i].base_low > gmemsize) \
@@ -204,5 +204,7 @@ void mm_init(void){
 	init_memory();
 	init_zone();
 	temp_mmio_map();
+	extern bool mm_available;
+	mm_available = true;
 }
 

@@ -2,6 +2,7 @@
 #define IF_ETHER_H
 #pragma pack(push)
 #pragma pack(1)
+#include<valType.h>
 
 struct ethhdr{
 	char yourmac[6];
@@ -10,4 +11,5 @@ struct ethhdr{
 };
 
 #pragma pack(push)
+#define ETHHDR_LEN (sizeof( struct ethhdr) )
 #endif

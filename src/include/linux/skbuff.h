@@ -2,6 +2,7 @@
 #define SKBUFF_H
 #include<linux/slab.h>
 #include<valType.h>
+#include<list.h>
 struct ethhdr;
 struct arphdr;
 struct iphdr;
@@ -15,7 +16,10 @@ struct net_device;
  */
 struct sk_buff{
 	int pkgsize;			/* package length */
-	int bufsize;		/* buffer size */
+	union{
+		int gotsize;		/* total size of ip fragments we got */
+		int bufsize;		/* buffer size */
+	};
 
 	char *data;			/* i.e. buffer */
 
@@ -33,6 +37,10 @@ struct sk_buff{
 		struct udphdr *udphdr;
 		void *third_hdr;
 	};
+	struct list_head node;
+	struct {
+		struct sk_buff *frag_begin, *frag_end;
+	}debug;
 };
 
 

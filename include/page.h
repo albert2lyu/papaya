@@ -1,5 +1,5 @@
-#ifndef PAGE_H
-#define PAGE_H
+#ifndef X86_PAGE_H
+#define X86_PAGE_H
 
 #define PAGE_SHIFT 12
 #define PAGE_SIZE 0x1000

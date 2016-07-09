@@ -1,14 +1,5 @@
-#ifndef UDP_H
-#define UDP_H
-#pragma pack(push)
-#pragma pack(1)
+#ifndef LINUX_UDP_H
+#define LINUX_UDP_H
+#include<net/udp.h>
 
-struct udphdr{
-	u16 myport;	
-	u16 yourport;
-	u16 len;
-	u16 checksum;
-};
-
-#pragma pack(pop)
 #endif

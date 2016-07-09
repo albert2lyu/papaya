@@ -74,7 +74,7 @@ struct sk_buff * dev_alloc_skb( int pkgsize ){
 
 	skb->ethhdr = (void *)( skb->data + 2 );
 	skb->second_hdr = (void *)(skb->ethhdr + 1);
-	skb->third_hdr = (void *)(skb->iphdr + 1);
+	skb->third_hdr = (void *)(skb->iphdr + 1);		/*已经被ip.c里代码依赖了*/
 
 	skb->dev = pick_nic();		/* TODO remove it later */
 	skb->bufsize = bufsize;

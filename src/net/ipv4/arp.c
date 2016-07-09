@@ -75,7 +75,7 @@ static u8 *arp_lookup(u32 ip){
  *
  */
 static struct arp_record * arp_learn(u8 *comer_mac, u32 comer_ip){
-	int index = comer_ip % ARP_TBL_LEN;
+	int index = iphash(comer_ip )% ARP_TBL_LEN;
 	struct arp_record *record = arptbl[index];
 	while(record){
 		if( record->his_ip == comer_ip) break;
@@ -122,7 +122,7 @@ static void arp_act(struct sk_buff *skb){
 
 	struct arp_record * record = arp_learn( arphdr->mymac ,arphdr->myip);
 
-	int index = record->his_ip % ARP_TBL_LEN;
+	int index = iphash(record->his_ip )% ARP_TBL_LEN;
 	struct sk_buff * waiting = later_down[index];
 	while(waiting){
 		struct sk_buff *_next = waiting->next;
@@ -136,42 +136,36 @@ static void arp_act(struct sk_buff *skb){
 		waiting = _next;
 	}
 }
-/* @DESC receive a package from upper layer, and fill in the  ehter-header's
- * 'MAC' field corresponding to it's IP. if the target ip is addressed in the 
- * subnet of the sender, we fill in the 'MAC' field by scaning the IP-MAC table.
- * Otherwise, we let it be the MAC of the Gateway.(i.e we will send this package
- * to Gateway)
+/* @DESC 
+ * Now, an IP datagram wanna go out. We let arp layer determine it's next hop,
+ * to a gateway, or directly to another host in LAN.
  */
 void arp_down(struct sk_buff *skb){
-	assert(0);
-	#if 1
 	memcpy(skb->ethhdr->mymac, skb->dev->mac, 6);
+	skb->ethhdr->protocol = htons(0x0800);
 
 	struct iphdr * iphdr = skb->iphdr;
 	struct net_device *dev = skb->dev;
 	//skb_cursor_up(skb, sizeof(struct ethhdr));
-	unsigned dest_ip;
-	if((iphdr->yourip & dev->ipmask) == (dev->ip & dev->ipmask)){
-		dest_ip = dev->gateway_ip;	
+	unsigned nexthop;
+	unsigned yourip = ntohl(iphdr->yourip);
+	if((yourip & dev->ipmask) == (dev->ip & dev->ipmask)){
+		nexthop = yourip;
 	}
-	else dest_ip = iphdr->yourip;
+	else nexthop = dev->gateway_ip;
 
-	u8 *dest_mac = arp_lookup(dest_ip);
+	u8 *dest_mac = arp_lookup(nexthop);
 	if(dest_mac){
 		memcpy(skb->ethhdr->yourmac, dest_mac, 6);
-		cli();
-		LL2_A( &dev->tx_queue, skb);
-		sti();
+		waiting_for_transmit(skb);
 	}
 	else{
 		oprintf("[!]\n");
 		cli();
-		//LL2_A( waiting_list(skb), skb);		
-		int index = iphdr->yourip % ARP_TBL_LEN;
+		int index = iphash(yourip )% ARP_TBL_LEN;
 		LL_I( later_down[index], skb);
 		sti();
 	}
-	#endif
 }
 
 

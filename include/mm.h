@@ -20,6 +20,7 @@
 /**macor 'alloc_page' defined for backward compatible, don't use it*/
 #define alloc_page(gfp, order) page_idx(alloc_pages(gfp, order))
 #define kmalloc_pg __get_free_pages
+#define kfree_pg free_pages
 #define G_PGNUM (gmemsize>>12)
 struct page *mem_map;
 typedef struct page{
@@ -37,7 +38,7 @@ typedef struct page{
 	int padden:28;
 }page_t;
 
-struct memseg_info{
+struct mem_seginfo{
 	u32 base_low, base_high;
 	u32 len_low, len_high;
 	u32 type;
