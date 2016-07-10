@@ -222,7 +222,7 @@ static inline bool sti_already(void){
 }
 #define MAKE_IP(a, b, c, d) (((a)<<24) + ((b)<<16) + ((c)<<8) + d)
 char *MAKE_IP_STR(u32 ip);
-void oprintf(char*format,...);
+int oprintf(char*format,...);
 static inline void print_mac(u8 * mac){
 	oprintf(" %x %x %x %x %x %x ", mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 }

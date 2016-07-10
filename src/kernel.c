@@ -36,17 +36,17 @@ struct pcb *idle;
 static void probe(void);
 
 void kernel_c(){
-	char tmp[512];
-	memset(tmp, 'o', 512);
-	int wr_nr = sprintf(tmp, "hello world:%*x %u %c", 8, 0x1234, 8760, 'a');
+	init_display();
+	write_bar(2, 2, "BH ", "see");
+
 	int count = 0;
-	while(1){
+	while(0){
 		count++;
 		mdelay(20);
-		printf("hello world, %x  ", count);
+		oprintf("hello world, %x  ", count);
 	}
-	while(1);
-	k_screen_reset();
+	//while(1);
+	//k_screen_reset();
 	probe();
 
 	mm_init();

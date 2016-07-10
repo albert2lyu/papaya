@@ -4,7 +4,7 @@
 
 void k_screen_reset(void);
 void k_show_chars(char*pt_head,unsigned end_flag);
-void oprintf(char*format,...);
+int oprintf(char*format,...);
 void k_scroll(void);
 void k_checkbound(void);
 

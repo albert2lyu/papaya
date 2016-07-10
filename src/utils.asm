@@ -2,7 +2,7 @@
 %include "utils.inc"
 global in_byte,out_byte,port_read,port_write,detect_cpu,in_dw,out_dw,update_eflags,ap_init,ap_init_end, read_imr_of8259
 global __bt, __bts, __btr, __bsc, __bs0s
-extern cpu_string,oldeflags
+extern cpu_string
 global init8259A
 global init8253
 [section .text]
@@ -106,11 +106,6 @@ init8253:
 	out 0x40,al
 	ret
 
-update_eflags:
-	pushfd
-	cli
-	pop dword [oldeflags]
-	ret
 
 ;;;;;;;;;;;;;;;;;;;;;	int __bt(void *base, int m);
 __bt:	

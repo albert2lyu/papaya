@@ -5,7 +5,7 @@
 //eax=0,写屏函数，在disp.c里
 //对void k_show_chars(char*pt_head,unsigned var_type)的包装
 void _k_show_chars(char*pt_head,unsigned end_flag){
-	k_show_chars(pt_head,end_flag);
+	//k_show_chars(pt_head,end_flag);
 }
 //eax=1,阻塞函数，使当前进程进入休眠，并放弃时间片
 //far-away

@@ -1,3 +1,5 @@
+Sun Jul 10 13:58:08 CST 2016
+* 完成了bottom monitor window的调试。
 
 Sun Jul 10 00:58:24 CST 2016
 * 基于sprintf的printf函数初步测试通过。明天要删掉disp.c了。

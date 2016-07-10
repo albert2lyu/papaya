@@ -97,7 +97,15 @@ out:
 	desc->hw_handler->end(irq);
 
 	//we don't cli() here, because code above runs in cli mode . TAKE CARE
-	if(bh_flags & BH_FLAG_DISABLE) oprintf(" #*& ");
+	if(bh_flags & BH_FLAG_DISABLE){
+		static int bh_collision_count = 0;
+		bh_collision_count++;
+		char title[] = {'B', 'H', 0xAE, 0};
+		char buf[16];
+		sprintf(buf, " %u", bh_collision_count);
+		write_bar(1, 0, title, buf);
+		//oprintf(" #*& ");
+	}
 	else do_bh();
 
 	return 0;

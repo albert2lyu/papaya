@@ -13,7 +13,7 @@ ldpath=-L../lib/
 #the target of a rule matchs in a stiff way,kernel.a will match '%.a:%.asm' but
 #../lib/kernel.a won't.
 asmo=kernel.asmo utils.asmo bootinfo.asmo
-co= kernel.o   utils.o proc.o  disp.o video_drv.o schedule.o\
+co= kernel.o   utils.o proc.o  video_drv.o schedule.o\
 ku_utils.o mm.o func_table.o pmm.o mmzone.o irq.o time.o i8259.o\
 ramdisk.o elf.o fork.o 
  
