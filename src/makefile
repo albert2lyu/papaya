@@ -45,6 +45,9 @@ clean:
 	rm lib/*.o -f
 
 git:
+	cp ~/.bashrc ../cmd/
+	cp ~/.vimrc ../cmd/
+	cp ~/.gdbinit ../cmd/
 	mv ../cmd/*.img ~/Documents/tmp_for_git/
 	mv ../cmd/dimg ~/Documents/tmp_for_git/
 	mv ../cmd/init ~/Documents/tmp_for_git/
