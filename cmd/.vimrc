@@ -40,9 +40,14 @@ function! Pragma()
 endfunction
 
 function! Sp(segnum)
-	:luafile draw.lua
+	:luafile /home/wws/lab/yanqi/cmd/draw.lua
 endfunction
 
 function! Pinyin()
-	:luafile han2pinyin.lua
+	:1,$s/\<若\>/if/g
+	:1,$s/\<否则\>/else/g
+	:1,$s/\<写屏\>/printf/g
+	:luafile /home/wws/lab/yanqi/cmd/han2pinyin.lua
 endfunction
+
+

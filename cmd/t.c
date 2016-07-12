@@ -1,37 +1,24 @@
 #include<stdio.h>
-struct x{
-	int _chuang_jian_shi_jian;
-	char *_xing_ming;
-	int _nian_ling;
+struct 条目{
+    int 创建时间;
+    char *姓名;
+    int 年龄;
 };
-
 int main(void){
-	int _dan_jia = 30;
-	int _jian_shu = 3;
-	struct x _xiang = {
-		_chuang_jian_shi_jian:1992,
-		_xing_ming:"_mou_wei",
-		_nian_ling:21
-	};
-	//printf("_zong_ji:%d\n", _dan_jia*_jian_shu);
-	printf("%d %s %d\n", _xiang._chuang_jian_shi_jian, _xiang._xing_ming, _xiang._nian_ling);
-
+    struct 条目 条目 = {
+        创建时间:1992,
+//姓名:"缪威",
+        姓名:"小刚",
+        年龄:24
+    };
+	若 (条目.姓名=="缪威"){
+		写屏("找到了\n");
+	}
+	否则 若(条目.姓名 == "小刚"){
+		写屏("他是小刚");
+	}
+	否则 {
+		写屏("不是他\n");
+	}
+    printf("%d %s %d\n", 条目.创建时间, 条目.姓名, 条目.年龄);
 }
-
-void ip_zhong_zu(void){
-		
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
