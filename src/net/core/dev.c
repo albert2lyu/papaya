@@ -29,6 +29,7 @@ void net_init(void){
 	skbuff_init();
 	arp_init();
 	ip_layer_init();
+	init_tcp();
 }
 
 /* 必须在sti()的外环境调用它

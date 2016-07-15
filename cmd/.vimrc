@@ -1,7 +1,7 @@
 source ~/.vim/macros/gdb_mappings.vim
 set backspace=indent,eol,start
 syntax on
-set noic
+set noic	"no ignore case
 set ruler
 set mouse=a
 set autoindent
@@ -11,6 +11,8 @@ highlight Pmenu ctermbg=white
 highlight PmenuSel  ctermbg=white  ctermfg=red
 highlight MatchParen ctermbg=white ctermfg=blue
 set hlsearch
+au BufNewFile,BufRead *.cn set syntax=c
+au BufNewFile,BufRead *.lua set list lcs=tab:\¦\ 
 
 function! Doo()
 	:r!ls %<CR>

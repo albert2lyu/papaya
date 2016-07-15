@@ -15,6 +15,7 @@
 	U+20000 - U+2FA1D : 0xF0 0xA0 0x80 0x80 - 0xF0 0xAF 0xA8 0x9D    共 64029 个
 --]]
 
+--package.path = "../cmd/?.lua;../cmd/?.so"
 require "bit"
 require "word"
 local tobyte = string.byte
@@ -22,7 +23,36 @@ for key, value in pairs(bit)do
 	--print(key, value)
 end
 
-function printx(value)
+--如果是全空白空字符串,直接返回它
+local function strip_space(str)
+	local start = 0
+	local _end = 0	
+	for i = 1, #str do
+		local byte = string.byte(i)
+		if byte ~= string.byte('\n') and byte ~= string.byte('\t') then 
+			start = i	
+			break
+		end
+	end
+
+	local i = #str
+	while i >= 1 do 
+		local byte = string.byte(i)
+		if byte ~= string.byte('\n') and byte ~= string.byte('\t') then 
+			_end = i	
+			break
+		end
+		i =  i - 1
+	end
+
+	if start ~= 0 and _end ~= 0 then 
+		return string.sub(str, start, _end)
+	else
+		return str
+	end
+end
+
+local function printx(value)
 	print( string.format("%x", value) )
 end
 function is_utf8_leader(byte)
@@ -74,7 +104,10 @@ function utf8_to_pinyin(str)
 	return py_str, i-1		--very lucky, the whole string is UTF8 encoded
 end
 
+--必须要能处理空白行和nil str
 function convert_line(str)
+	if str == nil then print("error: you passed me a nil string") return end
+
 	local text = ""
 	local i = 1
 	local seg_start = 1
@@ -111,14 +144,23 @@ function han2pinyin()
 	local in_comment  = false
 	for i = 1, #buffer do 
 		local line = buffer[i]
-		local first, second, tail, tail_ = string.byte(line, 1, 2, -1, -2)
+		local goodline = strip_space(line)
+		local first, second= string.byte(goodline, 1, 2)
+		local  near_tail, tail = string.byte(goodline, #goodline-1, #goodline)
 		if first == tobyte('/') and second == tobyte('/') then
 			--这一行是//注释
-		elseif first == tobyte('/') and second == tobyte('*') then 
+		elseif first == tobyte('/') and second == tobyte('*') then
 			--这一行是/*开端
-			in_comment = true;
-		elseif tail == tobyte('/') and  tail_ == tobyte('*') then
+			if tail == tobyte('/') and near_tail == tobyte('*') then 
+				print("single line", goodline, tail, near_tail)
+				print(string.char(tail), string.char(near_tail))
+				--单行注释,在行尾立刻结束了
+			else
+				in_comment = true;
+			end
+		elseif tail == tobyte('/') and  near_tail == tobyte('*') then
 			--*/结尾
+			print("close comment:", line)
 			in_comment = false;
 
 		else	--这一行不是注释开端，也不是注释结尾

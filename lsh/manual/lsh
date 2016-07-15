@@ -1,0 +1,56 @@
+lsh is a firstly a lua interpreter, every character you enter is processed into pure lua script.for example:
+`ls			=====>		run_cmdline("ls")
+:dd			====>		vim:normal("dd")
+if(aaa) bbb;	 =====>		if aaa then bbb end
+
+BASIC COMMAND
+-------------note, redundant space character will cause error---------
+0, cd
+
+1, mod lua
+  switch lsh to lua-mode. 
+  lua-mode is the basic mode. under lua-mode, lsh behaves like an interacive lua interpreter.
+  
+2, mod cmd
+  Switch lsh to command mode. 
+  that's not a big deal, the only difference is: when you input a command  and press 'Enter', lsh's preprocessor will insert a '`' at the begining before the preprocessing phase.
+
+3, source
+  run a lsh-script in current lsh process.
+  example:  source abc.lua
+  for current version, this is the only way to run a script. you can't use 'lsh abc.lua' to run a script in new lsh process. Not supported yet.
+
+SCRIPT
+1, `...` vs. `...|`(with a tail pipe)
+  when you write:
+  local ret = `cmd1 | cmd2 | cmd3`
+  your main aim is to just run these command. So lsh just pipe and run them. and return (one of)their exit code.
+  'ret' will always receives an integer.
+
+  However, when you write:
+  local ret = `cmd1 | cmd2 | cmd3 |`
+  LSH specify the tail pipe and believes your main aim is to get these command's final output for later usage,so it pipes and runs them, and redirects the final output to a lua-string.
+  'ret' will always receive a string(may be empty) on success, or nil when failed.
+  Note! in fact, the assign expression above is not implement yet. For temporary, '`' is required to be the first character of a line. but you can wirte:
+  `cmd1 | cmd2 | cmd3 |`
+  local ret = last_ret		--last_ret is a global value like 'errno' in language C
+
+2, $()
+  use $() to access a lua variable in command line.
+  for example:
+  ----------------------------
+  var = "abc.txt"
+  `cp $(var) $(var .. ".cp")
+  ----------------------------
+  the two lines above will copy "abc.txt" to "abc.txt.cp".
+
+   
+  
+  
+
+
+
+
+
+
+

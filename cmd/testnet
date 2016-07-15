@@ -1,2 +1,0 @@
-ip neigh flush dev eth0
-ifconfig eth0 192.168.0.22

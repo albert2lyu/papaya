@@ -8,6 +8,7 @@ struct arphdr;
 struct iphdr;
 struct icmphdr;
 struct udphdr;
+struct tcphdr;
 struct net_device;
 /* 1, sk_buff doesn't contain data, it holds pointer to a data-buffer who contains,
  *    sk_buff also collects some ctrl information.
@@ -35,6 +36,7 @@ struct sk_buff{
 	union{
 		struct icmphdr *icmphdr;
 		struct udphdr *udphdr;
+		struct tcphdr *tcphdr;
 		void *third_hdr;
 	};
 	struct list_head node;

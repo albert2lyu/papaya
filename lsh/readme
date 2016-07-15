@@ -1,0 +1,78 @@
+lua-shell(lsh) is designed for people who hate(or has wasted much time on) bash script and *nix text-tools like sed, awk.
+
+compared to bash, lsh has two features:
+1, lua as script.
+2, a built-in programmable vim-parser.
+
+here are some demo displaying the features
+DEMO1	
+find all files  under current directory named with a ".cp" suffix and remind you before delete it.
+the lsh script should be:
+	for filename in lfs.dir("./") do
+		if string.match(filename, ".cp") then
+			print("delete " .. filename .. "?" )
+			if(io.read() ~= "y" )	
+				`rm $(filename);
+		end
+	end
+
+DEMO2
+suppose we have many files, and their names  have a similar format: xxx_rgb_xxx.png, we want to traverse these files and extract 'rgb' field(like 0xff0000) to perfrm some follow up operations.
+the lsh script should be:
+	for filename in lfs.dir("./") do
+		vim:load(filename)
+		:f_lvf_hy:		--copy to clipboard for later use
+		 ... ...
+		 print(vim:clipboard())	--for example
+	end
+
+DEMO3
+suppose we have two files, abc.txt and 123.txt. their contents are respectively:
+$ cat abc.txt:
+aaa bbb ccc
+aaa bbb ccc
+aaa bbb ccc
+
+$ cat 123.txt:
+111 222 333
+111 222 333
+111 222 333
+
+now, we want to merge them to get a new file "result.txt":
+aaa 111 bbb 222 ccc 333
+aaa 111 bbb 222 ccc 333
+aaa 111 bbb 222 ccc 333
+
+the corresponding lsh script should be like this:
+vim:open("1.txt")
+vi2 = Vi:new()
+vi2:open("2.txt")
+vim:share_clipboard(vi2)
+
+for i = 0, vi2.lmax do
+	vim:Gn(i)
+	vi2:Gn(i)
+	repeat
+		vi2:normal("vey")
+		:ea  :
+		:p
+	until vi2:normal("w_") == 0
+end
+vim:write("result.txt")
+
+INSTALL   
+make sure you have installed the following libraries:
+(For ubuntu users)
+1, sudo apt-get install libreadline6
+2, sudo apt-get install luarocks
+   sudo luarocks install luafilesystem   (here may cost some time)
+3, sudo apt-get install libncurses5-dev
+
+extract the lsh-master.zip to your home directory and rename 'lsh-master' to 'lsh', and then goto ~/lsh/, run
+sudo make
+
+DOCUMENT
+this version is not well documented. but you can get a brief knowledge of it through material under lsh/manual.
+
+AUTHOR
+this project is in a loss of maintenance，the bug you submit is not promised to be fixed. if you want to maintain this project, email me at jiejinmv@163.com

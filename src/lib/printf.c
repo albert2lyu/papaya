@@ -1,5 +1,8 @@
 /* 注意，stat_wnd用x,y来定位bar。其中x是列，y是行！！！
  *     ,  另外，stat_wnd的第一行用来当分割线。所以所有的y都指向y+1行。TODO
+ * TODO 1, 用assert代替while(1)。
+ *      2, 怎样确保 mm_available在外部忘了初始化，这里能检测出来。限制栈分配
+ *     		内存的次数？
  */
 #include<linux/printf.h>
 #include<mm.h>

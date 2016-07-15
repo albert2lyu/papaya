@@ -1,0 +1,44 @@
+OPERATIONS
+* important operations not imlemented yet:
+  digit rep prefix,   for example, you can't wirte: vim:normal("100G") 
+  c
+  yw yW ... ( an alternative solutino is 'vey' 'vEy' ...)
+
+*  operations implemented:
+   d a y f F m ` v G p x 0 $ W w B b E e h j k l ^ %
+
+* special operation suffix
+  1, _ 
+  if w,W,e,E,b,B is followed by a '_', that move-operation will be  constrained within a line. for example, suppose we have two text line and now vim stand on the first line:
+111
+222
+  script 'vim:normal("w")' will sucessfully let vim move cursor to the second line, but script 'vim:normal("w_")' will fail.
+ 
+
+API
+* number normal(string operations)
+  Description:  perform vim operations
+  example: vim:normal("lldd") equals to: vim:l(), vim:l(), vim:dd()
+  because this API is frequently used, we have a syntax candy
+  :lldd
+  note, for current version, ':' is required to be the first chracter of the line.  
+
+* Vi new(void)
+  create a new instance of Vi.
+  example:  abc = Vi:new()	
+  note, for current version, you should call 'abc:open("flename")' or 'abc:load("str")' before perform any other vi-operations.
+    
+*void load(string str)
+    
+*bool open(string filepath)
+
+*bool Gn(number lineid)
+  example:  Gn(100),  is equation of '100G' under vim-editor
+
+*void share_clipboard(Vi friend_vi)
+ share it's clipboard to a friend_vi.
+ example:  vi_a:share_clipboard(vi_b) let vi_b drop it's own clipboard and use vi_a's clipboard.
+
+*void gg(void)
+*void G(void)
+*

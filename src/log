@@ -1,4 +1,21 @@
 
+Thu Jul 14 20:48:26 CST 2016
+* vim 在执行lua脚本时候的输出,怎么捕获它!!!!!
+   它显示两秒左右就消失了!
+
+Thu Jul 14 20:21:45 CST 2016
+* 调用vim的ex模式,如果不指定-s,是有输出的,可以用>重定向到文件里去.但是它遇到打开文件会提示,进而导致vim僵死.
+  但不指定-s,又无法查看脚本的执行信息.
+Thu Jul 14 18:45:00 CST 2016
+* lua的string.char设计的不符合我的第一习惯.
+  我以为string.char(str, 1, 2, -1 ,-2)是获取初始和末尾的两个character的byte value,但它的设计是跟string.sub()保持一致的,str后面只接受两个参数,按区间转换.
+  想学python了,lua的错误检查机制太弱.很耽误时间.
+
+
+Thu Jul 14 17:42:37 CST 2016
+* han2pinyin.lua 里面若设置package.path="../cmd/bit.so",即使在cmd本目录下执行,也会报错,说加载bit.so时symbol错误.去掉这个path就可以.但去掉了path又找不到bit.so了.
+  --没办法,必须于异目录调用,只好做个softlink指向cmd里的.
+
 Tue Jul 12 08:16:16 CST 2016
 * 试着折腾了一下汉语关键字的语法高亮。开始在工作目录下面建立了一个CN.vim，source然后set filetype，没效果。最后找到了/opt/share/vim/vim74/syntax/c.vim。在里面修改就好了，这个文件从哪儿来的呢？是自己编译的那个vim，make install 时，从源码包复制到opt路径的。 所以这个c.vim对/usr/bin下面的vim 就没用。
 
