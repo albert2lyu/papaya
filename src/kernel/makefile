@@ -1,4 +1,4 @@
-all: clean bh.o bh.o
+all: clean bh.o timer.o
 
 
 %.o:%.c

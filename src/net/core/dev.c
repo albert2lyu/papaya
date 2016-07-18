@@ -140,10 +140,10 @@ void process_rx_queue( struct net_device *netdev){
 		LL2_POP(rx_queue);
 		sti();
 		switch( ntohs(one->ethhdr->protocol) ){
-			case 0x0806:
+			case PROTOCOL_ARP:
 				arp_layer_receive(one);
 				break;
-			case 0x0800:
+			case PROTOCOL_IP:
 				ip_layer_receive(one);
 				break;
 			case 0x86dd:

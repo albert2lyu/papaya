@@ -1,3 +1,7 @@
+16, IPHDR_FLIP的宏要改成do while的形式。
+15, _dimg.c必须要扩大了。
+14, oprintf 带color。
+13, oprintf的一个bug,好在只是大量输出后才出现。找时间再找。用一个while(1) printf("xx");就能重现。
 12, push eflags; cli; pop eax 尤其前两句应该仅连在一起,这样能把被split 中断的机会降到最低。
 11, 尽快把函数声明警告打开。
 10, assert.h分离出来，好多头文件只需要访问它。却不得不包含utils.h。

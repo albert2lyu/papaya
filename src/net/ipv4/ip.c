@@ -65,7 +65,7 @@ void ip_layer_receive(struct sk_buff *skb){
 	assert(iphdr->version == 4 && iphdr->len == 5);
 	/* CRC16 check must be done before byte endian flip */
 	u16 checksum = crc16_compute_be(iphdr, 20);
-	if(checksum != 0) spin("crc check failed");
+	if((u16)~checksum != 0) spin("crc check failed");
 
 	IPHDR_FLIP(iphdr);
 
@@ -97,10 +97,11 @@ static int __ip_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){
 	struct iphdr *iphdr = skb->iphdr;
 	iphdr->protocol = me_protocol;
 	iphdr->msgid = skb->dev->ip_identifier++;
+	iphdr->ttl = ttl;
 	
 	if(iphdr->tot_len < 1486){
-		crc16_write_be(iphdr, IPHDR_LEN, &iphdr->chksum);
 		IPHDR_FLIP(iphdr);
+		crc16_write_be(iphdr, IPHDR_LEN, &iphdr->chksum);
 		arp_down(skb);
 		return 0;
 	}
@@ -137,7 +138,7 @@ int ip_down(struct sk_buff *skb, u8 me_protocol,
 	return __ip_down(skb, me_protocol, ttl);
 }
 
-int ip_echo_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){
+int ip_echo(struct sk_buff *skb, u8 me_protocol, u8 ttl){
 	struct iphdr *iphdr = skb->iphdr;
 	EXCHG_U32(iphdr->myip, iphdr->yourip);
 	return __ip_down(skb, me_protocol, ttl);
@@ -193,6 +194,13 @@ static struct sk_buff * ip_reassemble(struct sk_buff *group_head){
 
 static void ip_up(struct sk_buff *skb){
 	struct iphdr *iphdr  = skb->iphdr;
+	struct pseudo_hdr pseudo_hdr = {
+		myip: htonl(iphdr->myip),
+		yourip: htonl(iphdr->yourip),
+		zero: 0,
+		protocol: iphdr->protocol,
+		payload_len: htons(IP_PAYLOAD_LEN(iphdr))
+	};
 	switch(iphdr->protocol){
 		case 1:
 			icmp_receive(skb);
@@ -201,7 +209,7 @@ static void ip_up(struct sk_buff *skb){
 			oprintf("@IGMP\n");
 			break;
 		case 6:
-			oprintf("@TCP\n");
+			tcp_layer_recv(skb, &pseudo_hdr);
 			break;
 		case 17:
 			udp_layer_receive(skb);

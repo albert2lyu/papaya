@@ -78,7 +78,7 @@ int main(int argc, char *argv[]){
 	kernel_img_size = filesize("../bin/kernel.elf");
 	printf("source elf size:%d\n", kernel_img_size);
 	printf("target device :%s\n", filepath);
-	assert(kernel_img_size < 120 * 1024 && 
+	assert(kernel_img_size < 128 * 1024 && 
 			"kernel.elf firstly loaded at 0x80000, take care of 0xA0000, and \
 			boot.asm only read 126 sectors.");
 	/* Note, MUST be executed before @dd */

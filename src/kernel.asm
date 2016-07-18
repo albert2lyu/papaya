@@ -64,9 +64,58 @@ push  11931 ;1193180/100
 call init8253 ; init 8253
 
 
+;IRQ0
+;	Time
+;	电脑系统计时器
+;IRQ1
+;	KeyBoard
+;	键盘
+;IRQ2
+;	Redirect IRQ9
+;	与IRQ9相接，MPU-401 MDI使用该IRQ
+;IRQ3
+;	COM2
+;	串口设备
+;IRQ4
+;	COM1
+;	串口设备
+;IRQ5
+;	LPT2
+;	建议声卡使用该IRQ
+;IRQ6
+;	FDD
+;	软驱传输控制用
+;IRQ7
+;	LPT1
+;	打印机传输控制用
+;IRQ8
+;	CMOS Alert
+;	即时时钟
+;IRQ9
+;	Redirect IRQ2
+;	与IRQ2相接；可设定给其它硬件使用
+;IRQ10
+;	Reversed
+;	建议保留给网卡使用该IRQ
+;IRQ11
+;	Reversed
+;	建议保留给AGP显卡使用
+;IRQ12
+;	PS/2Mouse
+;	接PS/2鼠标，若无也可设定给其他硬件使用
+;IRQ13
+;	FPU
+;	协处理器用，例如FPU（浮点运算器）
+;IRQ14
+;	Primary IDE
+;	IDE0传输控制用
+;IRQ15
+;	Secondary Ide
+;	IDE1传输控制用
+
 add esp,4
 ;push 11111000b
-push 11111000b
+push 11011000b
 call init8259A ; init 8259A
 add esp,4
 ;init segment-regs

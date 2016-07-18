@@ -1,6 +1,7 @@
 #ifndef NET_TCP_H
 #define NET_TCP_H
 #include<valType.h>
+#include<linux/ip.h>
 
 #define TCP_FLAG_FIN  (1)
 #define TCP_FLAG_SYN  (1<<1)
@@ -56,9 +57,14 @@ struct tcphdr{
 	};
 	u16 wndsize;
 	u16 chksum;
-	u16 urg_ptr;
+	u16 urgptr;
 };
 
 #pragma pack(pop)
 
+static inline u32 tcphash(u32 hisip, u16 hisport, u32 myport){
+	u32 hash = iphash(hisip) +  (hisport & 0xff) + (hisport >> 8) 
+							 +  (myport & 0xff) + (myport >> 8);
+	return hash;
+}
 #endif

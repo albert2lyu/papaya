@@ -102,6 +102,7 @@ static struct ide_drive *get_info_ptr(u16 dev_id){
 /*issue to which channel, which driver */
 void hd_out(int *io_ports, int cmd, int drv, int lba, int count, void *buf){
 	while(in_byte(io_ports[SLOT_REG_STATUS]) & STATUS_BUSY) oprintf("@hd_out waiting on IDE controllor's BSY-bit\n");
+	oprintf("Ok, IDE");
 	//activate the interrupt enable bit
 
 	struct lba *lba_stru = (struct lba *)(&lba);

@@ -13,6 +13,7 @@
 #include<linux/slab.h>
 #include<linux/pci.h>
 #include<linux/skbuff.h>
+#include<linux/timer.h>
 char *testbuf;
 char *bigbuf;
 int avoid_compiler_warning;
@@ -57,7 +58,6 @@ void kernel_c(){
 	proc_init();
 	init_ISA_irqs();
 	init_time();
-
 	ide_init();
 	blkdev_layer_init();
 /*	init_fs();*/
@@ -113,7 +113,7 @@ void kernel_c(){
 	 * (for example,'current'(see in proc.h) will be invalid when esp register
 	 * not in the kernel stack of a process.
 	 */
-	ramdisk_init();
+	ramdisk_init(); 
 /*	cell_read("t.c", testbuf);*/
 /*	oprintf("%s", testbuf);*/
 /*	spin("ss");*/
@@ -130,9 +130,18 @@ void func1(void){
 		schedule_timeout(3000);
 	}
 }
+void timer_handler(void *data){
+	oprintf("timer handler ");
+}
 void func0(void){
 	//int counter = 0;
 	oprintf("func0 run..\n");
+	#if 0
+	for(int i = 0; i < 10; i++){
+		struct timer *t = create_mytimer(50 * i+1, timer_handler, 0);
+		start_mytimer(t);
+	}
+	#endif
 	while(1){
 		for(int i = 0; i < 1000*1000; i++);
 		oprintf("?");
@@ -162,9 +171,10 @@ void func2(void){
 	}
 }
 void func_init(void){
-	while(0){
-		mdelay(2000);
-		oprintf("/");
+	while(1){
+		oprintf("func_init sleep");
+		kp_sleep(0, 0);
+		oprintf("func_init waked up");
 	}
 	oprintf("func init run..\n");
 	ide_read_partation(0x3, 0);
@@ -188,7 +198,6 @@ void func_init(void){
 	avoid_compiler_warning = rbytes = (unsigned)&indir;
 
 	assert("func init keep running" && 0);
-	kp_sleep(0, 0);
 }
 void usr_func_backup(void){
 	while(1);

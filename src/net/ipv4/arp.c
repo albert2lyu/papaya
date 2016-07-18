@@ -66,7 +66,13 @@ static void init_arp_msg(struct sk_buff *arpmsg,
 }
 
 static u8 *arp_lookup(u32 ip){
-	spin(" arp look up");
+	int index = iphash(ip) % ARP_TBL_LEN;
+	struct arp_record * root = arptbl[index];
+	struct arp_record *it  = 0;
+	LL_SCAN_ON_KEY(root, his_ip, ip, it);
+	if(it){
+		return (u8*)it->his_mac;
+	}
 	return 0;
 }
 /* invoked within arp_act() when an ARP reply message comes, or within 

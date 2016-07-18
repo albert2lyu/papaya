@@ -3,8 +3,12 @@
 //2, TCP结束时,尝试3次握手怎么样.
 #include<net/tcp.h>
 #include<linux/skbuff.h>
+#include<net/ip.h>
+#include<linux/byteorder/generic.h>
+#include<utils.h>
 
-static void print_tcpmsg(struct sk_buff *skb);
+
+static void print_tcpmsg(struct tcphdr *hdr);
 
 enum{
 	 连接不存在,
@@ -23,28 +27,79 @@ struct connect{
 	u16 myport;
 	u16 hisport;
 	int state;
-	u32 next_seq;
-	u32 next_ack;
+	u32 seq_got;		//最近一个收到的报文的sequence number
+	u32 seq_out;		//最近一个发出的报文的sequence number
+	struct connect *next;
+	struct connect *prev;
 };
 
 #define 连接表长 1024
-static connect *连接表;
+static struct connect **连接表;
 
 static struct connect *
-_connection_lookup(u32 hisip, u16 hisport, u32 myip, u16 myport);
+__connection_lookup(u32 hisip, u16 hisport, u32 myip, u16 myport);
 static struct connect *
-_connection_create(u32 hisip, u16 hisport, u32 myip, u16 myport);
+__connection_create(u32 hisip, u16 hisport, u32 myip, u16 myport);
+
 static struct connect * connection_lookup(struct sk_buff * comer);
+static struct connect * connection_create(struct sk_buff *comer);
 
-void tcp_layer_recv(struct sk_buff *comer){
+static void tcp_fin(void){
+
+}
+
+#define TCPHDR_FLIP(tcphdr)	\
+		do{												\
+			BYTE_ENDIAN_FLIP2(tcphdr->myport);			\
+			BYTE_ENDIAN_FLIP2(tcphdr->yourport);		\
+			BYTE_ENDIAN_FLIP4(tcphdr->seq);				\
+			BYTE_ENDIAN_FLIP4(tcphdr->ack);				\
+			BYTE_ENDIAN_FLIP2(tcphdr->wndsize);			\
+			BYTE_ENDIAN_FLIP2(tcphdr->chksum);			\
+			BYTE_ENDIAN_FLIP2(tcphdr->urgptr);			\
+		}while(0)
+
+void tcp_layer_recv(struct sk_buff *comer, struct pseudo_hdr *pseudo_hdr){
 	struct tcphdr *tcphdr = comer->tcphdr;
+
+	//oprintf("ip tot_len:%x hdr_len:%x\n", comer->iphdr->tot_len, comer->iphdr->len);
+	int tcplen = IP_PAYLOAD_LEN(comer->iphdr);
+
+	int checksum = crc16_compute_be(tcphdr, tcplen);
+	int checksum2 = crc16_compute_be(pseudo_hdr, sizeof(struct pseudo_hdr));
+	int sum = checksum + checksum2;
+	sum = (sum & 0xffff) + (sum >> 16);
+	assert(~sum);
+
+	TCPHDR_FLIP(tcphdr);	
+
+	print_tcpmsg(tcphdr);
 	struct connect *connect = connection_lookup(comer);
+	if(connect) connect->seq_got = tcphdr->seq;
 	assert(tcphdr->flag_rst == 0);
 	if(!connect){
-		connect = connection_create();
+		connect = connection_create(comer);
+		connect->seq_got = tcphdr->seq;
 		if(tcphdr->flags == TCP_FLAG_SYN){
 			/*XXX 发送这个询问包*/
-			connect->state = 发起者_等待确认;
+			oprintf("someone try connecting me ");
+			tcphdr->flag_ack = 1;
+			tcphdr->flag_syn = 1;
+			tcphdr->ack = connect->seq_got + 1;
+			tcphdr->seq = connect->seq_out + 1; //发送syn,消耗一个序列号
+			EXCHG_U16(tcphdr->myport, tcphdr->yourport);	
+			TCPHDR_FLIP(tcphdr);
+
+			tcphdr->chksum = 0;
+			int checksum = crc16_compute_be(tcphdr, tcplen);
+			int sum = checksum + checksum2;
+			sum = (sum & 0xffff) + (sum >> 16);
+			tcphdr->chksum = htons( ~sum );
+
+			connect->state = 应答者_等待确认;
+			connect->seq_out = tcphdr->seq;	
+			
+			ip_echo(comer, PROTOCOL_TCP, comer->iphdr->ttl);
 			return;
 		}
 		else goto ignore;
@@ -54,8 +109,8 @@ void tcp_layer_recv(struct sk_buff *comer){
 		goto ignore;	
 	}
 	else if(connect->state == 发起者_等待确认){	//在等待第二次握手
-		if(tcphdr->ack == connect->next_seq && 
-				tcphdr->flags == TCP_FLAG_SYN | TCP_FLAG_ACK ){
+		if(tcphdr->ack == connect->seq_got && 
+				tcphdr->flags == (TCP_FLAG_SYN | TCP_FLAG_ACK) ){
 
 			//TODO 此处若被另一个同源包中断?不会,这是bottom half
 			/* we are waiting it */
@@ -68,7 +123,8 @@ void tcp_layer_recv(struct sk_buff *comer){
 		else goto ignore;
 	}
 	else if(connect->state == 应答者_等待确认){
-		if(tcphdr->flags = TCP_FLAG_ACK && connect->next_seq == tcphdr->ack){
+		if(tcphdr->flags == TCP_FLAG_ACK && connect->seq_got == tcphdr->ack){
+			oprintf("got an ack now, i just sent an ack+syn\n");
 			connect->state = 连接已建立;	
 		}
 		else goto ignore;
@@ -110,16 +166,23 @@ void tcp_layer_recv(struct sk_buff *comer){
 	return;
 
 	ignore:
-	//oprintf("ignore, )
-	print_tcpmsg(comer);
+	oprintf("ignore this tcp message\n");
+	//print_tcpmsg(comer);
 }
 
-static void print_tcpmsg(struct sk_buff *skb){
-	
+static void print_tcpmsg(struct tcphdr *hdr){
+	oprintf("tcp message, seq:%x, ack:%x\n", hdr->seq, hdr->ack);	
 }
 static struct connect *
 __connection_lookup(u32 hisip, u16 hisport, u32 myip, u16 myport){
-		//XXX
+		int index = tcphash(hisip, hisport, myport) % 连接表长;
+		struct connect *curr = 连接表[index];
+		while(curr){
+			if(curr->hisip == hisip && curr->hisport == hisport &&
+			   curr->myip == myip && curr->myport == myport) 
+				return curr;
+			curr = curr->next;
+		}
 		return 0;
 }
 
@@ -130,18 +193,29 @@ static struct connect * connection_lookup(struct sk_buff * comer){
 }
 
 static struct connect *
-_connection_create(u32 hisip, u16 hisport, u32 myip, u16 myport){
-		//XXX
-		return 0;
+__connection_create(u32 hisip, u16 hisport, u32 myip, u16 myport){
+		int index = tcphash(hisip, hisport, myport) % 连接表长;
+		struct connect *connect = kmalloc2( sizeof(struct connect), 0);
+		connect->myip = myip;
+		connect->hisip = hisip;
+		connect->hisport = hisport;
+		connect->myport = myport;
+		connect->state = 连接不存在;
+
+		connect->seq_out = 0;	/*TODO use a random value as initial Sequence*/
+
+		LL_I(连接表[index], connect);
+		return connect;
 }
 
 /* 根据某个接收到的tcp报文,创建相应的tcp connect 结构体*/
 static struct connect *
 connection_create(struct sk_buff *comer){
-	return _connection_create(comer->iphdr->myip, comer->tcphdr->myport,
+	return __connection_create(comer->iphdr->myip, comer->tcphdr->myport,
 							  comer->iphdr->yourip, comer->tcphdr->yourport);	
 }
 
 void init_tcp(void){
+	assert( sizeof(struct tcphdr) == 20);
 	连接表 = static_alloc( sizeof(void *), 连接表长);
 }

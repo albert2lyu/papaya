@@ -189,31 +189,10 @@ inline void map_pg(u32*dir,int vpg,int ppg,int us,int rw){
 void temp_mmio_map(void){
 	/* intel i3 motherboard, rtl8139, mmio base, 0x3baff0000
 	 * intel pentium motherboard, rtl8139, mmio base, 0x3febxxxxx
-	 * intel 945 mmio base, 0x3dbff000
-	 *  we map from 0xfba00000 ==> 0xfbb00000, 0xfeb80000 ===> 0xfec00000
-	 */
+	    we map from 0xfb000000 ==> 0xffffffff, 80M in total*/
 	oprintf(" temp mmio map begin >>>>>>>>>\n");
 	unsigned *dir = (unsigned *)0xc0100000;
-	//u32 start = 0xfeb80000;
-	//u32 end = 0xfec00000 - 0x1000;					/* 应该减去0x1000的，无伤大雅*/
-	u32 start = 0xfba00000;
-	u32 end = 0xfbb00000;
-	for(unsigned vaddr = start; vaddr <= end; vaddr+=1024*4){
-		int vpg = (vaddr - PAGE_OFFSET) >> 12;
-		int ppg = vaddr >> 12;
-		map_pg(dir, vpg, ppg, PG_USS, PG_RWW);	//equal map
-		#if 1
-		if(vaddr == end){		//only once
-			static int done = false;
-			if(done) break;
-			done = true;
-
-			end = 0xfec00000;
-			vaddr = 0xfeb80000;
-		}
-		#endif
-	}
-	for(unsigned vaddr = 0xfdbf0000; vaddr <= 0xfdc00000; vaddr+=1024*4){
+	for(unsigned vaddr = 0xfb000000; vaddr <= 0xffffffff; vaddr+=1024*4){
 		int vpg = (vaddr - PAGE_OFFSET) >> 12;
 		int ppg = vaddr >> 12;
 		map_pg(dir, vpg, ppg, PG_USS, PG_RWW);	//equal map

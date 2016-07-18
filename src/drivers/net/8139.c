@@ -152,6 +152,7 @@ enum ChipCmdBits {
 enum IntrStatusBits {
 	PCIErr		= 0x8000,
 	PCSTimeout	= 0x4000,
+	CabLenChg = 0x2000,
 	RxFIFOOver	= 0x40,
 	RxUnderrun	= 0x20,
 	RxOverflow	= 0x10,
@@ -397,8 +398,22 @@ static void on_intr(int irq, void *dev, void *regs){
 	else if(isr & RxUnderrun){
 		spin( "CARP is written but Rx buffer is empty, or link status changed");
 	}
+	else if(isr &RxOverflow){
+		oprintf("Rx FIFIO Overflow, ignore and clear it\n");
+		RTL_writew(netdev, ISR, 0xffff);
+	}
+	else if(isr & CabLenChg){
+		spin("Cable Length Change");
+	}
+	else if(isr & PCSTimeout){
+		spin("PCSTimeout");
+	}
+	else if(isr & PCIErr){
+		spin("PCIErr");
+	}
 	else{
-		spin("unknown interrupt reason, check your IMR");
+		oprintf("warning, an irq of 8139 with zero ISR. see ISR:%x \n", isr);
+		//spin("unknown interrupt reason, check your IMR");
 	}
 }
 
@@ -508,9 +523,9 @@ int rtl8139_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){
 	oprintf("irq pin: %u , line: %u\n", pcidev->irqpin, pcidev->irqline);
 	/* TODO ioremap, remove hard code */
 	netdev->base_addr = (unsigned)( pcidev->address[1] & ~0xf) - PAGE_OFFSET;
-	assert(( (netdev->base_addr + PAGE_OFFSET) >> 20) == 0xfeb);
+	oprintf("base_addr:%x\n", netdev->base_addr);
+	//assert(( (netdev->base_addr + PAGE_OFFSET) >> 20) == 0xfeb);
 	netdev->irq = pcidev->irqline;
-	//oprintf("base_addr:%x\n", netdev->base_addr);
 	int mac[2] = {0};
 	mac[0] = RTL_readl(netdev, 0);
 	mac[1] = RTL_readl(netdev, 4);

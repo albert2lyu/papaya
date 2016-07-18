@@ -13,6 +13,7 @@ highlight MatchParen ctermbg=white ctermfg=blue
 set hlsearch
 au BufNewFile,BufRead *.cn set syntax=c
 au BufNewFile,BufRead *.lua set list lcs=tab:\¦\ 
+set tags+=../tags		"for ~/lab/yanqi/tags
 
 function! Doo()
 	:r!ls %<CR>

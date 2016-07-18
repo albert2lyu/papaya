@@ -1,4 +1,12 @@
 
+Mon Jul 18 03:10:09 CST 2016
+* icmp的rely在wireshark上显示的好好的，但ping程序就是接受不到。明天弄清楚。
+Sun Jul 17 18:28:59 CST 2016
+* oprintf的一个bug,好在只是打量输出后才出现。找时间再找。
+Sun Jul 17 11:39:41 CST 2016
+*  8139. i3主板上测，老毛病，unknown interrupt reason， 这次我想看看到底是ISR的哪个bit，于是把ISR的所有bit都写了handler，但发现没有一个触发。 原来ISR是0 ！ 只好让等于0时直接返回。 这样改动之后，却发现再不会发生这种情况了，又出现irq7的suprious irq。 估计冥冥中有关系。 好在内核现在能处理7,15中断了。
+Sat Jul 16 22:38:42 CST 2016
+*  在i3主板上，"waiting on IDE controller's BYS-bit “，打量循环输出。 暂时先把func_init里的这段代码注释掉。
 Thu Jul 14 20:48:26 CST 2016
 * vim 在执行lua脚本时候的输出,怎么捕获它!!!!!
    它显示两秒左右就消失了!

@@ -4,6 +4,7 @@
 #include<linux/mylist.h>
 #include<valType.h>
 #include<linux/assert.h>
+#include<linux/byteorder/generic.h>
 //杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
 static inline unsigned str_hash(const char *str, int len){
     unsigned seed = 131; // 31 131 1313 13131 131313 etc..
@@ -131,6 +132,7 @@ dispInt(i);
 #define POINTER_SHIFT(pt,type,len) (type*)((u32)pt+len) 
 #define EXCHG_U32(a,b) do{unsigned c=a;a=b;b=c;} while(0)
 #define EXCHG_PTR(a, b) do { void *tmp = a; a = b; b = tmp; } while(0)
+#define EXCHG_U16(a,b) do{ u16 tmp = a; a = b; b = tmp; } while(0)
 boolean strmatch(char*seg,char*whole);
 void info_heap(void);
 /* 0, 这一组函数不会在critical area用,所以cli_already默认是初始是false
@@ -234,12 +236,31 @@ static inline void print_ip(u32 ip){
 unsigned read_imr_of8259(void);
 
 /* CRC16, for memory area on big endian */
+/* 我们总是在刚接受到一个报文，还没把它转化成本地字节序之前，做CRC校验。
+   我们总是在即将发出一个报文，已经把它转化成网络字节序之后，计算并填写CRC值。
+   这样，我们跟目标主机面对的是一模一样的报文。(每个bit都一样)。利于我们编程。
+
+   因为我们是小端机器，所以我们要“装作”大端机器去计算CRC校验值。一份报文被分成
+   n个16字节大小的cell，我们要确保我们读出来的每个cell的value，和大端机器眼中是
+   一样的。这就是crc16_compute_be()唯一要注意的。
+
+   @return 返回的CRC校验值是本地字节序。当然应该这样，一半的情形下，我们只关心
+   它是否为0 。
+ */
 u16 crc16_compute_be(void *area, int len);
 
+/* @DESC 
+ * We compute the CRC16 checksum of a memory area, and write the result 
+   to @chksum  in netword byte order.
+ * @return 		
+   We return the checksum in host byte order, just keep consistant
+ 	with crc16_compute_be(). It's indifferent, we seldom cares about this value.
+ */
 static inline u16 crc16_write_be(void *area, int len, u16 *chksum){
 	*chksum = 0;
-	*chksum = crc16_compute_be(area, len);
-	return *chksum;
+	u16 x = crc16_compute_be(area, len);
+	*chksum = htons(~x);
+	return x;
 }
 
 void __less(void *buf, int len);

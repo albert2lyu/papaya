@@ -17,6 +17,7 @@ void pci_init(void){
 			for(int func = 0; func < PCI_FUNC_MAX; func++){
 				unsigned port0xcfc = get_pci_cfg_reg(bus, dev, func, 0);
 				u16 vendor = (u16)port0xcfc;
+				//if(vendor == 0x8086) continue;
 				if(vendor == 0xffff) break; 
 				
 				struct pci_dev *pcidev = kmalloc2( sizeof(struct pci_dev), 0);

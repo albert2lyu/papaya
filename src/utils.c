@@ -148,7 +148,7 @@ u16 crc16_compute_be(void *area, int len){
 		sum = eax->ax + eax->carry;	
 	}
 	//oprintf(" sum:%x\n",   sum);
-	return ~sum;
+	return sum;
 }
 
 int __less_go = 1;
