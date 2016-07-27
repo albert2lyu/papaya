@@ -1,3 +1,4 @@
+【1】
 papaya内核是我学习linux的一个习作。
 
 很多人是通过读源码来学习它，我觉得写一个与它平行的内核，是另一种方式。
@@ -14,6 +15,14 @@ papaya内核是我学习linux的一个习作。
 虽然这样，还是希望把这个内核写到某种极致。
 
 
+【2】
+src/ 下面是源码
+include/  早期的头文件。 后来的都放在src/include。
+cmd/ 调试时用到的小工具。包括刻录到虚拟img，刻录到usb等等。
+lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为有还在完善中，工作时遇到bug随手改过来，所以也一并上传。
+
+
+【3】
 [2016,7,27] Version 0.607b
 ==========update===========
 1, TCP implementation. Receive only.  See net/ipv4/tcp.cn
@@ -40,5 +49,6 @@ papaya内核是我学习linux的一个习作。
 3, virtual filesystem( interfaces: open(), read(), close() implemented, write() not yet)
 
 
+【4】
 >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 空间博客：http://user.qzone.qq.com/2106507650/2
