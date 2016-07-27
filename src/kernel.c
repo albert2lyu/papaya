@@ -122,6 +122,7 @@ void kernel_c(){
 }
 
 
+#if 0
 void func1(void){
 	oprintf("func1 run..\n");
 	int counter = 0;
@@ -130,6 +131,7 @@ void func1(void){
 		schedule_timeout(3000);
 	}
 }
+#endif
 void timer_handler(void *data){
 	oprintf("timer handler ");
 }

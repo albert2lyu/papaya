@@ -1,0 +1,1 @@
+objdump -D -mi8086 -bbinary xx.bin

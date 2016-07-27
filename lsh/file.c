@@ -19,3 +19,14 @@ int filesize(char *name){
 	close(fd);
 	return size;
 }
+
+char *get_dirfile(char *dir, char *filename, char *fullpath){
+	//assert(dir[strlen(dir)-1] == '/');
+	strcpy(fullpath, dir);
+	if(dir[strlen(dir) - 1] != '/'){
+		fullpath[strlen(dir)] = '/';
+		fullpath[strlen(dir) + 1] = 0;
+	}
+	strcat(fullpath, filename);
+	return fullpath;
+}

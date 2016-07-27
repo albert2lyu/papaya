@@ -49,13 +49,6 @@ struct iphdr{
 	u32 yourip;
 };
 
-struct pseudo_hdr{
-	u32 myip;
-	u32 yourip;
-	u8 zero;
-	u8 protocol;
-	u16 payload_len;
-};
 #pragma pack(pop)
 
 #define IPHDR_LEN ( sizeof( struct iphdr ) )
@@ -66,7 +59,7 @@ static inline unsigned iphash(unsigned ip){
 }
 
 struct sk_buff;
-int ip_echo(struct sk_buff *skb, u8 me_protocol, u8 ttl);
+int ip_echo_down(struct sk_buff *skb, u8 me_protocol, u8 ttl);
 int ip_down(struct sk_buff *skb, u8 me_protocol, 
 			u32 dest_ip, 	u32 src_ip,
 			u8 ttl);

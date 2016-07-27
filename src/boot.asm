@@ -14,6 +14,7 @@ mbrHead:
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 1,0,1,63,(addr_mbr_loaded + 512 * 63) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 2,0,1,63,(addr_mbr_loaded + 512 * 63 * 2) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 3,0,1,63,(addr_mbr_loaded + 512 * 63 * 3) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 4,0,1,63,(addr_mbr_loaded + 512 * 63 * 4) >> 4, 0
     jmp entrance
 
 ;[section .gdt]

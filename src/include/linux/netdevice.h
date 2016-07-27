@@ -15,7 +15,7 @@ struct net_device{
 	int		(*stop)(struct net_device *dev);
 	int		(*start_xmit) (struct sk_buff *skb, struct net_device *dev);
 	bool 	(*tx_busy) (struct net_device *dev);
-	u8 mac[6];
+	u8 mac[7];
 
 	unsigned base_addr;
 	char irq;
@@ -49,6 +49,8 @@ struct net_device{
 //}
 
 void nic_wake_queue(struct net_device *netdev);
-struct net_device *pick_nic(void);
+struct net_device *pick_nic(u32 dest_ip, u32 src_ip);
 void register_nic(struct net_device *netdev);
+void list_nic(void);
+struct net_device * who_am_i(u8 *mac);
 #endif

@@ -21,6 +21,7 @@ void assert_func(char*exp,char*file,char*base_file,int line){
 	while(1);
 }
 
+#if 0
 int bit1_count(char*addr,int bytes){
 	int count=0;
 	for(int offset=0;offset<bytes;offset++){
@@ -35,6 +36,7 @@ int bit1_count(char*addr,int bytes){
 	return count;
 }
 
+#endif
 void memcpy(void* dest,void *src,int bytes){
 	for(int i=0;i<bytes;i++){
 		((char *)dest)[i] = ((char *)src)[i];
@@ -99,6 +101,15 @@ int strncmp(const char *str1, const char *str2, int n){
 	return 0;	
 }
 
+int memcmp(void *_s1, void *_s2, int len){
+	char *s1 = _s1;
+	char *s2 = _s2;
+	for(int i = 0; i < len; i++){
+		if(s1[i] == s2[i]) continue;
+		return 1;
+	}
+	return 0;
+}
 /* 测试一段内存是否全为0. 因为内存是上电清零的，很多时候我不想再”为保险起见而再次清零”，
  * 但我会为保险起见确认一下是否全为0. 读比写快.
  * BTW 这个函数不一定更快，有时间用汇编写。 我是决心不做二次清零的。
@@ -163,7 +174,17 @@ void __less(void *buf, int len){
 	}
 }
 
-
+static char ipstr_buf[128];
+static char *ipstr = ipstr_buf;
+char * mk_ipstr(u32 ip){
+	char *result = ipstr;
+	struct __eax *eax = (void *)&ip;
+	int len = sprintf(ipstr, "%u.%u.%u.%u",  eax->AH, eax->AL, eax->ah, eax->al);	
+	ipstr[len] = 0;
+	ipstr += len + 2;
+	if(ipstr - ipstr_buf > 110)	ipstr = ipstr_buf;
+	return result;
+}
 
 
 

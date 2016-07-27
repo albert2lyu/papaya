@@ -158,6 +158,16 @@ static inline void sti_safe(){
 void memtest(void *, int len);
 void udelay(unsigned long usecs);
 
+/* by unit of Us */
+static inline unsigned __RDTSC_U(void){
+	unsigned tsc;
+	__asm__ __volatile__("rdtsc\n\t"
+						 "shr $18, %%eax\n\t"
+						 "shl $14, %%edx\n\t"
+						 "or %%eax, %%edx\n\t"
+						 :"=d"(tsc));
+	return tsc;
+}
 /* by unit of MS */
 static inline unsigned __RDTSC(void){
 	unsigned tsc;
@@ -265,4 +275,7 @@ static inline u16 crc16_write_be(void *area, int len, u16 *chksum){
 
 void __less(void *buf, int len);
 
+int memcmp(void *s1, void *s2, int len);
+struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};
+char * mk_ipstr(u32 ip);
 #endif

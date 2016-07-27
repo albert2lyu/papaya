@@ -19,7 +19,7 @@
 #define NUM_TX_DESC 4
 #define TX_BUF_SIZE (1762 & ~3) /* MTU of 8139 should be 1762, but 4 bytes 
 								 * aligned is required for this chip */
-static struct net_device *testnd;
+//static struct net_device *testnd;
 struct rtl8139_private{
 	struct pci_dev *pcidev;
 	void *mmio_addr;			/* memory mapped I/O addr */
@@ -74,6 +74,25 @@ static inline void RTL_writel(struct net_device *netdev, int offset, unsigned va
 	writel(netdev->base_addr + offset, value);
 }
 
+static struct ipconfig{
+	u8 mac[7];
+	u32 ip;
+	u32 gateway_ip;
+	u32 ipmask;
+} ipconfigs[] ={
+	{
+		{0x00, 0xe0, 0x4c, 0x4b, 0x79, 0x9e, 0},	//base addr: 0x3bafe000  高挡板网卡，连开发机
+		MAKE_IP(192, 168, 0, 9),
+		MAKE_IP(192, 168, 0, 1),
+		~0xff
+	},
+	{
+		{0x00, 0x19, 0xe0, 0x00, 0x4f, 0xaa, 0},	//base addr: 0x3baff000		低板网卡，连网关出口
+		MAKE_IP(192, 168, 1, 9),
+		MAKE_IP(192, 168, 1, 1),
+		~0xff
+	},
+};
 
 /* vendor 和 device就能唯一的指定设备类型*/
 static struct pci_device_id rtl8139_id_tbl[] = {
@@ -321,8 +340,7 @@ static void on_tx(struct net_device *netdev){
 			break;
 		}
 		if(TSR.TOK){
-			//RTL_maskw(netdev, ISR, TxOK);
-			RTL_writew(netdev, ISR, 0xffff);
+			//RTL_writew(netdev, ISR, TxOK);
 		}
 		else{
 			oprintf(" TSR NOT TOK: %u, bsy_desc: %u, touse_desc:%u\n", TSR.value, private->bsy_desc, private->touse_desc);	
@@ -346,15 +364,14 @@ static int rx_bottomhalf( void *_netdev){
 	return 0;
 }
 static void on_rx(struct net_device *netdev){
-	//RTL_maskw(netdev, ISR, RxOK);
-	//u16 isr = RTL_readw(netdev, ISR);
-	RTL_writew(netdev, ISR, 0xffff);
+	//RTL_writew(netdev, ISR, RxOK);
+	
 	oprintf(" !R! ");
 
 	struct rtl8139_private *private = netdev->private;
 	while(!( RTL_readb(netdev, ChipCmd) & RxBufEmpty )){
 		struct raw_package *raw = (void *)(private->rx_ring + private->cursor_r);
-		oprintf("Raw->Size :%x\n", raw->size);
+		//oprintf("Raw->Size :%x\n", raw->size);
 		//spin("on_rx");
 		int data_size = raw->size - 4;	/* trip CRC */
 		struct sk_buff *skb = dev_alloc_skb(data_size );
@@ -372,48 +389,55 @@ static void on_rx(struct net_device *netdev){
 		//oprintf("CBR:%x, CAPR:%x, cursor_r_old:%x, cursor_r_now:%x\n", RTL_readw(netdev, CursorToRecv), RTL_readw(netdev, CursorToRead), cursor_r_old, private->cursor_r);
 	}
 }
+/*
+ * 中断例程里，假如又发生了网卡中断，那ISR上相应的bit会被置位。我们处理一个bit
+ * 之后就返回。 如果ISR里还有置位，它自然还会触发新的中断。 FIXME  对吗？
+ * 不，不该这样做，应该尽最快把ISR空闲出来，这样新的网卡中断能表征出来。
+ */
 static void on_intr(int irq, void *dev, void *regs){
 	struct net_device *netdev = dev;
 	/* the interupt Status Register reflects all current pending interrupts, regardless of
 	 * the state of the corresponding mask bit in the IMR.
 	 */
+	 //如果有一个中断发生在下面两句话中间怎么办？
 	unsigned isr = RTL_readw(netdev, ISR);
+	RTL_writew(netdev, ISR, 0xffff);		//clear all interrupts
+	//oprintf("@isr: %x  \n", isr);
+
 	if(isr & TxOK){
 	    on_tx(netdev);	
 	}
-	//else spin("&&&&&&&&&&&&&&&&&&&&&\n");
-	//if(1);
-	else if(isr & TxErr){
+	if(isr & TxErr){
 		spin("TxErr");
 	}
-	else if(isr & RxOK){
+	if(isr & RxOK){
        	on_rx( netdev ); 
 	}
-	else if(isr & RxErr){
+	if(isr & RxErr){
         spin("RxErr");
 	}
-	else if(isr & RxOverflow){
+	if(isr & RxOverflow){
 		spin( "RxOverflow");
 	}
-	else if(isr & RxUnderrun){
+	if(isr & RxUnderrun){
 		spin( "CARP is written but Rx buffer is empty, or link status changed");
 	}
-	else if(isr &RxOverflow){
+	if(isr &RxOverflow){
 		oprintf("Rx FIFIO Overflow, ignore and clear it\n");
-		RTL_writew(netdev, ISR, 0xffff);
 	}
-	else if(isr & CabLenChg){
+	if(isr & CabLenChg){
 		spin("Cable Length Change");
 	}
-	else if(isr & PCSTimeout){
+	if(isr & PCSTimeout){
 		spin("PCSTimeout");
 	}
-	else if(isr & PCIErr){
+	if(isr & PCIErr){
 		spin("PCIErr");
 	}
-	else{
+	if(isr == 0)
+	{
 		oprintf("warning, an irq of 8139 with zero ISR. see ISR:%x \n", isr);
-		//spin("unknown interrupt reason, check your IMR");
+		return;
 	}
 }
 
@@ -481,6 +505,7 @@ int rtl8139_open(struct net_device *netdev){
 	private->bsy_desc = 4;
 	private->touse_desc = 0;
 	//netdev->flags |= ND_QUEUE_STOOPED;
+	netdev->flags = 0;
 	netdev->tx_count = netdev->rx_count  = 0;
 	memset(&netdev->debug,  0, sizeof(netdev->debug));
 	private->cursor_r = 0;
@@ -512,6 +537,7 @@ int rtl8139_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){
 	pci_enable_device(pcidev);
 	pci_set_master(pcidev);	/*多数BIOS会清除PCI网卡的master位，导致板卡不能往主存拷数据*/
 	struct net_device *netdev = kmalloc2( sizeof(struct net_device), 0 );
+	//oprintf(" INIT ONE, netdev: %x ", netdev);
 	pcidev->core = netdev;
 	netdev->pcidev = pcidev;
 	register_nic(netdev);
@@ -530,19 +556,27 @@ int rtl8139_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){
 	mac[0] = RTL_readl(netdev, 0);
 	mac[1] = RTL_readl(netdev, 4);
 	memcpy(netdev->mac, (char *)mac, 6);
-	oprintf("MAC:%x %x\n", mac[0], mac[1]);
+	netdev->mac[6] = 0; 
+	//oprintf("MAC:%x %x\n", mac[0], mac[1]);
 
 	struct rtl8139_private *private = kmalloc2( sizeof(struct rtl8139_private), 0);
 	private->pcidev = pcidev;
 	netdev->private = private;
-	netdev->ipmask = ~0xff;
-	netdev->gateway_ip = MAKE_IP(192, 168, 1, 1);
-	extern u32 __local_ip;
-	netdev->ip = __local_ip;
+
+	for(int i = 0; i <= 2; i ++){
+		assert(i != 2);	
+		if(memcmp((char *)netdev->mac, ipconfigs[i].mac, 6) == 0){
+			//oprintf("strncmp success, i = %u, ipconfig-mac: %x %x\n", i, ipconfigs[i].mac[0], ipconfigs[i].mac[1]);
+			netdev->ipmask = ipconfigs[i].ipmask;
+			netdev->gateway_ip = ipconfigs[i].gateway_ip;
+			netdev->ip = ipconfigs[i].ip;
+			break;
+		}
+	}
 	/*TODO how we pick out the right bar */
 	//assert(!(pcidev->address[0] & 1));	/* port mapped address */
 	//assert( pcidev->address[0] & 1);	/* memory mapped address */
-	testnd = netdev;
+	//testnd = netdev;
 	return 0;
 }
 

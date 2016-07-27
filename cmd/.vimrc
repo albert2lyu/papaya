@@ -1,6 +1,8 @@
+map <F5> :colorscheme evening
 source ~/.vim/macros/gdb_mappings.vim
 set backspace=indent,eol,start
 syntax on
+set nofoldenable
 set noic	"no ignore case
 set ruler
 set mouse=a

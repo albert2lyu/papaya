@@ -1,3 +1,7 @@
+20, oprintf("%"),这样，只打印一个百分号，是会出bug的。
+19, IP_PAYLOAD_LEN这个宏，对刚生成的skb是管用的。
+18, lsh对当前进程的ctrl-c无法正确处理。网络模块结束后希望能做掉。
+17, timer,tcp整个代码都没有考虑加锁（cli）
 16, IPHDR_FLIP的宏要改成do while的形式。
 15, _dimg.c必须要扩大了。
 14, oprintf 带color。

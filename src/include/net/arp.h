@@ -24,14 +24,15 @@ struct arp_packet{
 	struct arphdr arphdr;
 };
 
-#define ARP_PACK_SIZE (sizeof(struct arp_packet))
 #pragma pack(pop)
+
+#define ARP_PACK_SIZE (sizeof(struct arp_packet))
 
 void mk_arp_packet(struct arp_packet *packet, u8 *mymac, unsigned myip, u8 *yourmac,  u32 yourip);
 void arp_init(void);
 void arp_layer_receive(struct sk_buff *skb);
 void arp_down(struct sk_buff *skb);
-void arp_inquire(u32 yourip, u8 *mymac, u32 myip );
+void arp_inquire(u32 yourip);
 #endif
 
 

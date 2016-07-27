@@ -2,10 +2,10 @@
  *     “最后一百米”的寻址。
  */
 #include<net/arp.h>
+#include<linux/netdevice.h>
 #include<linux/slab.h>
 #include<linux/byteorder/generic.h>
 #include<utils.h>
-#include<linux/netdevice.h>
 #include<linux/skbuff.h>
 #include<linux/ip.h>
 /* For those sk_buffs who are waiting the ARP layer to resolve their target 
@@ -16,7 +16,6 @@
  */
 static struct sk_buff **later_down;
 static u8 __mac_broadcast[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};
-static u8 __mac_empty[6] = {0};
 u32 __local_ip = MAKE_IP(192, 168, 0, 9);	/*TODO one for each nic */
 struct arp_record{
 	u32 his_ip;
@@ -31,38 +30,20 @@ void arp_init(void){
 	arptbl = kmalloc2 (4 * ARP_TBL_LEN, __GFP_ZERO);
 }
 
-/* BUG 一个问题，为什么要向网关发送ARP，为什么要向一个单独的主机发送ARP */
-static void init_arp_msg(struct sk_buff *arpmsg, 
-							int operation,
-							u8 *mymac, u32 myip, 
-							u8 *yourmac,  u32 yourip)
-{
-	assert( arpmsg->pkgsize == 14 + 28 && arpmsg->dev);
-
-	//struct arp_packet packet = kmalloc2( sizeof( struct arp_packet), 0)
-	struct ethhdr *ethhdr = arpmsg->ethhdr;
+/* 只是做最简单的初始化，这样arp_inquire和arp_respond里面的代码会有重复，先
+ * 不做进一步的提炼。 因为对ARP的所有类型还没学，慢慢进化。
+ *
+ */
+static void init_arp_msg(struct sk_buff *arpmsg,  int operation){
 	struct arphdr *arphdr = arpmsg->arphdr;
-	struct net_device *dev = arpmsg->dev;
-	
-	if(!mymac) mymac= dev->mac;
 
-	memcp(ethhdr->mymac, mymac, 6);
-	memcp(ethhdr->yourmac, yourmac ? yourmac : __mac_broadcast, 6);
-	ethhdr->protocol = htons(0x0806);
+	arpmsg->ethhdr->protocol = htons(0x0806);
 
 	arphdr->hardware = htons(1);
 	arphdr->protocol = htons(0x0800);
 	arphdr->operation = htons(operation);
 	arphdr->haddr_len = 6;
 	arphdr->paddr_len = 4;
-	/* Note, we fill in 'yourmac', 'yourip' before 'mymac', 'myip', because 
-	 * in some cases, we just copy "myip' to 'yourip'.
-	 */
-	memcpy(arphdr->yourmac, yourmac ? yourmac : __mac_empty, 6);
-	arphdr->yourip = htonl(yourip);
-
-	memcpy(arphdr->mymac, mymac, 6);
-	arphdr->myip = htonl(myip ? myip : __local_ip);
 }
 
 static u8 *arp_lookup(u32 ip){
@@ -97,26 +78,63 @@ static struct arp_record * arp_learn(u8 *comer_mac, u32 comer_ip){
 		memcpy( record->his_mac, comer_mac, 6);
 		
 		LL_I( arptbl[index], record);
-		oprintf("ARP Learn:" );
-		print_mac(comer_mac);
-		oprintf("<==");
-		print_ip(comer_ip);
-		oprintf("\n");
+		//oprintf("ARP Learn:" );
+		//print_mac(comer_mac);
+		//oprintf("<==");
+		//print_ip(comer_ip);
+		//oprintf("\n");
 	}
 	return record;
 }
 
-void arp_inquire(u32 yourip, u8 *mymac, u32 myip ){
+#if 0
+void __arp_inquire(u32 yourip, u8 *mymac, u32 myip ){
 	//spin("in arp_inquire");
 	struct sk_buff *skb = dev_alloc_skb2( 0x0806, 0);
 	init_arp_msg(skb, 1, mymac, myip, 0, yourip);
 	waiting_for_transmit(skb);
 }
+#endif
 
-static void arp_respond(struct sk_buff *msg, u8 *mymac, u32 myip){
+//arp询问，一般不指定自己的mac，只是根据对方ip挑选网卡
+void arp_inquire(u32 yourip){
+	struct net_device *netdev = pick_nic(yourip, 0);
+	assert(netdev);
+
+	struct sk_buff *skb = dev_alloc_skb2( 0x0806, 0);
+	struct arphdr *arphdr = skb->arphdr;
+	init_arp_msg(skb, 1);
+	skb->dev =  netdev;
+	memcpy(skb->ethhdr->yourmac, __mac_broadcast, 6);
+	memcpy(skb->ethhdr->mymac, netdev->mac, 6);
+
+	memset(arphdr->yourmac, 0, 6);
+	memcpy(arphdr->mymac, netdev->mac, 6);
+	arphdr->yourip = htonl(yourip);
+	arphdr->myip = htonl(netdev->ip);
+
+	waiting_for_transmit(skb);
+}
+
+/* 这个接口只考虑常规应答，我是什么ip，什么mac，就照直告诉它。 */
+static void arp_respond(struct sk_buff *msg){
+	struct arphdr * arphdr = msg->arphdr;
+	struct ethhdr * ethhdr = msg->ethhdr;
+	struct net_device *netdev = msg->dev;
+
 	arp_learn(msg->arphdr->mymac, msg->arphdr->myip);	
 
-	init_arp_msg(msg, 2, mymac, myip, msg->arphdr->mymac, msg->arphdr->myip);
+	init_arp_msg(msg, 2);
+
+	memcpy(ethhdr->yourmac, arphdr->mymac, 6);
+	memcpy(ethhdr->mymac, netdev->mac, 6);
+
+	memcpy(arphdr->yourmac, ethhdr->yourmac, 6);
+	memcpy(arphdr->mymac, netdev->mac, 6);
+	arphdr->yourip = htonl(arphdr->myip);
+
+	arphdr->myip = htonl(netdev->ip);
+
 	waiting_for_transmit(msg);	
 }
 
@@ -130,9 +148,12 @@ static void arp_act(struct sk_buff *skb){
 
 	int index = iphash(record->his_ip )% ARP_TBL_LEN;
 	struct sk_buff * waiting = later_down[index];
+	//oprintf("laterdown try waked!target ip:%s, got index:%u\n", mk_ipstr(record->his_ip), index);
 	while(waiting){
+		oprintf("$");
 		struct sk_buff *_next = waiting->next;
-		if(waiting->iphdr->yourip == record->his_ip){
+		if(waiting->iphdr->yourip == htonl(record->his_ip)){
+			//oprintf("find one in later_down\n");
 			memcpy(waiting->ethhdr->yourmac, record->his_mac, 6);
 			cli();
 			LL_DEL(later_down[index], waiting);
@@ -147,14 +168,18 @@ static void arp_act(struct sk_buff *skb){
  * to a gateway, or directly to another host in LAN.
  */
 void arp_down(struct sk_buff *skb){
+	struct iphdr * iphdr = skb->iphdr;
+	unsigned yourip = ntohl(iphdr->yourip);
+	//unsigned myip = ntohl(iphdr->myip);
+
+	struct net_device * dev = skb->dev;
+	assert(dev);
+
 	memcpy(skb->ethhdr->mymac, skb->dev->mac, 6);
 	skb->ethhdr->protocol = htons(0x0800);
 
-	struct iphdr * iphdr = skb->iphdr;
-	struct net_device *dev = skb->dev;
 	//skb_cursor_up(skb, sizeof(struct ethhdr));
 	unsigned nexthop;
-	unsigned yourip = ntohl(iphdr->yourip);
 	if((yourip & dev->ipmask) == (dev->ip & dev->ipmask)){
 		nexthop = yourip;
 	}
@@ -169,8 +194,10 @@ void arp_down(struct sk_buff *skb){
 		oprintf("[!]\n");
 		cli();
 		int index = iphash(yourip )% ARP_TBL_LEN;
+		//oprintf("hash ip:%s, got index:%u", mk_ipstr(yourip), index);
 		LL_I( later_down[index], skb);
 		sti();
+		arp_inquire(yourip);
 	}
 }
 
@@ -190,15 +217,15 @@ void arp_layer_receive( struct sk_buff *comer_skb ){
 	BYTE_ENDIAN_FLIP4(arphdr->yourip);
 
 	//////////done
-	u8 *mac = arphdr->mymac;
-	oprintf("arp layer receive: operation=%u, from mac(%x %x %x %x %x %x)", arphdr->operation, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+	//u8 *mac = arphdr->mymac;
+	//oprintf("arp layer receive: operation=%u, from mac(%x %x %x %x %x %x)", arphdr->operation, mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
 	if(arphdr->operation == 1){		/* it's an inquiry */
-		arp_respond(comer_skb, 0, 0);
+		arp_respond(comer_skb);
 	}	
 	else if(arphdr->operation == 2){	/* it's a REPLY */
 		arp_act(comer_skb);
 	}
 	else spin("unknown operation");
 	
-	oprintf(" ARP layer exit\n");
+	//oprintf(" ARP layer exit\n");
 }

@@ -1,3 +1,4 @@
+#include<utils.h>
 #include<linux/skbuff.h>
 #include<linux/netdevice.h>
 #include<linux/if_ether.h>
@@ -76,7 +77,7 @@ struct sk_buff * dev_alloc_skb( int pkgsize ){
 	skb->second_hdr = (void *)(skb->ethhdr + 1);
 	skb->third_hdr = (void *)(skb->iphdr + 1);		/*已经被ip.c里代码依赖了*/
 
-	skb->dev = pick_nic();		/* TODO remove it later */
+	//skb->dev = pick_nic();		/* TODO remove it later */
 	skb->bufsize = bufsize;
 	skb->pkgsize = pkgsize;
 	return skb;	
@@ -87,3 +88,51 @@ void dev_free_skb( struct sk_buff *skb){
 	kfree2(skb->data);
 	kmem_cache_free( skbuff_cache, skb );
 }
+
+static char *get_iptype(struct iphdr *iphdr){
+	switch(iphdr->protocol){
+		case PROTOCOL_ICMP:
+			return "ICMP";
+		case PROTOCOL_UDP:
+			return "UDP";
+		case PROTOCOL_TCP:
+			return "TCP";
+		default:
+			break;
+	}
+	return "unknown";
+}
+
+
+//注意，它是用来打印出口处的skb。所以采用网络字节序。
+void info_skb(struct sk_buff *skb){
+	oprintf("@skb ");
+	switch(ntohs(skb->ethhdr->protocol)){
+		case PROTOCOL_ARP:
+			oprintf("ARP %s ==> %s\n", 
+					mk_ipstr( ntohl(skb->arphdr->myip) ), 
+					mk_ipstr( ntohl(skb->arphdr->yourip) ) );
+			break;
+		case PROTOCOL_IP:{
+			oprintf("IP(%s) %s ==> %s\n",
+					get_iptype(skb->iphdr), 
+					mk_ipstr( ntohl(skb->iphdr->myip) ), 
+					mk_ipstr( ntohl(skb->iphdr->yourip) )
+				   );
+			break;
+		}
+		default:
+			oprintf("UNKNOWN protocol\n");
+	}
+
+}
+
+
+
+
+
+
+
+
+
+

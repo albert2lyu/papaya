@@ -21,8 +21,8 @@ void udp_layer_receive(struct sk_buff *comer){
 }
 
 static void info_udpmsg(struct udphdr *udphdr){
-	oprintf("UDP port(%x) ==> port(%x)", udphdr->myport, udphdr->yourport);	
-	int datalen = udphdr->tot_len - 8;
-	__less(udphdr->data, datalen);
+	oprintf("UDP port(%x) ==> port(%x) ", udphdr->myport, udphdr->yourport);	
+	//int datalen = udphdr->tot_len - 8;
+//	__less(udphdr->data, datalen);
 	//oprintf(" %x bytes :%*s\n", datalen, datalen, udphdr->data);
 }

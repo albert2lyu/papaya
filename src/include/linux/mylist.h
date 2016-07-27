@@ -62,6 +62,15 @@ struct ll2{
  * you must specify the target list's root-node when you use these macros.
  */
 
+#if 0
+//list和location必须非0
+#define LL_APPEND(list, location, new)\
+	do{\
+		assert((list) && (location) && (new));\
+		d
+	}
+#endif
+
 /**list: root node
  * location: the node you want to insert at
  * new: the node you want to inser

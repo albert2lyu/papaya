@@ -14,6 +14,17 @@
 
 #pragma pack(push)
 #pragma pack(1)
+
+struct tcp_opt{
+	u8 kind;
+	u8 len;
+	union{
+		u8 byte[0];
+		u16 word[0];
+		u32  dword[0];
+	}data;
+};
+
 /*
     0                   1                   2                   3   
     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
@@ -41,7 +52,7 @@ struct tcphdr{
 	u32 seq;
 	u32	ack;
 	int resv: 4;
-	int	len:  4;	
+	int	len:  4;			/* by unit of 4-bytes */
 	union{
 	struct{
 		int flag_fin: 1;
@@ -58,10 +69,12 @@ struct tcphdr{
 	u16 wndsize;
 	u16 chksum;
 	u16 urgptr;
+	struct tcp_opt opt_area[0];
 };
 
 #pragma pack(pop)
 
+#define TCPHDR_LEN (sizeof(struct tcphdr))
 static inline u32 tcphash(u32 hisip, u16 hisport, u32 myport){
 	u32 hash = iphash(hisip) +  (hisport & 0xff) + (hisport >> 8) 
 							 +  (myport & 0xff) + (myport >> 8);

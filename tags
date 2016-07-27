@@ -4,6 +4,8 @@
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+AH	include/utils.h	/^struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};$/;"	m	struct:__eax
+AL	include/utils.h	/^struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};$/;"	m	struct:__eax
 ALL_A	lsh/lua/Makefile	/^ALL_A= $(LUA_A)$/;"	m
 ALL_O	lsh/lua/Makefile	/^ALL_O= $(CORE_O) $(LIB_O) $(LUA_O) $(LUAC_O)$/;"	m
 ALL_T	lsh/lua/Makefile	/^ALL_T= $(LUA_A) $(LUA_T) $(LUAC_T) $(LUA_SO)$/;"	m
@@ -12,14 +14,14 @@ ALT_R	include/kbd_drv.h	16;"	d
 AR	lsh/lua/Makefile	/^AR= ar rcu$/;"	m
 ARGC_MAX	lsh/lsh.h	18;"	d
 ARP_H	src/include/net/arp.h	2;"	d
-ARP_PACK_SIZE	src/include/net/arp.h	27;"	d
-ARP_TBL_LEN	src/net/ipv4/arp.c	26;"	d	file:
-ARR_CELLS	include/utils.h	233;"	d
+ARP_PACK_SIZE	src/include/net/arp.h	29;"	d
+ARP_TBL_LEN	src/net/ipv4/arp.c	25;"	d	file:
+ARR_CELLS	include/utils.h	245;"	d
 ASM_GENERIC_FCNTL_H	src/include/asm-generic/fcntl.h	2;"	d
 ASM_LABLE_H	include/asm_lable.h	2;"	d
 ASSERT_H	src/include/linux/assert.h	2;"	d
 ATOMIC_INIT	include/atomic.h	3;"	d
-ATTRIBUTE_TYPE	include/ntfs.h	/^} ATTRIBUTE_TYPE, *PATTRIBUTE_TYPE;$/;"	t	typeref:enum:__anon40
+ATTRIBUTE_TYPE	include/ntfs.h	/^} ATTRIBUTE_TYPE, *PATTRIBUTE_TYPE;$/;"	t	typeref:enum:__anon45
 AUXMARK	lsh/lua/loadlib.c	590;"	d	file:
 AcceptAllPhys	src/drivers/net/8139.c	/^	AcceptAllPhys	= 0x01,$/;"	e	enum:rx_mode_bits	file:
 AcceptBroadcast	src/drivers/net/8139.c	/^	AcceptBroadcast	= 0x08,$/;"	e	enum:rx_mode_bits	file:
@@ -28,23 +30,23 @@ AcceptMulticast	src/drivers/net/8139.c	/^	AcceptMulticast	= 0x04,$/;"	e	enum:rx_
 AcceptMyPhys	src/drivers/net/8139.c	/^	AcceptMyPhys	= 0x02,$/;"	e	enum:rx_mode_bits	file:
 AcceptRunt	src/drivers/net/8139.c	/^	AcceptRunt	= 0x10,$/;"	e	enum:rx_mode_bits	file:
 Arith	lsh/lua/lvm.c	/^static void Arith (lua_State *L, StkId ra, const TValue *rb,$/;"	f	file:
-AttributeAttributeList	include/ntfs.h	/^  AttributeAttributeList = 0x20,$/;"	e	enum:__anon40
-AttributeBitmap	include/ntfs.h	/^  AttributeBitmap = 0xB0,$/;"	e	enum:__anon40
-AttributeData	include/ntfs.h	/^  AttributeData = 0x80,$/;"	e	enum:__anon40
-AttributeEA	include/ntfs.h	/^  AttributeEA = 0xE0,$/;"	e	enum:__anon40
-AttributeEAInformation	include/ntfs.h	/^  AttributeEAInformation = 0xD0,$/;"	e	enum:__anon40
-AttributeFileName	include/ntfs.h	/^  AttributeFileName = 0x30,$/;"	e	enum:__anon40
-AttributeIndexAllocation	include/ntfs.h	/^  AttributeIndexAllocation = 0xA0,$/;"	e	enum:__anon40
-AttributeIndexRoot	include/ntfs.h	/^  AttributeIndexRoot = 0x90,$/;"	e	enum:__anon40
-AttributeLoggedUtilityStream	include/ntfs.h	/^  AttributeLoggedUtilityStream = 0x100$/;"	e	enum:__anon40
-AttributeObjectId	include/ntfs.h	/^  AttributeObjectId = 0x40,$/;"	e	enum:__anon40
-AttributePropertySet	include/ntfs.h	/^  AttributePropertySet = 0xF0,$/;"	e	enum:__anon40
-AttributeReparsePoint	include/ntfs.h	/^  AttributeReparsePoint = 0xC0,$/;"	e	enum:__anon40
-AttributeSecurityDescriptor	include/ntfs.h	/^  AttributeSecurityDescriptor = 0x50,$/;"	e	enum:__anon40
-AttributeStandardInformation	include/ntfs.h	/^  AttributeStandardInformation = 0x10,$/;"	e	enum:__anon40
-AttributeVolumeInformation	include/ntfs.h	/^  AttributeVolumeInformation = 0x70,$/;"	e	enum:__anon40
-AttributeVolumeName	include/ntfs.h	/^  AttributeVolumeName = 0x60,$/;"	e	enum:__anon40
-B	include/utils.h	64;"	d
+AttributeAttributeList	include/ntfs.h	/^  AttributeAttributeList = 0x20,$/;"	e	enum:__anon45
+AttributeBitmap	include/ntfs.h	/^  AttributeBitmap = 0xB0,$/;"	e	enum:__anon45
+AttributeData	include/ntfs.h	/^  AttributeData = 0x80,$/;"	e	enum:__anon45
+AttributeEA	include/ntfs.h	/^  AttributeEA = 0xE0,$/;"	e	enum:__anon45
+AttributeEAInformation	include/ntfs.h	/^  AttributeEAInformation = 0xD0,$/;"	e	enum:__anon45
+AttributeFileName	include/ntfs.h	/^  AttributeFileName = 0x30,$/;"	e	enum:__anon45
+AttributeIndexAllocation	include/ntfs.h	/^  AttributeIndexAllocation = 0xA0,$/;"	e	enum:__anon45
+AttributeIndexRoot	include/ntfs.h	/^  AttributeIndexRoot = 0x90,$/;"	e	enum:__anon45
+AttributeLoggedUtilityStream	include/ntfs.h	/^  AttributeLoggedUtilityStream = 0x100$/;"	e	enum:__anon45
+AttributeObjectId	include/ntfs.h	/^  AttributeObjectId = 0x40,$/;"	e	enum:__anon45
+AttributePropertySet	include/ntfs.h	/^  AttributePropertySet = 0xF0,$/;"	e	enum:__anon45
+AttributeReparsePoint	include/ntfs.h	/^  AttributeReparsePoint = 0xC0,$/;"	e	enum:__anon45
+AttributeSecurityDescriptor	include/ntfs.h	/^  AttributeSecurityDescriptor = 0x50,$/;"	e	enum:__anon45
+AttributeStandardInformation	include/ntfs.h	/^  AttributeStandardInformation = 0x10,$/;"	e	enum:__anon45
+AttributeVolumeInformation	include/ntfs.h	/^  AttributeVolumeInformation = 0x70,$/;"	e	enum:__anon45
+AttributeVolumeName	include/ntfs.h	/^  AttributeVolumeName = 0x60,$/;"	e	enum:__anon45
+B	include/utils.h	65;"	d
 BACKSPACE	include/kbd_drv.h	9;"	d
 BAR	src/lib/printf.c	155;"	d	file:
 BAR_CELLS	src/lib/printf.c	152;"	d	file:
@@ -170,8 +172,8 @@ ClosureHeader	lsh/lua/lobject.h	291;"	d
 CmdReset	src/drivers/net/8139.c	/^	CmdReset	= 0x10,$/;"	e	enum:ChipCmdBits	file:
 CmdRxEnb	src/drivers/net/8139.c	/^	CmdRxEnb	= 0x08,$/;"	e	enum:ChipCmdBits	file:
 CmdTxEnb	src/drivers/net/8139.c	/^	CmdTxEnb	= 0x04,$/;"	e	enum:ChipCmdBits	file:
-CommonHeader	lsh/lua/lobject.h	/^    CommonHeader;$/;"	m	struct:TString::__anon61
-CommonHeader	lsh/lua/lobject.h	/^    CommonHeader;$/;"	m	struct:Udata::__anon62
+CommonHeader	lsh/lua/lobject.h	/^    CommonHeader;$/;"	m	struct:TString::__anon66
+CommonHeader	lsh/lua/lobject.h	/^    CommonHeader;$/;"	m	struct:Udata::__anon67
 CommonHeader	lsh/lua/lobject.h	/^  CommonHeader;$/;"	m	struct:GCheader
 CommonHeader	lsh/lua/lobject.h	/^  CommonHeader;$/;"	m	struct:Proto
 CommonHeader	lsh/lua/lobject.h	/^  CommonHeader;$/;"	m	struct:Table
@@ -190,11 +192,11 @@ DCACHE_H	src/include/linux/dcache.h	2;"	d
 DESCRIPTOR	debug/include/valType.h	/^}DESCRIPTOR;$/;"	t	typeref:struct:descriptorr
 DESCRIPTOR	include/valType.h	/^}DESCRIPTOR;$/;"	t	typeref:struct:descriptorr
 DEVICE_NR	src/drivers/ide/ide.c	11;"	d	file:
-DIRENT	include/fs_ext.h	/^}DIRENT;$/;"	t	typeref:struct:__anon34
+DIRENT	include/fs_ext.h	/^}DIRENT;$/;"	t	typeref:struct:__anon39
 DISP_H	include/disp.h	2;"	d
 DLMSG	lsh/lua/loadlib.c	236;"	d	file:
 DONE	debug/pdb.c	29;"	d	file:
-DSI	include/utils.h	126;"	d
+DSI	include/utils.h	127;"	d
 D_HASHTABLE_LEN	src/include/linux/dcache.h	7;"	d
 Def_arr_a	lsh/utils.h	28;"	d
 Def_arr_del	lsh/utils.h	9;"	d
@@ -213,7 +215,7 @@ DumpHeader	lsh/lua/ldump.c	/^static void DumpHeader(DumpState* D)$/;"	f	file:
 DumpInt	lsh/lua/ldump.c	/^static void DumpInt(int x, DumpState* D)$/;"	f	file:
 DumpMem	lsh/lua/ldump.c	26;"	d	file:
 DumpNumber	lsh/lua/ldump.c	/^static void DumpNumber(lua_Number x, DumpState* D)$/;"	f	file:
-DumpState	lsh/lua/ldump.c	/^} DumpState;$/;"	t	typeref:struct:__anon70	file:
+DumpState	lsh/lua/ldump.c	/^} DumpState;$/;"	t	typeref:struct:__anon75	file:
 DumpString	lsh/lua/ldump.c	/^static void DumpString(const TString* s, DumpState* D)$/;"	f	file:
 DumpVar	lsh/lua/ldump.c	27;"	d	file:
 DumpVector	lsh/lua/ldump.c	/^static void DumpVector(const void* b, int n, size_t size, DumpState* D)$/;"	f	file:
@@ -239,20 +241,22 @@ ERRNO_BASE_H	src/include/asm-generic/errno-base.h	2;"	d
 ERRNO_H	src/include/asm-generic/errno.h	2;"	d
 ESC	include/kbd_drv.h	8;"	d
 ETHHDR_LEN	src/include/linux/if_ether.h	14;"	d
+ETHHDR_LEN	src/net/ipv4/tcp.cc	15;"	d	file:
 ETH_MIN_LEN	src/drivers/net/8139.c	18;"	d	file:
 EXCHG_INT	lsh/vi.h	26;"	d
-EXCHG_PTR	include/utils.h	133;"	d
+EXCHG_PTR	include/utils.h	134;"	d
 EXCHG_PTR	lsh/vi.h	25;"	d
-EXCHG_U32	include/utils.h	132;"	d
+EXCHG_U16	include/utils.h	135;"	d
+EXCHG_U32	include/utils.h	133;"	d
 EXTRA_STACK	lsh/lua/lstate.h	29;"	d
 Elf32_Addr	debug/include/valType.h	/^typedef unsigned Elf32_Addr;$/;"	t
 Elf32_Addr	include/valType.h	/^typedef unsigned Elf32_Addr;$/;"	t
-Elf32_Ehdr	include/elf.h	/^} Elf32_Ehdr;$/;"	t	typeref:struct:__anon49
+Elf32_Ehdr	include/elf.h	/^} Elf32_Ehdr;$/;"	t	typeref:struct:__anon54
 Elf32_Half	debug/include/valType.h	/^typedef unsigned short Elf32_Half;$/;"	t
 Elf32_Half	include/valType.h	/^typedef unsigned short Elf32_Half;$/;"	t
 Elf32_Off	debug/include/valType.h	/^typedef unsigned Elf32_Off;$/;"	t
 Elf32_Off	include/valType.h	/^typedef unsigned Elf32_Off;$/;"	t
-Elf32_Phdr	include/elf.h	/^} Elf32_Phdr;$/;"	t	typeref:struct:__anon50
+Elf32_Phdr	include/elf.h	/^} Elf32_Phdr;$/;"	t	typeref:struct:__anon55
 Elf32_Word	debug/include/valType.h	/^typedef unsigned Elf32_Word;$/;"	t
 Elf32_Word	include/valType.h	/^typedef unsigned Elf32_Word;$/;"	t
 FIFOTMS	src/drivers/net/8139.c	/^	FIFOTMS		= 0x70,	 \/* FIFO Control and test. *\/$/;"	e	enum:RTL8139_registers	file:
@@ -307,7 +311,7 @@ GETARG_Bx	lsh/lua/lopcodes.h	96;"	d
 GETARG_C	lsh/lua/lopcodes.h	92;"	d
 GETARG_sBx	lsh/lua/lopcodes.h	100;"	d
 GET_OPCODE	lsh/lua/lopcodes.h	80;"	d
-GROUP_DESC	include/fs_ext.h	/^}GROUP_DESC;$/;"	t	typeref:struct:__anon32
+GROUP_DESC	include/fs_ext.h	/^}GROUP_DESC;$/;"	t	typeref:struct:__anon37
 G_PGNUM	include/mm.h	24;"	d
 Gate	src/kernel.asm	/^Gate selector_plain_c0, i80 - _start + base_text, 0, DA_386IGate$/;"	l
 Gate	src/kernel.asm	/^Gate selector_plain_c0, i80 -_start + base_text, 0, DA_386IGate$/;"	l
@@ -318,7 +322,7 @@ HEADER_MAX	debug/include/stab.h	9;"	d
 HEAP_BASE	include/pmm.h	9;"	d
 HEAP_H	include/heap.h	2;"	d
 HEAP_SIZE	include/pmm.h	10;"	d
-HS_CMD	include/hs.h	/^}HS_CMD;$/;"	t	typeref:struct:__anon46
+HS_CMD	include/hs.h	/^}HS_CMD;$/;"	t	typeref:struct:__anon51
 HS_H	include/hs.h	2;"	d
 HTYPE_MAX	debug/include/stab.h	14;"	d
 HT_3BIT_CAP_MASK	src/include/linux/pci_regs.h	591;"	d
@@ -343,7 +347,7 @@ HT_MSI_FIXED_ADDR	src/include/linux/pci_regs.h	605;"	d
 HT_MSI_FLAGS	src/include/linux/pci_regs.h	602;"	d
 HT_MSI_FLAGS_ENABLE	src/include/linux/pci_regs.h	603;"	d
 HT_MSI_FLAGS_FIXED	src/include/linux/pci_regs.h	604;"	d
-HZ	src/utils.c	121;"	d	file:
+HZ	src/utils.c	132;"	d	file:
 HltClk	src/drivers/net/8139.c	/^	HltClk		= 0x5B,$/;"	e	enum:RTL8139_registers	file:
 I8259_H	include/i8259.h	2;"	d
 ICMP_ADDRESS	src/include/net/icmp.h	18;"	d
@@ -404,7 +408,7 @@ INDXENTRY	include/ntfs.h	/^} INDXENTRY, *LPINDXENTRY;$/;"	t	typeref:struct:tag_I
 INDXHEAD	include/ntfs.h	/^} INDXHEAD, *LPINDXHEAD;$/;"	t	typeref:struct:tag_INDXHEAD
 INDXROOT	include/ntfs.h	/^} INDXROOT, *LPINDXROOT;$/;"	t	typeref:struct:tag_INDXROOT
 INIT_LIST_HEAD	include/list.h	11;"	d
-INODE	include/fs_ext.h	/^}INODE;$/;"	t	typeref:struct:__anon33
+INODE	include/fs_ext.h	/^}INODE;$/;"	t	typeref:struct:__anon38
 INODE_COMMON_SIZE	src/include/linux/fs.h	44;"	d
 INODE_FILE_DIR	include/fs_ext.h	6;"	d
 INTEL_VEND	src/drivers/net/e1000.c	9;"	d	file:
@@ -412,10 +416,10 @@ IN_WAKE_QUEUE	src/net/core/dev.c	6;"	d	file:
 IO_INPUT	lsh/lua/liolib.c	23;"	d	file:
 IO_OUTPUT	lsh/lua/liolib.c	24;"	d	file:
 IPHDR_FLIP	src/net/ipv4/ip.c	32;"	d	file:
-IPHDR_LEN	src/include/net/ip.h	53;"	d
+IPHDR_LEN	src/include/net/ip.h	54;"	d
 IP_H	src/include/net/ip.h	2;"	d
 IP_ORIGIN_SIZE	src/net/ipv4/ip.c	28;"	d	file:
-IP_PAYLOAD_LEN	src/include/net/ip.h	54;"	d
+IP_PAYLOAD_LEN	src/include/net/ip.h	55;"	d
 IRQ_DISABLED	include/irq.h	8;"	d
 IRQ_H	include/irq.h	2;"	d
 IRQ_INPROCESS	include/irq.h	7;"	d
@@ -445,11 +449,11 @@ KV	include/bootinfo.h	22;"	d
 KV	include/pmm.h	6;"	d
 L	lsh/lsh.c	/^lua_State *L;$/;"	v
 L	lsh/lua/lauxlib.h	/^  lua_State *L;$/;"	m	struct:luaL_Buffer
-L	lsh/lua/ldump.c	/^ lua_State* L;$/;"	m	struct:__anon70	file:
+L	lsh/lua/ldump.c	/^ lua_State* L;$/;"	m	struct:__anon75	file:
 L	lsh/lua/llex.h	/^  struct lua_State *L;$/;"	m	struct:LexState	typeref:struct:LexState::lua_State
 L	lsh/lua/lparser.h	/^  struct lua_State *L;  \/* copy of the Lua state *\/$/;"	m	struct:FuncState	typeref:struct:FuncState::lua_State
 L	lsh/lua/lstrlib.c	/^  lua_State *L;$/;"	m	struct:MatchState	file:
-L	lsh/lua/lundump.c	/^ lua_State* L;$/;"	m	struct:__anon57	file:
+L	lsh/lua/lundump.c	/^ lua_State* L;$/;"	m	struct:__anon62	file:
 L	lsh/lua/lzio.h	/^  lua_State *L;			\/* Lua state (for reader) *\/$/;"	m	struct:Zio
 L1_CACHLINE_SIZE	src/include/linux/slab.h	9;"	d
 LAST_TAG	lsh/lua/lobject.h	20;"	d
@@ -481,17 +485,17 @@ LIST_H	include/list.h	2;"	d
 LL2_A	src/include/linux/mylist.h	20;"	d
 LL2_DEL	src/include/linux/mylist.h	37;"	d
 LL2_POP	src/include/linux/mylist.h	11;"	d
-LL_ASSIGN	src/include/linux/mylist.h	199;"	d
-LL_CHECK	src/include/linux/mylist.h	222;"	d
-LL_DEL	src/include/linux/mylist.h	180;"	d
-LL_I	src/include/linux/mylist.h	85;"	d
-LL_I2	src/include/linux/mylist.h	99;"	d
-LL_INFO	src/include/linux/mylist.h	189;"	d
-LL_INSERT	src/include/linux/mylist.h	70;"	d
-LL_I_DECRE	src/include/linux/mylist.h	155;"	d
-LL_I_INCRE	src/include/linux/mylist.h	129;"	d
-LL_REPLACE	src/include/linux/mylist.h	108;"	d
-LL_SCAN_ON_KEY	src/include/linux/mylist.h	209;"	d
+LL_ASSIGN	src/include/linux/mylist.h	208;"	d
+LL_CHECK	src/include/linux/mylist.h	231;"	d
+LL_DEL	src/include/linux/mylist.h	189;"	d
+LL_I	src/include/linux/mylist.h	94;"	d
+LL_I2	src/include/linux/mylist.h	108;"	d
+LL_INFO	src/include/linux/mylist.h	198;"	d
+LL_INSERT	src/include/linux/mylist.h	79;"	d
+LL_I_DECRE	src/include/linux/mylist.h	164;"	d
+LL_I_INCRE	src/include/linux/mylist.h	138;"	d
+LL_REPLACE	src/include/linux/mylist.h	117;"	d
+LL_SCAN_ON_KEY	src/include/linux/mylist.h	218;"	d
 LOOKUP_DIR	src/fs/namei.c	8;"	d	file:
 LOOP	src/disp.c	26;"	d	file:
 LPFILENAME	include/ntfs.h	/^} FILE_NAME, *LPFILENAME;$/;"	t	typeref:struct:tag_FILE_NAME
@@ -500,15 +504,15 @@ LPINDXATTR	include/ntfs.h	/^} INDXATTR, *LPINDXATTR;$/;"	t	typeref:struct:tag_IN
 LPINDXENTRY	include/ntfs.h	/^} INDXENTRY, *LPINDXENTRY;$/;"	t	typeref:struct:tag_INDXENTRY
 LPINDXHEAD	include/ntfs.h	/^} INDXHEAD, *LPINDXHEAD;$/;"	t	typeref:struct:tag_INDXHEAD
 LPINDXROOT	include/ntfs.h	/^} INDXROOT, *LPINDXROOT;$/;"	t	typeref:struct:tag_INDXROOT
-LPJ	src/utils.c	120;"	d	file:
+LPJ	src/utils.c	131;"	d	file:
 LPMFTATTR	include/ntfs.h	/^} MFTATTR, *LPMFTATTR;$/;"	t	typeref:struct:tag_MFTATTR
 LPNONRESIDATTR	include/ntfs.h	/^} NONRESIDATTR, *LPNONRESIDATTR;$/;"	t	typeref:struct:tag_NONRESIDATTR
 LPRESIDATTR	include/ntfs.h	/^} RESIDATTR, *LPRESIDATTR;$/;"	t	typeref:struct:tag_RESIDATTR
 LSH_CMD_MAX	lsh/lsh.h	23;"	d
 LSH_H	lsh/lsh.h	2;"	d
-LSH_MOD_CMD	lsh/lsh.h	/^	LSH_MOD_CMD,$/;"	e	enum:__anon56
-LSH_MOD_LUA	lsh/lsh.h	/^	LSH_MOD_LUA,$/;"	e	enum:__anon56
-LSH_MOD_VI	lsh/lsh.h	/^	LSH_MOD_VI$/;"	e	enum:__anon56
+LSH_MOD_CMD	lsh/lsh.h	/^	LSH_MOD_CMD,$/;"	e	enum:__anon61
+LSH_MOD_LUA	lsh/lsh.h	/^	LSH_MOD_LUA,$/;"	e	enum:__anon61
+LSH_MOD_VI	lsh/lsh.h	/^	LSH_MOD_VI$/;"	e	enum:__anon61
 LSTA_TU	src/drivers/net/e1000.c	95;"	d	file:
 LUAC_FORMAT	lsh/lua/lundump.h	31;"	d
 LUAC_HEADERSIZE	lsh/lua/lundump.h	34;"	d
@@ -728,7 +732,7 @@ LoadMem	lsh/lua/lundump.c	43;"	d	file:
 LoadNumber	lsh/lua/lundump.c	/^static lua_Number LoadNumber(LoadState* S)$/;"	f	file:
 LoadS	lsh/lua/lauxlib.c	/^typedef struct LoadS {$/;"	s	file:
 LoadS	lsh/lua/lauxlib.c	/^} LoadS;$/;"	t	typeref:struct:LoadS	file:
-LoadState	lsh/lua/lundump.c	/^} LoadState;$/;"	t	typeref:struct:__anon57	file:
+LoadState	lsh/lua/lundump.c	/^} LoadState;$/;"	t	typeref:struct:__anon62	file:
 LoadString	lsh/lua/lundump.c	/^static TString* LoadString(LoadState* S)$/;"	f	file:
 LoadVar	lsh/lua/lundump.c	45;"	d	file:
 LoadVector	lsh/lua/lundump.c	46;"	d	file:
@@ -736,7 +740,7 @@ LocVar	lsh/lua/lobject.h	/^typedef struct LocVar {$/;"	s
 LocVar	lsh/lua/lobject.h	/^} LocVar;$/;"	t	typeref:struct:LocVar
 MAC0	src/drivers/net/8139.c	/^	MAC0		= 0,	 \/* Ethernet hardware address. *\/$/;"	e	enum:RTL8139_registers	file:
 MAJOR	src/include/linux/blkdev.h	8;"	d
-MAKE_IP	include/utils.h	223;"	d
+MAKE_IP	include/utils.h	235;"	d
 MAKE_IP_STR	src/utils.c	/^char *MAKE_IP_STR(u32 ip){$/;"	f
 MAKE_REG_DEVICE	include/hd.h	35;"	d
 MAKE_REG_DEVICE	include/hs.h	38;"	d
@@ -777,7 +781,7 @@ MB2STRU	include/list.h	87;"	d
 MC_CTRL_L	include/kbd_drv.h	21;"	d
 MC_SHIFT_L	include/kbd_drv.h	19;"	d
 MC_SHIFT_R	include/kbd_drv.h	20;"	d
-MEMBER_OFFSET	include/utils.h	153;"	d
+MEMBER_OFFSET	include/utils.h	155;"	d
 MEMERRMSG	lsh/lua/lmem.h	16;"	d
 MFTATTR	include/ntfs.h	/^} MFTATTR, *LPMFTATTR;$/;"	t	typeref:struct:tag_MFTATTR
 MINOR	src/include/linux/blkdev.h	11;"	d
@@ -801,6 +805,8 @@ MYCFLAGS	lsh/lua/Makefile	/^MYCFLAGS=$/;"	m
 MYLDFLAGS	lsh/lua/Makefile	/^MYLDFLAGS=$/;"	m
 MYLIBS	lsh/lua/Makefile	/^MYLIBS=$/;"	m
 MYLIST_H	src/include/linux/mylist.h	2;"	d
+MY_MSS	src/net/ipv4/tcp.cc	/^static u16 MY_MSS = 1460;$/;"	v	file:
+MY_WND_SIZE	src/net/ipv4/tcp.cc	/^static u32 MY_WND_SIZE = 0x100000;$/;"	v	file:
 MatchState	lsh/lua/lstrlib.c	/^typedef struct MatchState {$/;"	s	file:
 MatchState	lsh/lua/lstrlib.c	/^} MatchState;$/;"	t	typeref:struct:MatchState	file:
 Mbuffer	lsh/lua/lzio.h	/^typedef struct Mbuffer {$/;"	s
@@ -835,7 +841,7 @@ Node	lsh/lua/lobject.h	/^typedef struct Node {$/;"	s
 Node	lsh/lua/lobject.h	/^} Node;$/;"	t	typeref:struct:Node
 NonResidAttr	include/ntfs.h	/^		NONRESIDATTR	NonResidAttr;$/;"	m	union:tag_MFTATTR::unAttrib
 OBJNUM_PER_SLAB	src/mm/slab.c	33;"	d	file:
-OBUFFER	include/proc.h	/^}OBUFFER;$/;"	t	typeref:struct:__anon42
+OBUFFER	include/proc.h	/^}OBUFFER;$/;"	t	typeref:struct:__anon47
 OFFSET2	include/hd.h	6;"	d
 OFFSET2	include/hs.h	9;"	d
 OPR_ADD	lsh/lua/lcode.h	/^  OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_MOD, OPR_POW,$/;"	e	enum:BinOpr
@@ -858,44 +864,44 @@ OPR_NOUNOPR	lsh/lua/lcode.h	/^typedef enum UnOpr { OPR_MINUS, OPR_NOT, OPR_LEN, 
 OPR_OR	lsh/lua/lcode.h	/^  OPR_AND, OPR_OR,$/;"	e	enum:BinOpr
 OPR_POW	lsh/lua/lcode.h	/^  OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_MOD, OPR_POW,$/;"	e	enum:BinOpr
 OPR_SUB	lsh/lua/lcode.h	/^  OPR_ADD, OPR_SUB, OPR_MUL, OPR_DIV, OPR_MOD, OPR_POW,$/;"	e	enum:BinOpr
-OP_ADD	lsh/lua/lopcodes.h	/^OP_ADD,\/*	A B C	R(A) := RK(B) + RK(C)				*\/$/;"	e	enum:__anon71
-OP_CALL	lsh/lua/lopcodes.h	/^OP_CALL,\/*	A B C	R(A), ... ,R(A+C-2) := R(A)(R(A+1), ... ,R(A+B-1)) *\/$/;"	e	enum:__anon71
-OP_CLOSE	lsh/lua/lopcodes.h	/^OP_CLOSE,\/*	A 	close all variables in the stack up to (>=) R(A)*\/$/;"	e	enum:__anon71
-OP_CLOSURE	lsh/lua/lopcodes.h	/^OP_CLOSURE,\/*	A Bx	R(A) := closure(KPROTO[Bx], R(A), ... ,R(A+n))	*\/$/;"	e	enum:__anon71
-OP_CONCAT	lsh/lua/lopcodes.h	/^OP_CONCAT,\/*	A B C	R(A) := R(B).. ... ..R(C)			*\/$/;"	e	enum:__anon71
-OP_DIV	lsh/lua/lopcodes.h	/^OP_DIV,\/*	A B C	R(A) := RK(B) \/ RK(C)				*\/$/;"	e	enum:__anon71
-OP_EQ	lsh/lua/lopcodes.h	/^OP_EQ,\/*	A B C	if ((RK(B) == RK(C)) ~= A) then pc++		*\/$/;"	e	enum:__anon71
-OP_FORLOOP	lsh/lua/lopcodes.h	/^OP_FORLOOP,\/*	A sBx	R(A)+=R(A+2);$/;"	e	enum:__anon71
-OP_FORPREP	lsh/lua/lopcodes.h	/^OP_FORPREP,\/*	A sBx	R(A)-=R(A+2); pc+=sBx				*\/$/;"	e	enum:__anon71
-OP_GETGLOBAL	lsh/lua/lopcodes.h	/^OP_GETGLOBAL,\/*	A Bx	R(A) := Gbl[Kst(Bx)]				*\/$/;"	e	enum:__anon71
-OP_GETTABLE	lsh/lua/lopcodes.h	/^OP_GETTABLE,\/*	A B C	R(A) := R(B)[RK(C)]				*\/$/;"	e	enum:__anon71
-OP_GETUPVAL	lsh/lua/lopcodes.h	/^OP_GETUPVAL,\/*	A B	R(A) := UpValue[B]				*\/$/;"	e	enum:__anon71
-OP_JMP	lsh/lua/lopcodes.h	/^OP_JMP,\/*	sBx	pc+=sBx					*\/$/;"	e	enum:__anon71
-OP_LE	lsh/lua/lopcodes.h	/^OP_LE,\/*	A B C	if ((RK(B) <= RK(C)) ~= A) then pc++  		*\/$/;"	e	enum:__anon71
-OP_LEN	lsh/lua/lopcodes.h	/^OP_LEN,\/*	A B	R(A) := length of R(B)				*\/$/;"	e	enum:__anon71
-OP_LOADBOOL	lsh/lua/lopcodes.h	/^OP_LOADBOOL,\/*	A B C	R(A) := (Bool)B; if (C) pc++			*\/$/;"	e	enum:__anon71
-OP_LOADK	lsh/lua/lopcodes.h	/^OP_LOADK,\/*	A Bx	R(A) := Kst(Bx)					*\/$/;"	e	enum:__anon71
-OP_LOADNIL	lsh/lua/lopcodes.h	/^OP_LOADNIL,\/*	A B	R(A) := ... := R(B) := nil			*\/$/;"	e	enum:__anon71
-OP_LT	lsh/lua/lopcodes.h	/^OP_LT,\/*	A B C	if ((RK(B) <  RK(C)) ~= A) then pc++  		*\/$/;"	e	enum:__anon71
-OP_MOD	lsh/lua/lopcodes.h	/^OP_MOD,\/*	A B C	R(A) := RK(B) % RK(C)				*\/$/;"	e	enum:__anon71
-OP_MOVE	lsh/lua/lopcodes.h	/^OP_MOVE,\/*	A B	R(A) := R(B)					*\/$/;"	e	enum:__anon71
-OP_MUL	lsh/lua/lopcodes.h	/^OP_MUL,\/*	A B C	R(A) := RK(B) * RK(C)				*\/$/;"	e	enum:__anon71
-OP_NEWTABLE	lsh/lua/lopcodes.h	/^OP_NEWTABLE,\/*	A B C	R(A) := {} (size = B,C)				*\/$/;"	e	enum:__anon71
-OP_NOT	lsh/lua/lopcodes.h	/^OP_NOT,\/*	A B	R(A) := not R(B)				*\/$/;"	e	enum:__anon71
-OP_POW	lsh/lua/lopcodes.h	/^OP_POW,\/*	A B C	R(A) := RK(B) ^ RK(C)				*\/$/;"	e	enum:__anon71
-OP_RETURN	lsh/lua/lopcodes.h	/^OP_RETURN,\/*	A B	return R(A), ... ,R(A+B-2)	(see note)	*\/$/;"	e	enum:__anon71
-OP_SELF	lsh/lua/lopcodes.h	/^OP_SELF,\/*	A B C	R(A+1) := R(B); R(A) := R(B)[RK(C)]		*\/$/;"	e	enum:__anon71
-OP_SETGLOBAL	lsh/lua/lopcodes.h	/^OP_SETGLOBAL,\/*	A Bx	Gbl[Kst(Bx)] := R(A)				*\/$/;"	e	enum:__anon71
-OP_SETLIST	lsh/lua/lopcodes.h	/^OP_SETLIST,\/*	A B C	R(A)[(C-1)*FPF+i] := R(A+i), 1 <= i <= B	*\/$/;"	e	enum:__anon71
-OP_SETTABLE	lsh/lua/lopcodes.h	/^OP_SETTABLE,\/*	A B C	R(A)[RK(B)] := RK(C)				*\/$/;"	e	enum:__anon71
-OP_SETUPVAL	lsh/lua/lopcodes.h	/^OP_SETUPVAL,\/*	A B	UpValue[B] := R(A)				*\/$/;"	e	enum:__anon71
-OP_SUB	lsh/lua/lopcodes.h	/^OP_SUB,\/*	A B C	R(A) := RK(B) - RK(C)				*\/$/;"	e	enum:__anon71
-OP_TAILCALL	lsh/lua/lopcodes.h	/^OP_TAILCALL,\/*	A B C	return R(A)(R(A+1), ... ,R(A+B-1))		*\/$/;"	e	enum:__anon71
-OP_TEST	lsh/lua/lopcodes.h	/^OP_TEST,\/*	A C	if not (R(A) <=> C) then pc++			*\/ $/;"	e	enum:__anon71
-OP_TESTSET	lsh/lua/lopcodes.h	/^OP_TESTSET,\/*	A B C	if (R(B) <=> C) then R(A) := R(B) else pc++	*\/ $/;"	e	enum:__anon71
-OP_TFORLOOP	lsh/lua/lopcodes.h	/^OP_TFORLOOP,\/*	A C	R(A+3), ... ,R(A+2+C) := R(A)(R(A+1), R(A+2)); $/;"	e	enum:__anon71
-OP_UNM	lsh/lua/lopcodes.h	/^OP_UNM,\/*	A B	R(A) := -R(B)					*\/$/;"	e	enum:__anon71
-OP_VARARG	lsh/lua/lopcodes.h	/^OP_VARARG\/*	A B	R(A), R(A+1), ..., R(A+B-1) = vararg		*\/$/;"	e	enum:__anon71
+OP_ADD	lsh/lua/lopcodes.h	/^OP_ADD,\/*	A B C	R(A) := RK(B) + RK(C)				*\/$/;"	e	enum:__anon76
+OP_CALL	lsh/lua/lopcodes.h	/^OP_CALL,\/*	A B C	R(A), ... ,R(A+C-2) := R(A)(R(A+1), ... ,R(A+B-1)) *\/$/;"	e	enum:__anon76
+OP_CLOSE	lsh/lua/lopcodes.h	/^OP_CLOSE,\/*	A 	close all variables in the stack up to (>=) R(A)*\/$/;"	e	enum:__anon76
+OP_CLOSURE	lsh/lua/lopcodes.h	/^OP_CLOSURE,\/*	A Bx	R(A) := closure(KPROTO[Bx], R(A), ... ,R(A+n))	*\/$/;"	e	enum:__anon76
+OP_CONCAT	lsh/lua/lopcodes.h	/^OP_CONCAT,\/*	A B C	R(A) := R(B).. ... ..R(C)			*\/$/;"	e	enum:__anon76
+OP_DIV	lsh/lua/lopcodes.h	/^OP_DIV,\/*	A B C	R(A) := RK(B) \/ RK(C)				*\/$/;"	e	enum:__anon76
+OP_EQ	lsh/lua/lopcodes.h	/^OP_EQ,\/*	A B C	if ((RK(B) == RK(C)) ~= A) then pc++		*\/$/;"	e	enum:__anon76
+OP_FORLOOP	lsh/lua/lopcodes.h	/^OP_FORLOOP,\/*	A sBx	R(A)+=R(A+2);$/;"	e	enum:__anon76
+OP_FORPREP	lsh/lua/lopcodes.h	/^OP_FORPREP,\/*	A sBx	R(A)-=R(A+2); pc+=sBx				*\/$/;"	e	enum:__anon76
+OP_GETGLOBAL	lsh/lua/lopcodes.h	/^OP_GETGLOBAL,\/*	A Bx	R(A) := Gbl[Kst(Bx)]				*\/$/;"	e	enum:__anon76
+OP_GETTABLE	lsh/lua/lopcodes.h	/^OP_GETTABLE,\/*	A B C	R(A) := R(B)[RK(C)]				*\/$/;"	e	enum:__anon76
+OP_GETUPVAL	lsh/lua/lopcodes.h	/^OP_GETUPVAL,\/*	A B	R(A) := UpValue[B]				*\/$/;"	e	enum:__anon76
+OP_JMP	lsh/lua/lopcodes.h	/^OP_JMP,\/*	sBx	pc+=sBx					*\/$/;"	e	enum:__anon76
+OP_LE	lsh/lua/lopcodes.h	/^OP_LE,\/*	A B C	if ((RK(B) <= RK(C)) ~= A) then pc++  		*\/$/;"	e	enum:__anon76
+OP_LEN	lsh/lua/lopcodes.h	/^OP_LEN,\/*	A B	R(A) := length of R(B)				*\/$/;"	e	enum:__anon76
+OP_LOADBOOL	lsh/lua/lopcodes.h	/^OP_LOADBOOL,\/*	A B C	R(A) := (Bool)B; if (C) pc++			*\/$/;"	e	enum:__anon76
+OP_LOADK	lsh/lua/lopcodes.h	/^OP_LOADK,\/*	A Bx	R(A) := Kst(Bx)					*\/$/;"	e	enum:__anon76
+OP_LOADNIL	lsh/lua/lopcodes.h	/^OP_LOADNIL,\/*	A B	R(A) := ... := R(B) := nil			*\/$/;"	e	enum:__anon76
+OP_LT	lsh/lua/lopcodes.h	/^OP_LT,\/*	A B C	if ((RK(B) <  RK(C)) ~= A) then pc++  		*\/$/;"	e	enum:__anon76
+OP_MOD	lsh/lua/lopcodes.h	/^OP_MOD,\/*	A B C	R(A) := RK(B) % RK(C)				*\/$/;"	e	enum:__anon76
+OP_MOVE	lsh/lua/lopcodes.h	/^OP_MOVE,\/*	A B	R(A) := R(B)					*\/$/;"	e	enum:__anon76
+OP_MUL	lsh/lua/lopcodes.h	/^OP_MUL,\/*	A B C	R(A) := RK(B) * RK(C)				*\/$/;"	e	enum:__anon76
+OP_NEWTABLE	lsh/lua/lopcodes.h	/^OP_NEWTABLE,\/*	A B C	R(A) := {} (size = B,C)				*\/$/;"	e	enum:__anon76
+OP_NOT	lsh/lua/lopcodes.h	/^OP_NOT,\/*	A B	R(A) := not R(B)				*\/$/;"	e	enum:__anon76
+OP_POW	lsh/lua/lopcodes.h	/^OP_POW,\/*	A B C	R(A) := RK(B) ^ RK(C)				*\/$/;"	e	enum:__anon76
+OP_RETURN	lsh/lua/lopcodes.h	/^OP_RETURN,\/*	A B	return R(A), ... ,R(A+B-2)	(see note)	*\/$/;"	e	enum:__anon76
+OP_SELF	lsh/lua/lopcodes.h	/^OP_SELF,\/*	A B C	R(A+1) := R(B); R(A) := R(B)[RK(C)]		*\/$/;"	e	enum:__anon76
+OP_SETGLOBAL	lsh/lua/lopcodes.h	/^OP_SETGLOBAL,\/*	A Bx	Gbl[Kst(Bx)] := R(A)				*\/$/;"	e	enum:__anon76
+OP_SETLIST	lsh/lua/lopcodes.h	/^OP_SETLIST,\/*	A B C	R(A)[(C-1)*FPF+i] := R(A+i), 1 <= i <= B	*\/$/;"	e	enum:__anon76
+OP_SETTABLE	lsh/lua/lopcodes.h	/^OP_SETTABLE,\/*	A B C	R(A)[RK(B)] := RK(C)				*\/$/;"	e	enum:__anon76
+OP_SETUPVAL	lsh/lua/lopcodes.h	/^OP_SETUPVAL,\/*	A B	UpValue[B] := R(A)				*\/$/;"	e	enum:__anon76
+OP_SUB	lsh/lua/lopcodes.h	/^OP_SUB,\/*	A B C	R(A) := RK(B) - RK(C)				*\/$/;"	e	enum:__anon76
+OP_TAILCALL	lsh/lua/lopcodes.h	/^OP_TAILCALL,\/*	A B C	return R(A)(R(A+1), ... ,R(A+B-1))		*\/$/;"	e	enum:__anon76
+OP_TEST	lsh/lua/lopcodes.h	/^OP_TEST,\/*	A C	if not (R(A) <=> C) then pc++			*\/ $/;"	e	enum:__anon76
+OP_TESTSET	lsh/lua/lopcodes.h	/^OP_TESTSET,\/*	A B C	if (R(B) <=> C) then R(A) := R(B) else pc++	*\/ $/;"	e	enum:__anon76
+OP_TFORLOOP	lsh/lua/lopcodes.h	/^OP_TFORLOOP,\/*	A C	R(A+3), ... ,R(A+2+C) := R(A)(R(A+1), R(A+2)); $/;"	e	enum:__anon76
+OP_UNM	lsh/lua/lopcodes.h	/^OP_UNM,\/*	A B	R(A) := -R(B)					*\/$/;"	e	enum:__anon76
+OP_VARARG	lsh/lua/lopcodes.h	/^OP_VARARG\/*	A B	R(A), R(A+1), ..., R(A+B-1) = vararg		*\/$/;"	e	enum:__anon76
 OUTPUT	lsh/lua/luac.c	27;"	d	file:
 OWC	src/drivers/net/8139.c	/^			int OWC: 1;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
 OWN	src/drivers/net/8139.c	/^			int OWN: 1;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
@@ -909,7 +915,7 @@ OpArgMask	lsh/lua/lopcodes.h	/^enum OpArgMask {$/;"	g
 OpArgN	lsh/lua/lopcodes.h	/^  OpArgN,  \/* argument is not used *\/$/;"	e	enum:OpArgMask
 OpArgR	lsh/lua/lopcodes.h	/^  OpArgR,  \/* argument is a register or a jump offset *\/$/;"	e	enum:OpArgMask
 OpArgU	lsh/lua/lopcodes.h	/^  OpArgU,  \/* argument is used *\/$/;"	e	enum:OpArgMask
-OpCode	lsh/lua/lopcodes.h	/^} OpCode;$/;"	t	typeref:enum:__anon71
+OpCode	lsh/lua/lopcodes.h	/^} OpCode;$/;"	t	typeref:enum:__anon76
 OpMode	lsh/lua/lopcodes.h	/^enum OpMode {iABC, iABx, iAsBx};  \/* basic instruction format *\/$/;"	g
 Output	lsh/lua/luac.c	/^static char Output[]={ OUTPUT };	\/* default output file name *\/$/;"	v	file:
 PAGE_H	src/lib/printf.c	26;"	d	file:
@@ -925,7 +931,7 @@ PARA78	src/drivers/net/8139.c	/^	PARA78		= 0x78,$/;"	e	enum:RTL8139_registers	fi
 PARA7c	src/drivers/net/8139.c	/^	PARA7c		= 0x7c,	 \/* Magic transceiver parameter register. *\/$/;"	e	enum:RTL8139_registers	file:
 PATH_ITEM_MAX	lsh/lsh.h	15;"	d
 PATH_MAX	lsh/lsh.h	14;"	d
-PATTRIBUTE_TYPE	include/ntfs.h	/^} ATTRIBUTE_TYPE, *PATTRIBUTE_TYPE;$/;"	t	typeref:enum:__anon40
+PATTRIBUTE_TYPE	include/ntfs.h	/^} ATTRIBUTE_TYPE, *PATTRIBUTE_TYPE;$/;"	t	typeref:enum:__anon45
 PCB_MAGIC_NUMBER	src/proc.c	7;"	d	file:
 PCB_SIZE	include/proc.h	71;"	d
 PCIErr	src/drivers/net/8139.c	/^	PCIErr		= 0x8000,$/;"	e	enum:IntrStatusBits	file:
@@ -1614,7 +1620,7 @@ PMM_H	include/pmm.h	2;"	d
 POF	lsh/lua/loadlib.c	155;"	d	file:
 POF	lsh/lua/loadlib.c	156;"	d	file:
 POF	lsh/lua/loadlib.c	34;"	d	file:
-POINTER_SHIFT	include/utils.h	131;"	d
+POINTER_SHIFT	include/utils.h	132;"	d
 POS_A	lsh/lua/lopcodes.h	45;"	d
 POS_B	lsh/lua/lopcodes.h	47;"	d
 POS_Bx	lsh/lua/lopcodes.h	48;"	d
@@ -1768,10 +1774,10 @@ RGB_WHITE	src/lib/printf.c	40;"	d	file:
 RKASK	lsh/lua/lopcodes.h	130;"	d
 RKB	lsh/lua/lvm.c	351;"	d	file:
 RKC	lsh/lua/lvm.c	353;"	d	file:
-RLIMIT_CPU	src/include/asm/resource.h	/^	RLIMIT_CPU ,	\/* CPU time in ms *\/$/;"	e	enum:__anon28
-RLIMIT_FSIZE	src/include/asm/resource.h	/^	RLIMIT_FSIZE ,	\/* Maximun filesize *\/   $/;"	e	enum:__anon28
-RLIMIT_MAX	src/include/asm/resource.h	/^	RLIMIT_MAX$/;"	e	enum:__anon28
-RLIMIT_NOFILE	src/include/asm/resource.h	/^	RLIMIT_NOFILE ,	\/*max number of open files *\/$/;"	e	enum:__anon28
+RLIMIT_CPU	src/include/asm/resource.h	/^	RLIMIT_CPU ,	\/* CPU time in ms *\/$/;"	e	enum:__anon32
+RLIMIT_FSIZE	src/include/asm/resource.h	/^	RLIMIT_FSIZE ,	\/* Maximun filesize *\/   $/;"	e	enum:__anon32
+RLIMIT_MAX	src/include/asm/resource.h	/^	RLIMIT_MAX$/;"	e	enum:__anon32
+RLIMIT_NOFILE	src/include/asm/resource.h	/^	RLIMIT_NOFILE ,	\/*max number of open files *\/$/;"	e	enum:__anon32
 RM	lsh/lua/Makefile	/^RM= rm -f$/;"	m
 ROOT	src/makefile	/^ROOT=\/home\/wws\/lab\/yanqi$/;"	m
 ROOTCELL_DEFAULT	src/include/linux/cell_common.h	9;"	d
@@ -1885,14 +1891,14 @@ STATUS_WRERR	src/include/linux/ide.h	15;"	d
 STAT_WND_H	src/lib/printf.c	73;"	d	file:
 STAT_WND_SIZE	src/lib/printf.c	74;"	d	file:
 STRUINFO_H	include/struinfo.h	2;"	d
-SUPER_BLOCK	include/fs_ext.h	/^}SUPER_BLOCK;$/;"	t	typeref:struct:__anon31
+SUPER_BLOCK	include/fs_ext.h	/^}SUPER_BLOCK;$/;"	t	typeref:struct:__anon36
 SYSID_CELL	src/include/linux/blkdev.h	19;"	d
 SYSID_EXTEND	src/include/linux/blkdev.h	14;"	d
 SYSID_FAT16	src/include/linux/blkdev.h	16;"	d
 SYSID_FAT32	src/include/linux/blkdev.h	17;"	d
 SYSID_LINUX	src/include/linux/blkdev.h	15;"	d
 SYSID_NTFS	src/include/linux/blkdev.h	18;"	d
-SemInfo	lsh/lua/llex.h	/^} SemInfo;  \/* semantics information *\/$/;"	t	typeref:union:__anon58
+SemInfo	lsh/lua/llex.h	/^} SemInfo;  \/* semantics information *\/$/;"	t	typeref:union:__anon63
 Sizeof	lsh/lua/print.c	20;"	d	file:
 Smain	lsh/lua/lua.c	/^struct Smain {$/;"	s	file:
 Smain	lsh/lua/luac.c	/^struct Smain {$/;"	s	file:
@@ -1903,20 +1909,34 @@ SubDesc	src/include/linux/pci_vendor.h	/^	char *		SubDesc ;$/;"	m	struct:pci_cla
 SubDesc	src/include/linux/pci_vendor_full.h	/^	char *		SubDesc ;$/;"	m	struct:_PCI_CLASSCODETABLE
 TAB	include/kbd_drv.h	10;"	d
 TABT	src/drivers/net/8139.c	/^			int TABT: 1;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
-TCP_FALG_CWR	src/include/net/tcp.h	12;"	d
-TCP_FALG_ECE	src/include/net/tcp.h	11;"	d
-TCP_FALG_PSH	src/include/net/tcp.h	8;"	d
-TCP_FALG_URG	src/include/net/tcp.h	10;"	d
-TCP_FLAG_ACK	src/include/net/tcp.h	9;"	d
-TCP_FLAG_FIN	src/include/net/tcp.h	5;"	d
-TCP_FLAG_RST	src/include/net/tcp.h	7;"	d
-TCP_FLAG_SYN	src/include/net/tcp.h	6;"	d
+TCPHDR_FLIP	src/net/ipv4/tcp.cc	172;"	d	file:
+TCPHDR_LEN	src/include/net/tcp.h	77;"	d
+TCP_FALG_CWR	src/include/net/tcp.h	13;"	d
+TCP_FALG_ECE	src/include/net/tcp.h	12;"	d
+TCP_FALG_PSH	src/include/net/tcp.h	9;"	d
+TCP_FALG_URG	src/include/net/tcp.h	11;"	d
+TCP_FLAG_ACK	src/include/net/tcp.h	10;"	d
+TCP_FLAG_FIN	src/include/net/tcp.h	6;"	d
+TCP_FLAG_RST	src/include/net/tcp.h	8;"	d
+TCP_FLAG_SYN	src/include/net/tcp.h	7;"	d
+TCP_OPT_AO	src/net/ipv4/tcp.cc	/^	TCP_OPT_AO = 29$/;"	e	enum:__anon33	file:
+TCP_OPT_EOL	src/net/ipv4/tcp.cc	/^	TCP_OPT_EOL,$/;"	e	enum:__anon33	file:
+TCP_OPT_MSS	src/net/ipv4/tcp.cc	/^	TCP_OPT_MSS,$/;"	e	enum:__anon33	file:
+TCP_OPT_NOP	src/net/ipv4/tcp.cc	/^	TCP_OPT_NOP,$/;"	e	enum:__anon33	file:
+TCP_OPT_SACK	src/net/ipv4/tcp.cc	/^	TCP_OPT_SACK,$/;"	e	enum:__anon33	file:
+TCP_OPT_SACK_PERMIT	src/net/ipv4/tcp.cc	/^	TCP_OPT_SACK_PERMIT,$/;"	e	enum:__anon33	file:
+TCP_OPT_TSTAMP	src/net/ipv4/tcp.cc	/^	TCP_OPT_TSTAMP = 8,$/;"	e	enum:__anon33	file:
+TCP_OPT_UTO	src/net/ipv4/tcp.cc	/^	TCP_OPT_UTO = 28,$/;"	e	enum:__anon33	file:
+TCP_OPT_WNDSCL	src/net/ipv4/tcp.cc	/^	TCP_OPT_WNDSCL,$/;"	e	enum:__anon33	file:
+TCP_PAYLOAD_LEN	src/net/ipv4/tcp.cc	14;"	d	file:
 TCTL_COLD_SHIFT	src/drivers/net/e1000.c	88;"	d	file:
 TCTL_CT_SHIFT	src/drivers/net/e1000.c	87;"	d	file:
 TCTL_EN	src/drivers/net/e1000.c	85;"	d	file:
 TCTL_PSP	src/drivers/net/e1000.c	86;"	d	file:
 TCTL_RTLC	src/drivers/net/e1000.c	90;"	d	file:
 TCTL_SWXOFF	src/drivers/net/e1000.c	89;"	d	file:
+TIMER_RUNNING	src/include/linux/timer.h	/^	TIMER_RUNNING$/;"	e	enum:__anon22
+TIMER_STOPPED	src/include/linux/timer.h	/^	TIMER_STOPPED,$/;"	e	enum:__anon22
 TIME_H	include/time.h	2;"	d
 TK_AND	lsh/lua/llex.h	/^  TK_AND = FIRST_RESERVED, TK_BREAK,$/;"	e	enum:RESERVED
 TK_BREAK	lsh/lua/llex.h	/^  TK_AND = FIRST_RESERVED, TK_BREAK,$/;"	e	enum:RESERVED
@@ -1951,25 +1971,25 @@ TK_UNTIL	lsh/lua/llex.h	/^  TK_RETURN, TK_THEN, TK_TRUE, TK_UNTIL, TK_WHILE,$/;"
 TK_WHILE	lsh/lua/llex.h	/^  TK_RETURN, TK_THEN, TK_TRUE, TK_UNTIL, TK_WHILE,$/;"	e	enum:RESERVED
 TKey	lsh/lua/lobject.h	/^typedef union TKey {$/;"	u
 TKey	lsh/lua/lobject.h	/^} TKey;$/;"	t	typeref:union:TKey
-TMS	lsh/lua/ltm.h	/^} TMS;$/;"	t	typeref:enum:__anon66
-TM_ADD	lsh/lua/ltm.h	/^  TM_ADD,$/;"	e	enum:__anon66
-TM_CALL	lsh/lua/ltm.h	/^  TM_CALL,$/;"	e	enum:__anon66
-TM_CONCAT	lsh/lua/ltm.h	/^  TM_CONCAT,$/;"	e	enum:__anon66
-TM_DIV	lsh/lua/ltm.h	/^  TM_DIV,$/;"	e	enum:__anon66
-TM_EQ	lsh/lua/ltm.h	/^  TM_EQ,  \/* last tag method with `fast' access *\/$/;"	e	enum:__anon66
-TM_GC	lsh/lua/ltm.h	/^  TM_GC,$/;"	e	enum:__anon66
-TM_INDEX	lsh/lua/ltm.h	/^  TM_INDEX,$/;"	e	enum:__anon66
-TM_LE	lsh/lua/ltm.h	/^  TM_LE,$/;"	e	enum:__anon66
-TM_LEN	lsh/lua/ltm.h	/^  TM_LEN,$/;"	e	enum:__anon66
-TM_LT	lsh/lua/ltm.h	/^  TM_LT,$/;"	e	enum:__anon66
-TM_MOD	lsh/lua/ltm.h	/^  TM_MOD,$/;"	e	enum:__anon66
-TM_MODE	lsh/lua/ltm.h	/^  TM_MODE,$/;"	e	enum:__anon66
-TM_MUL	lsh/lua/ltm.h	/^  TM_MUL,$/;"	e	enum:__anon66
-TM_N	lsh/lua/ltm.h	/^  TM_N		\/* number of elements in the enum *\/$/;"	e	enum:__anon66
-TM_NEWINDEX	lsh/lua/ltm.h	/^  TM_NEWINDEX,$/;"	e	enum:__anon66
-TM_POW	lsh/lua/ltm.h	/^  TM_POW,$/;"	e	enum:__anon66
-TM_SUB	lsh/lua/ltm.h	/^  TM_SUB,$/;"	e	enum:__anon66
-TM_UNM	lsh/lua/ltm.h	/^  TM_UNM,$/;"	e	enum:__anon66
+TMS	lsh/lua/ltm.h	/^} TMS;$/;"	t	typeref:enum:__anon71
+TM_ADD	lsh/lua/ltm.h	/^  TM_ADD,$/;"	e	enum:__anon71
+TM_CALL	lsh/lua/ltm.h	/^  TM_CALL,$/;"	e	enum:__anon71
+TM_CONCAT	lsh/lua/ltm.h	/^  TM_CONCAT,$/;"	e	enum:__anon71
+TM_DIV	lsh/lua/ltm.h	/^  TM_DIV,$/;"	e	enum:__anon71
+TM_EQ	lsh/lua/ltm.h	/^  TM_EQ,  \/* last tag method with `fast' access *\/$/;"	e	enum:__anon71
+TM_GC	lsh/lua/ltm.h	/^  TM_GC,$/;"	e	enum:__anon71
+TM_INDEX	lsh/lua/ltm.h	/^  TM_INDEX,$/;"	e	enum:__anon71
+TM_LE	lsh/lua/ltm.h	/^  TM_LE,$/;"	e	enum:__anon71
+TM_LEN	lsh/lua/ltm.h	/^  TM_LEN,$/;"	e	enum:__anon71
+TM_LT	lsh/lua/ltm.h	/^  TM_LT,$/;"	e	enum:__anon71
+TM_MOD	lsh/lua/ltm.h	/^  TM_MOD,$/;"	e	enum:__anon71
+TM_MODE	lsh/lua/ltm.h	/^  TM_MODE,$/;"	e	enum:__anon71
+TM_MUL	lsh/lua/ltm.h	/^  TM_MUL,$/;"	e	enum:__anon71
+TM_N	lsh/lua/ltm.h	/^  TM_N		\/* number of elements in the enum *\/$/;"	e	enum:__anon71
+TM_NEWINDEX	lsh/lua/ltm.h	/^  TM_NEWINDEX,$/;"	e	enum:__anon71
+TM_POW	lsh/lua/ltm.h	/^  TM_POW,$/;"	e	enum:__anon71
+TM_SUB	lsh/lua/ltm.h	/^  TM_SUB,$/;"	e	enum:__anon71
+TM_UNM	lsh/lua/ltm.h	/^  TM_UNM,$/;"	e	enum:__anon71
 TOK	src/drivers/net/8139.c	/^			int TOK: 1;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
 TOKEN_LEN	lsh/lua/llex.h	17;"	d
 TSS1	src/kernel.asm	/^TSS1 selector_plain_d0,ring0_smallstack_bottom, 0, 0, 0, 0$/;"	l
@@ -1981,7 +2001,7 @@ TString	lsh/lua/lobject.h	/^} TString;$/;"	t	typeref:union:TString
 TTY_H	include/tty.h	2;"	d
 TUN	src/drivers/net/8139.c	/^			int TUN: 1;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
 TValue	lsh/lua/lobject.h	/^} TValue;$/;"	t	typeref:struct:lua_TValue
-TValuefields	lsh/lua/lobject.h	/^    TValuefields;$/;"	m	struct:TKey::__anon65
+TValuefields	lsh/lua/lobject.h	/^    TValuefields;$/;"	m	struct:TKey::__anon70
 TValuefields	lsh/lua/lobject.h	/^  TValuefields;$/;"	m	struct:lua_TValue
 TValuefields	lsh/lua/lobject.h	71;"	d
 TX_BUF_SIZE	src/drivers/net/8139.c	20;"	d	file:
@@ -2041,15 +2061,15 @@ VALUE_LEN	src/lib/vsprintf.c	112;"	d	file:
 VARARG_HASARG	lsh/lua/lobject.h	257;"	d
 VARARG_ISVARARG	lsh/lua/lobject.h	258;"	d
 VARARG_NEEDSARG	lsh/lua/lobject.h	259;"	d
-VCALL	lsh/lua/lparser.h	/^  VCALL,	\/* info = instruction pc *\/$/;"	e	enum:__anon67
-VFALSE	lsh/lua/lparser.h	/^  VFALSE,$/;"	e	enum:__anon67
-VGLOBAL	lsh/lua/lparser.h	/^  VGLOBAL,	\/* info = index of table; aux = index of global name in `k' *\/$/;"	e	enum:__anon67
+VCALL	lsh/lua/lparser.h	/^  VCALL,	\/* info = instruction pc *\/$/;"	e	enum:__anon72
+VFALSE	lsh/lua/lparser.h	/^  VFALSE,$/;"	e	enum:__anon72
+VGLOBAL	lsh/lua/lparser.h	/^  VGLOBAL,	\/* info = index of table; aux = index of global name in `k' *\/$/;"	e	enum:__anon72
 VIDEO_BUF_SIZE	src/lib/printf.c	32;"	d	file:
 VIDEO_CELL_NUM	src/lib/printf.c	31;"	d	file:
 VIDEO_DRV_H	include/video_drv.h	2;"	d
 VIDEO_L_ADDR	src/lib/printf.c	35;"	d	file:
 VIM_H	lsh/vim.h	2;"	d
-VINDEXED	lsh/lua/lparser.h	/^  VINDEXED,	\/* info = table register; aux = index register (or `k') *\/$/;"	e	enum:__anon67
+VINDEXED	lsh/lua/lparser.h	/^  VINDEXED,	\/* info = table register; aux = index register (or `k') *\/$/;"	e	enum:__anon72
 VI_A_LINES	lsh/vi.h	/^static void VI_A_LINES(struct vi *vi, int l, int lnum){$/;"	f
 VI_CLEAR_FLAG	lsh/vi.h	68;"	d
 VI_CURRL_LEN	lsh/vi.h	10;"	d
@@ -2066,24 +2086,24 @@ VI_LINE_A_SAFE	lsh/vi.c	/^void VI_LINE_A_SAFE(struct vi *vi, int l, int  at, cha
 VI_LINE_I_SAFE	lsh/vi.c	/^void VI_LINE_I_SAFE(struct vi *vi, int l, int at, char *src, int srclen){$/;"	f
 VI_LINE_MK	lsh/vi.c	/^void VI_LINE_MK(struct vi *vi, int l, char *src, int srclen){$/;"	f
 VI_MK_FLAG	lsh/vi.h	71;"	d
-VI_MOD_BUSY	lsh/vi.h	/^	VI_MOD_BUSY$/;"	e	enum:__anon74
-VI_MOD_FREE	lsh/vi.h	/^	VI_MOD_FREE,$/;"	e	enum:__anon74
+VI_MOD_BUSY	lsh/vi.h	/^	VI_MOD_BUSY$/;"	e	enum:__anon79
+VI_MOD_FREE	lsh/vi.h	/^	VI_MOD_FREE,$/;"	e	enum:__anon79
 VI_SET_FLAG	lsh/vi.h	67;"	d
 VI_TEST_FLAG	lsh/vi.h	69;"	d
 VI_YLINE_MAX	lsh/vi.h	54;"	d
 VI_YLINE_MK	lsh/vi.c	/^void VI_YLINE_MK(struct vi *vi, int l, char *src, int srclen){$/;"	f
-VJMP	lsh/lua/lparser.h	/^  VJMP,		\/* info = instruction pc *\/$/;"	e	enum:__anon67
-VK	lsh/lua/lparser.h	/^  VK,		\/* info = index of constant in `k' *\/$/;"	e	enum:__anon67
-VKNUM	lsh/lua/lparser.h	/^  VKNUM,	\/* nval = numerical value *\/$/;"	e	enum:__anon67
-VLOCAL	lsh/lua/lparser.h	/^  VLOCAL,	\/* info = local register *\/$/;"	e	enum:__anon67
-VNIL	lsh/lua/lparser.h	/^  VNIL,$/;"	e	enum:__anon67
-VNONRELOC	lsh/lua/lparser.h	/^  VNONRELOC,	\/* info = result register *\/$/;"	e	enum:__anon67
+VJMP	lsh/lua/lparser.h	/^  VJMP,		\/* info = instruction pc *\/$/;"	e	enum:__anon72
+VK	lsh/lua/lparser.h	/^  VK,		\/* info = index of constant in `k' *\/$/;"	e	enum:__anon72
+VKNUM	lsh/lua/lparser.h	/^  VKNUM,	\/* nval = numerical value *\/$/;"	e	enum:__anon72
+VLOCAL	lsh/lua/lparser.h	/^  VLOCAL,	\/* info = local register *\/$/;"	e	enum:__anon72
+VNIL	lsh/lua/lparser.h	/^  VNIL,$/;"	e	enum:__anon72
+VNONRELOC	lsh/lua/lparser.h	/^  VNONRELOC,	\/* info = result register *\/$/;"	e	enum:__anon72
 VOID	lsh/lua/print.c	21;"	d	file:
-VRELOCABLE	lsh/lua/lparser.h	/^  VRELOCABLE,	\/* info = instruction pc *\/$/;"	e	enum:__anon67
-VTRUE	lsh/lua/lparser.h	/^  VTRUE,$/;"	e	enum:__anon67
-VUPVAL	lsh/lua/lparser.h	/^  VUPVAL,       \/* info = index of upvalue in `upvalues' *\/$/;"	e	enum:__anon67
-VVARARG	lsh/lua/lparser.h	/^  VVARARG	\/* info = instruction pc *\/$/;"	e	enum:__anon67
-VVOID	lsh/lua/lparser.h	/^  VVOID,	\/* no value *\/$/;"	e	enum:__anon67
+VRELOCABLE	lsh/lua/lparser.h	/^  VRELOCABLE,	\/* info = instruction pc *\/$/;"	e	enum:__anon72
+VTRUE	lsh/lua/lparser.h	/^  VTRUE,$/;"	e	enum:__anon72
+VUPVAL	lsh/lua/lparser.h	/^  VUPVAL,       \/* info = index of upvalue in `upvalues' *\/$/;"	e	enum:__anon72
+VVARARG	lsh/lua/lparser.h	/^  VVARARG	\/* info = instruction pc *\/$/;"	e	enum:__anon72
+VVOID	lsh/lua/lparser.h	/^  VVOID,	\/* no value *\/$/;"	e	enum:__anon72
 V_HEAD_LEN	lsh/vi.h	18;"	d
 V_HEAD_OFFSET	lsh/vi.h	17;"	d
 V_MEM_BASE	include/video_drv.h	11;"	d
@@ -2092,7 +2112,7 @@ V_START_LEN	lsh/vi.h	22;"	d
 V_START_OFFSET	lsh/vi.h	21;"	d
 V_TAIL_LEN	lsh/vi.h	20;"	d
 V_TAIL_OFFSET	lsh/vi.h	19;"	d
-Value	lsh/lua/lobject.h	/^} Value;$/;"	t	typeref:union:__anon60
+Value	lsh/lua/lobject.h	/^} Value;$/;"	t	typeref:union:__anon65
 VenFull	src/include/linux/pci_vendor.h	/^	char *	VenFull ;$/;"	m	struct:pci_vendor_entry
 VenId	src/include/linux/pci_vendor.h	/^	unsigned short	VenId ;$/;"	m	struct:pci_info_entry
 VenId	src/include/linux/pci_vendor.h	/^	unsigned short	VenId ;$/;"	m	struct:pci_vendor_entry
@@ -2110,8 +2130,8 @@ X86_BIT_H	src/arch/x86/include/asm/bit.h	2;"	d
 X86_ERRNO_H	src/arch/x86/include/asm/errno.h	2;"	d
 X86_IO_H	src/arch/x86/include/asm/io.h	2;"	d
 X86_PAGE_H	include/page.h	2;"	d
-YOUR_NIC_NUM	src/net/core/dev.c	8;"	d	file:
-Z	lsh/lua/lundump.c	/^ ZIO* Z;$/;"	m	struct:__anon57	file:
+YOUR_NIC_CNT	src/net/core/dev.c	8;"	d	file:
+Z	lsh/lua/lundump.c	/^ ZIO* Z;$/;"	m	struct:__anon62	file:
 ZIO	lsh/lua/lzio.h	/^typedef struct Zio ZIO;$/;"	t	typeref:struct:Zio
 ZONE_DMA	include/mmzone.h	13;"	d
 ZONE_DMA_PA	include/mmzone.h	18;"	d
@@ -2139,23 +2159,24 @@ __IS_BLANK	lsh/vi.h	/^static inline bool __IS_BLANK(char c){$/;"	f
 __IS_CWORD	lsh/vi.h	/^static inline bool __IS_CWORD(char c){$/;"	f
 __NTFS_H__	include/ntfs.h	2;"	d
 __RDTSC	include/utils.h	/^static inline unsigned __RDTSC(void){$/;"	f
+__RDTSC_U	include/utils.h	/^static inline unsigned __RDTSC_U(void){$/;"	f
 __SAVE	include/schedule.h	18;"	d
 __SET_STATE	lsh/vi.h	73;"	d
 __TEST_STATE	lsh/vi.h	75;"	d
-__VI_FLAG_ML	lsh/vi.h	/^	__VI_FLAG_ML,$/;"	e	enum:__anon73
-__VI_FLAG_SUCCESS	lsh/vi.h	/^	__VI_FLAG_SUCCESS,$/;"	e	enum:__anon73
-__VI_FLAG_W0	lsh/vi.h	/^	__VI_FLAG_W0,$/;"	e	enum:__anon73
-__VI_FLAG_curr	lsh/vi.h	/^	__VI_FLAG_curr,$/;"	e	enum:__anon73
-__VI_FLAG_cword	lsh/vi.h	/^	__VI_FLAG_cword,$/;"	e	enum:__anon73
-__VI_FLAG_lazy	lsh/vi.h	/^	__VI_FLAG_lazy,$/;"	e	enum:__anon73
-__VI_FLAG_meet0	lsh/vi.h	/^	__VI_FLAG_meet0,$/;"	e	enum:__anon73
-__VI_FLAG_meetn	lsh/vi.h	/^	__VI_FLAG_meetn,	\/*vi里不存在meet0的说法,vi buf里不许出现'\\0'*\/$/;"	e	enum:__anon73
-__VI_FLAG_noquote	lsh/vi.h	/^	__VI_FLAG_noquote$/;"	e	enum:__anon73
-__VI_FLAG_yy	lsh/vi.h	/^	__VI_FLAG_yy,$/;"	e	enum:__anon73
+__VI_FLAG_ML	lsh/vi.h	/^	__VI_FLAG_ML,$/;"	e	enum:__anon78
+__VI_FLAG_SUCCESS	lsh/vi.h	/^	__VI_FLAG_SUCCESS,$/;"	e	enum:__anon78
+__VI_FLAG_W0	lsh/vi.h	/^	__VI_FLAG_W0,$/;"	e	enum:__anon78
+__VI_FLAG_curr	lsh/vi.h	/^	__VI_FLAG_curr,$/;"	e	enum:__anon78
+__VI_FLAG_cword	lsh/vi.h	/^	__VI_FLAG_cword,$/;"	e	enum:__anon78
+__VI_FLAG_lazy	lsh/vi.h	/^	__VI_FLAG_lazy,$/;"	e	enum:__anon78
+__VI_FLAG_meet0	lsh/vi.h	/^	__VI_FLAG_meet0,$/;"	e	enum:__anon78
+__VI_FLAG_meetn	lsh/vi.h	/^	__VI_FLAG_meetn,	\/*vi里不存在meet0的说法,vi buf里不许出现'\\0'*\/$/;"	e	enum:__anon78
+__VI_FLAG_noquote	lsh/vi.h	/^	__VI_FLAG_noquote$/;"	e	enum:__anon78
+__VI_FLAG_yy	lsh/vi.h	/^	__VI_FLAG_yy,$/;"	e	enum:__anon78
 __VI_NEXT	lsh/vi.h	/^static inline char * __VI_NEXT(struct vi *vi, int currl, char *curr){$/;"	f
 __VI_NEXT_SET	lsh/vi.h	/^static inline void __VI_NEXT_SET(struct vi *vi, int *pcurrl, char **pcurr){$/;"	f
 __WR_STATE	lsh/vi.h	76;"	d
-__all_your_nic	src/net/core/dev.c	/^static struct net_device *__all_your_nic[YOUR_NIC_NUM];$/;"	v	typeref:struct:net_device	file:
+__all_your_nic	src/net/core/dev.c	/^static struct net_device *__all_your_nic[YOUR_NIC_CNT];$/;"	v	typeref:struct:net_device	file:
 __blh	include/proc.h	/^	unsigned short back_link,__blh;$/;"	m	struct:tss
 __bs	src/arch/x86/include/asm/bit.h	/^static inline int __bs(unsigned x){$/;"	f
 __bs0	src/arch/x86/include/asm/bit.h	/^static inline int __bs0(unsigned x){$/;"	f
@@ -2195,6 +2216,7 @@ __connection_lookup	cmd/tcp.cc	/^__connection_lookup(u32 hisip, u16 hisport, u32
 __connection_lookup	src/net/ipv4/tcp.cc	/^__connection_lookup(u32 hisip, u16 hisport, u32 myip, u16 myport){$/;"	f	file:
 __csh	include/proc.h	/^	unsigned short cs, __csh;$/;"	m	struct:tss
 __dsh	include/proc.h	/^	unsigned short ds, __dsh;$/;"	m	struct:tss
+__eax	include/utils.h	/^struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};$/;"	s
 __eflags	src/proc.c	/^int __eflags=0x1200;\/\/IOPL=1,STI	__prefix, 避免gdb犯晕:p eflags$/;"	v
 __esh	include/proc.h	/^	unsigned short es, __esh;$/;"	m	struct:tss
 __expand_line	lsh/vi.c	/^static inline void __expand_line(int l, int size, char **lines, int *size_of_line){$/;"	f	file:
@@ -2224,7 +2246,6 @@ __lshmod	lsh/lsh.c	/^int __lshmod = LSH_MOD_LUA;$/;"	v
 __lshprefixArr	lsh/lsh.c	/^char *__lshprefixArr[]={$/;"	v
 __luavi	lsh/lsh.c	/^struct vi __luavi;$/;"	v	typeref:struct:vi
 __mac_broadcast	src/net/ipv4/arp.c	/^static u8 __mac_broadcast[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};$/;"	v	file:
-__mac_empty	src/net/ipv4/arp.c	/^static u8 __mac_empty[6] = {0};$/;"	v	file:
 __onindex	lsh/lsh.c	/^int __onindex(lua_State *L){$/;"	f
 __onindex_vi_currc	lsh/lsh.c	/^int __onindex_vi_currc(lua_State *L){	\/*stack: ud "currc" *\/$/;"	f
 __onindex_vi_currl	lsh/lsh.c	/^int __onindex_vi_currl(lua_State *L){	\/*stack: ud "lmax" *\/$/;"	f
@@ -2246,7 +2267,7 @@ __ss1h	include/proc.h	/^	unsigned short ss1,__ss1h;$/;"	m	struct:tss
 __ss2h	include/proc.h	/^	unsigned short ss2,__ss2h;$/;"	m	struct:tss
 __ssh	include/proc.h	/^	unsigned short ss, __ssh;$/;"	m	struct:tss
 __start_request	src/drivers/ide/ide.c	/^static void __start_request(struct request *rq){$/;"	f	file:
-__task_struct_end	include/proc.h	/^			u32 __task_struct_end;$/;"	m	struct:pcb::__anon44::__anon45
+__task_struct_end	include/proc.h	/^			u32 __task_struct_end;$/;"	m	struct:pcb::__anon49::__anon50
 __u16	debug/include/valType.h	/^typedef unsigned short __u16;$/;"	t
 __u16	include/valType.h	/^typedef unsigned short __u16;$/;"	t
 __u32	debug/include/valType.h	/^typedef unsigned __u32;$/;"	t
@@ -2271,24 +2292,24 @@ _errno	lsh/vi.h	/^	int _errno;$/;"	m	struct:vi
 _k_show_chars	src/func_table.c	/^void _k_show_chars(char*pt_head,unsigned end_flag){$/;"	f
 _pwd_block	cmd/cell.c	/^struct cell *_pwd_block;$/;"	v	typeref:struct:cell
 _reallystart	src/kernel.asm	/^_reallystart:$/;"	l
-_revision	src/include/linux/pci_vendor.h	/^			unsigned _revision: 8;$/;"	m	struct:pci_classcode::__anon16::__anon18
+_revision	src/include/linux/pci_vendor.h	/^			unsigned _revision: 8;$/;"	m	struct:pci_classcode::__anon17::__anon19
 _start	src/kernel.asm	/^_start:$/;"	l
 _start_sector	src/include/linux/blkdev.h	/^	char _start_sector;$/;"	m	struct:partition
 _tmp_block	cmd/cell.c	/^struct cell *_tmp_block;$/;"	v	typeref:struct:cell
-_typeid	debug/include/stab.h	/^		unsigned _typeid:15;$/;"	m	struct:typenumber::__anon51
+_typeid	debug/include/stab.h	/^		unsigned _typeid:15;$/;"	m	struct:typenumber::__anon56
 a	debug/kernel/c.h	/^	int a;$/;"	m	struct:c_stru
 a	debug/kernel/d.h	/^	int a;$/;"	m	struct:d_stru
 a	debug/kernel/e.h	/^	int a;$/;"	m	struct:e_stru
 a	debug/kernel/t.c	/^	int a[1000];$/;"	m	struct:arrstru	file:
 a	debug/kernel/t.h	/^	unsigned a;$/;"	m	struct:bfield
-abind	debug/include/stab.h	/^		struct abind *abind;$/;"	m	union:typeobj::__anon53	typeref:struct:typeobj::__anon53::abind
+abind	debug/include/stab.h	/^		struct abind *abind;$/;"	m	union:typeobj::__anon58	typeref:struct:typeobj::__anon58::abind
 abind	debug/include/stab.h	/^struct abind{$/;"	s
 abs_index	lsh/lua/lauxlib.c	32;"	d	file:
-ack	include/irq.h	/^	void (*ack)(unsigned irq);$/;"	m	struct:__anon38
+ack	include/irq.h	/^	void (*ack)(unsigned irq);$/;"	m	struct:__anon43
 ack	src/include/net/tcp.h	/^	u32	ack;$/;"	m	struct:tcphdr
 act	src/include/linux/timer.h	/^	void (*act)(void *data);$/;"	m	struct:timer
-action	include/irq.h	/^	struct irqaction *action;	\/**interrupt service list*\/$/;"	m	struct:__anon39	typeref:struct:__anon39::irqaction
-active	lsh/lsh.c	/^	bool active;$/;"	m	struct:__anon80	file:
+action	include/irq.h	/^	struct irqaction *action;	\/**interrupt service list*\/$/;"	m	struct:__anon44	typeref:struct:__anon44::irqaction
+active	lsh/lsh.c	/^	bool active;$/;"	m	struct:__anon85	file:
 active	src/kernel/bh.c	/^static unsigned active;	\/* bitmap for active bh *\/$/;"	v	file:
 active_expire	src/schedule.c	/^void active_expire(struct pcb *p){$/;"	f
 active_sleep	src/schedule.c	/^void active_sleep(struct pcb *p,u32 msg_type,u32 msg_bind){$/;"	f
@@ -2305,7 +2326,7 @@ addinfo	lsh/lua/ldebug.c	/^static void addinfo (lua_State *L, const char *msg) {
 addintlen	lsh/lua/lstrlib.c	/^static void addintlen (char *form) {$/;"	f	file:
 addk	lsh/lua/lcode.c	/^static int addk (FuncState *fs, TValue *k, TValue *v) {$/;"	f	file:
 addquoted	lsh/lua/lstrlib.c	/^static void addquoted (lua_State *L, luaL_Buffer *b, int arg) {$/;"	f	file:
-addr	debug/include/stab.h	/^	unsigned addr;$/;"	m	struct:__anon54
+addr	debug/include/stab.h	/^	unsigned addr;$/;"	m	struct:__anon59
 addr_mask	src/include/net/icmp.h	/^	unsigned addr_mask;$/;"	m	struct:icmpmsg_mask
 addr_mbr_loaded	src/boot.asm	/^addr_mbr_loaded equ (_base_kernel_loaded - 512 * (_bootbin_occupy_sectors + _fiximg_occupy_sectors))$/;"	d
 address	src/mm/slab.c	/^void *address[2048];$/;"	v
@@ -2314,6 +2335,8 @@ adjust_varargs	lsh/lua/ldo.c	/^static StkId adjust_varargs (lua_State *L, Proto 
 adjustlocalvars	lsh/lua/lparser.c	/^static void adjustlocalvars (LexState *ls, int nvars) {$/;"	f	file:
 adjustresults	lsh/lua/lapi.c	768;"	d	file:
 adjuststack	lsh/lua/lauxlib.c	/^static void adjuststack (luaL_Buffer *B) {$/;"	f	file:
+ah	include/utils.h	/^struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};$/;"	m	struct:__eax
+al	include/utils.h	/^struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};$/;"	m	struct:__eax
 alloc_bh	src/kernel/bh.c	/^int alloc_bh(bh_fn routine, void *data){$/;"	f
 alloc_free_block	cmd/cell.c	/^int alloc_free_block(struct cell_superblock *sb){$/;"	f
 alloc_page	include/mm.h	21;"	d
@@ -2340,13 +2363,13 @@ arith_op	lsh/lua/lvm.c	364;"	d	file:
 arp_act	src/net/ipv4/arp.c	/^static void arp_act(struct sk_buff *skb){$/;"	f	file:
 arp_down	src/net/ipv4/arp.c	/^void arp_down(struct sk_buff *skb){$/;"	f
 arp_init	src/net/ipv4/arp.c	/^void arp_init(void){$/;"	f
-arp_inquire	src/net/ipv4/arp.c	/^void arp_inquire(u32 yourip, u8 *mymac, u32 myip ){$/;"	f
+arp_inquire	src/net/ipv4/arp.c	/^void arp_inquire(u32 yourip){$/;"	f
 arp_layer_receive	src/net/ipv4/arp.c	/^void arp_layer_receive( struct sk_buff *comer_skb ){$/;"	f
 arp_learn	src/net/ipv4/arp.c	/^static struct arp_record * arp_learn(u8 *comer_mac, u32 comer_ip){$/;"	f	file:
 arp_lookup	src/net/ipv4/arp.c	/^static u8 *arp_lookup(u32 ip){$/;"	f	file:
 arp_packet	src/include/net/arp.h	/^struct arp_packet{$/;"	s
 arp_record	src/net/ipv4/arp.c	/^struct arp_record{$/;"	s	file:
-arp_respond	src/net/ipv4/arp.c	/^static void arp_respond(struct sk_buff *msg, u8 *mymac, u32 myip){$/;"	f	file:
+arp_respond	src/net/ipv4/arp.c	/^static void arp_respond(struct sk_buff *msg){$/;"	f	file:
 arphdr	src/include/linux/skbuff.h	/^		struct arphdr *arphdr;$/;"	m	union:sk_buff::__anon12	typeref:struct:sk_buff::__anon12::arphdr
 arphdr	src/include/net/arp.h	/^	struct arphdr arphdr;$/;"	m	struct:arp_packet	typeref:struct:arp_packet::arphdr
 arphdr	src/include/net/arp.h	/^struct arphdr{$/;"	s
@@ -2357,7 +2380,7 @@ arrayindex	lsh/lua/ltable.c	/^static int arrayindex (const TValue *key) {$/;"	f	
 arrstru	debug/kernel/t.c	/^static struct arrstru{$/;"	s	file:
 ascii	src/lib/printf.c	/^			char ascii;$/;"	m	struct:cell::__anon3::__anon4	file:
 asciis_buffer	src/disp.c	/^static char asciis_buffer[buffer_len];$/;"	v	file:
-asker	include/hs.h	/^	struct pcb * asker;$/;"	m	struct:__anon46	typeref:struct:__anon46::pcb
+asker	include/hs.h	/^	struct pcb * asker;$/;"	m	struct:__anon51	typeref:struct:__anon51::pcb
 asker	src/include/linux/blkdev.h	/^	struct pcb *asker;$/;"	m	struct:request	typeref:struct:request::pcb
 assert	src/include/linux/assert.h	6;"	d
 assert_func	src/utils.c	/^void assert_func(char*exp,char*file,char*base_file,int line){$/;"	f
@@ -2366,11 +2389,11 @@ atomic	lsh/lua/lgc.c	/^static void atomic (lua_State *L) {$/;"	f	file:
 atomic_add	include/atomic.h	/^inline void atomic_add(int i, atomic_t *v){$/;"	f
 atomic_read	include/atomic.h	/^inline int atomic_read(atomic_t *v){$/;"	f
 atomic_set	include/atomic.h	/^inline void atomic_set(int i, atomic_t *v){$/;"	f
-atomic_t	debug/include/valType.h	/^}atomic_t;$/;"	t	typeref:struct:__anon55
-atomic_t	include/valType.h	/^}atomic_t;$/;"	t	typeref:struct:__anon37
+atomic_t	debug/include/valType.h	/^}atomic_t;$/;"	t	typeref:struct:__anon60
+atomic_t	include/valType.h	/^}atomic_t;$/;"	t	typeref:struct:__anon42
 attr1	debug/include/valType.h	/^	u8 attr1;$/;"	m	struct:descriptorr
 attr1	include/valType.h	/^	u8 attr1;$/;"	m	struct:descriptorr
-aux	lsh/lua/lparser.h	/^    struct { int info, aux; } s;$/;"	m	struct:expdesc::__anon68::__anon69
+aux	lsh/lua/lparser.h	/^    struct { int info, aux; } s;$/;"	m	struct:expdesc::__anon73::__anon74
 aux_close	lsh/lua/liolib.c	/^static int aux_close (lua_State *L) {$/;"	f	file:
 aux_getn	lsh/lua/ltablib.c	19;"	d	file:
 aux_lines	lsh/lua/liolib.c	/^static void aux_lines (lua_State *L, int idx, int toclose) {$/;"	f	file:
@@ -2386,8 +2409,8 @@ b	debug/kernel/d.h	/^	short b;$/;"	m	struct:d_stru
 b	debug/kernel/e.h	/^	unsigned b;$/;"	m	struct:e_stru
 b	debug/kernel/t.c	/^	char b[3];$/;"	m	struct:arrstru	file:
 b	lsh/lua/ldo.c	/^  luai_jmpbuf b;$/;"	m	struct:lua_longjmp	file:
-b	lsh/lua/lobject.h	/^  int b;$/;"	m	union:__anon60
-b	lsh/lua/lundump.c	/^ Mbuffer* b;$/;"	m	struct:__anon57	file:
+b	lsh/lua/lobject.h	/^  int b;$/;"	m	union:__anon65
+b	lsh/lua/lundump.c	/^ Mbuffer* b;$/;"	m	struct:__anon62	file:
 b:c_minlines	cmd/c.vim	/^    let b:c_minlines = 15	" mostly for () constructs$/;"	v
 b:c_minlines	cmd/c.vim	/^    let b:c_minlines = 50	" #if 0 constructs can be long$/;"	v
 b:c_minlines	cmd/c.vim	/^  let b:c_minlines = c_minlines$/;"	v
@@ -2433,7 +2456,7 @@ barrier	include/utils.h	/^static inline void barrier(void){$/;"	f
 base	include/proc.h	/^				int base[EFLAGS_STACK_LEN + 1];	$/;"	m	struct:eflags_stack
 base	lsh/lua/lstate.h	/^  StkId base;  \/* base for this function *\/$/;"	m	struct:CallInfo
 base	lsh/lua/lstate.h	/^  StkId base;  \/* base of current function *\/$/;"	m	struct:lua_State
-base	src/include/linux/pci_vendor.h	/^			u8 base;$/;"	m	struct:pci_classcode::__anon16::__anon17
+base	src/include/linux/pci_vendor.h	/^			u8 base;$/;"	m	struct:pci_classcode::__anon17::__anon18
 baseCcalls	lsh/lua/lstate.h	/^  unsigned short baseCcalls;  \/* nested C calls when resuming coroutine *\/$/;"	m	struct:lua_State
 base_01	debug/include/valType.h	/^	u16 base_01;$/;"	m	struct:descriptorr
 base_01	include/valType.h	/^	u16 base_01;$/;"	m	struct:descriptorr
@@ -2454,14 +2477,14 @@ base_tss	src/kernel.asm	/^base_tss  equ base_text + (tss -_start)$/;"	d
 basehookcount	lsh/lua/lstate.h	/^  int basehookcount;$/;"	m	struct:lua_State
 bfield	debug/kernel/t.h	/^struct bfield{$/;"	s
 bg	src/lib/printf.c	/^			int bg: 3;$/;"	m	struct:colormod::__anon1::__anon2	file:
-bg_block_bitmap	include/fs_ext.h	/^	__le32 bg_block_bitmap; \/\/ 块位图所在的第一个块的块ID$/;"	m	struct:__anon32
-bg_free_blocks_count	include/fs_ext.h	/^	__le16 bg_free_blocks_count; \/\/ 块组中未使用的块数$/;"	m	struct:__anon32
-bg_free_inodes_count	include/fs_ext.h	/^	__le16 bg_free_inodes_count; \/\/ 块组中未使用的inode数$/;"	m	struct:__anon32
-bg_inode_bitmap	include/fs_ext.h	/^	__le32 bg_inode_bitmap; \/\/ inode位图所在的第一个块的块ID$/;"	m	struct:__anon32
-bg_inode_table	include/fs_ext.h	/^	__le32 bg_inode_table; \/\/ inode表所在的第一个块的块ID$/;"	m	struct:__anon32
-bg_pad	include/fs_ext.h	/^	__le16 bg_pad;$/;"	m	struct:__anon32
-bg_reserved	include/fs_ext.h	/^	__le32 bg_reserved[3];$/;"	m	struct:__anon32
-bg_used_dirs_count	include/fs_ext.h	/^	__le16 bg_used_dirs_count; \/\/ 块组分配的目录的inode数$/;"	m	struct:__anon32
+bg_block_bitmap	include/fs_ext.h	/^	__le32 bg_block_bitmap; \/\/ 块位图所在的第一个块的块ID$/;"	m	struct:__anon37
+bg_free_blocks_count	include/fs_ext.h	/^	__le16 bg_free_blocks_count; \/\/ 块组中未使用的块数$/;"	m	struct:__anon37
+bg_free_inodes_count	include/fs_ext.h	/^	__le16 bg_free_inodes_count; \/\/ 块组中未使用的inode数$/;"	m	struct:__anon37
+bg_inode_bitmap	include/fs_ext.h	/^	__le32 bg_inode_bitmap; \/\/ inode位图所在的第一个块的块ID$/;"	m	struct:__anon37
+bg_inode_table	include/fs_ext.h	/^	__le32 bg_inode_table; \/\/ inode表所在的第一个块的块ID$/;"	m	struct:__anon37
+bg_pad	include/fs_ext.h	/^	__le16 bg_pad;$/;"	m	struct:__anon37
+bg_reserved	include/fs_ext.h	/^	__le32 bg_reserved[3];$/;"	m	struct:__anon37
+bg_used_dirs_count	include/fs_ext.h	/^	__le16 bg_used_dirs_count; \/\/ 块组分配的目录的inode数$/;"	m	struct:__anon37
 bh	src/kernel/bh.c	/^static struct bh{$/;"	s	file:
 bh_disable	src/include/linux/bh.h	/^static inline void bh_disable(void){$/;"	f
 bh_enable	src/include/linux/bh.h	/^static inline void bh_enable(void){$/;"	f
@@ -2470,7 +2493,6 @@ bh_fn	src/include/linux/bh.h	/^typedef void(*bh_fn)(void *data) ;$/;"	t
 bh_init	src/kernel/bh.c	/^void bh_init(void){$/;"	f
 bh_strus	src/kernel/bh.c	/^}bh_strus[NUM_BH];$/;"	v	typeref:struct:bh	file:
 bigbuf	src/kernel.c	/^char *bigbuf;$/;"	v
-bit1_count	src/utils.c	/^int bit1_count(char*addr,int bytes){$/;"	f
 bit2mask	lsh/lua/lgc.h	31;"	d
 bit5	include/hd.h	/^	u8 bit5: 1;	\/* always 1*\/$/;"	m	struct:select
 bit5	src/include/linux/ide.h	/^	u8 bit5: 1;	\/* always 1*\/$/;"	m	struct:select
@@ -2480,7 +2502,7 @@ bit_off	debug/include/stab.h	/^	int bit_off;$/;"	m	struct:subind
 bit_size	debug/include/stab.h	/^	int bit_size;$/;"	m	struct:subind
 bitmap	include/proc.h	/^	unsigned short trace, bitmap;$/;"	m	struct:tss
 bitmap	src/include/linux/cell.h	/^	char *bitmap;$/;"	m	struct:cell_sb_info
-bitmap	src/include/linux/cell_common.h	/^			char bitmap[0];$/;"	m	struct:cell_superblock::__anon19::__anon20
+bitmap	src/include/linux/cell_common.h	/^			char bitmap[0];$/;"	m	struct:cell_superblock::__anon20::__anon21
 bitmask	lsh/lua/lgc.h	30;"	d
 bl	lsh/lua/lparser.h	/^  struct BlockCnt *bl;  \/* chain of current blocks *\/$/;"	m	struct:FuncState	typeref:struct:FuncState::BlockCnt
 black2gray	lsh/lua/lgc.c	38;"	d	file:
@@ -2492,9 +2514,9 @@ blk_unit	src/include/linux/blkdev.h	/^struct blk_unit {$/;"	s
 blkdev_layer_init	src/drivers/block/ll_rw_blk.c	/^void blkdev_layer_init(void){$/;"	f
 block	lsh/lua/lparser.c	/^static void block (LexState *ls) {$/;"	f	file:
 block0	src/pmm.c	/^static EMPTY_BLOCK*block0=(EMPTY_BLOCK*)KV(HEAP_BASE);$/;"	v	file:
-block_count	include/fs_ext.h	/^	int block_count;$/;"	m	struct:__anon33
+block_count	include/fs_ext.h	/^	int block_count;$/;"	m	struct:__anon38
 block_follow	lsh/lua/lparser.c	/^static int block_follow (int token) {$/;"	f	file:
-blocks	include/fs_ext.h	/^	int blocks[12];$/;"	m	struct:__anon33
+blocks	include/fs_ext.h	/^	int blocks[12];$/;"	m	struct:__anon38
 body	lsh/lua/lparser.c	/^static void body (LexState *ls, expdesc *e, int needself, int line) {$/;"	f	file:
 bool	cmd/cell.c	19;"	d	file:
 bool	debug/include/valType.h	/^typedef int bool;$/;"	t
@@ -2513,7 +2535,7 @@ breaklist	lsh/lua/lparser.c	/^  int breaklist;  \/* list of jumps out of this lo
 breakstat	lsh/lua/lparser.c	/^static void breakstat (LexState *ls) {$/;"	f	file:
 bsy_desc	src/drivers/net/8139.c	/^	unsigned bsy_desc;$/;"	m	struct:rtl8139_private	file:
 buf	include/hd.h	/^	char*buf;$/;"	m	struct:require
-buf	include/hs.h	/^	char*buf;$/;"	m	struct:__anon46
+buf	include/hs.h	/^	char*buf;$/;"	m	struct:__anon51
 buf	src/include/linux/blkdev.h	/^	char *buf;$/;"	m	struct:request
 buf2	src/fs/cell/namei.c	/^struct buf2{$/;"	s	file:
 buff	lsh/lua/lauxlib.c	/^  char buff[LUAL_BUFFERSIZE];$/;"	m	struct:LoadF	file:
@@ -2537,10 +2559,13 @@ bvalue	lsh/lua/lobject.h	100;"	d
 byte	cmd/old/han2pinyin.cc	/^		local byte = string.byte(i)$/;"	v
 byte	debug/include/valType.h	/^typedef unsigned char byte;$/;"	t
 byte	include/valType.h	/^typedef unsigned char byte;$/;"	t
+byte	src/include/net/tcp.h	/^		u8 byte[0];$/;"	m	union:tcp_opt::__anon29
+bytes_got	src/net/ipv4/tcp.cc	/^	u32 bytes_got;		\/\/zuihouyigeshoudaodebaowendedataqudechangdu$/;"	m	struct:connect	file:
+bytes_out	src/net/ipv4/tcp.cc	/^	u32 bytes_out;		\/\/zuihouyigefachudebaowendedataqudechangdu$/;"	m	struct:connect	file:
 c	debug/kernel/c.h	/^	char c;$/;"	m	struct:c_stru
 c	debug/kernel/d.h	/^	char c;$/;"	m	struct:d_stru
 c	debug/kernel/e.h	/^	char c;$/;"	m	struct:e_stru
-c	include/proc.h	/^	char c[size_buffer];$/;"	m	struct:__anon42
+c	include/proc.h	/^	char c[size_buffer];$/;"	m	struct:__anon47
 c	lsh/lua/lobject.h	/^  CClosure c;$/;"	m	union:Closure
 c_func	debug/kernel/c.c	/^int c_func(void){$/;"	f
 c_stru	debug/kernel/c.h	/^typedef struct c_stru{$/;"	s
@@ -2559,7 +2584,7 @@ call_orderTM	lsh/lua/lvm.c	/^static int call_orderTM (lua_State *L, const TValue
 callallgcTM	lsh/lua/lstate.c	/^static void callallgcTM (lua_State *L, void *ud) {$/;"	f	file:
 callrethooks	lsh/lua/ldo.c	/^static StkId callrethooks (lua_State *L, StkId firstResult) {$/;"	f	file:
 cannot	lsh/lua/luac.c	/^static void cannot(const char* what)$/;"	f	file:
-capture	lsh/lua/lstrlib.c	/^  } capture[LUA_MAXCAPTURES];$/;"	m	struct:MatchState	typeref:struct:MatchState::__anon72	file:
+capture	lsh/lua/lstrlib.c	/^  } capture[LUA_MAXCAPTURES];$/;"	m	struct:MatchState	typeref:struct:MatchState::__anon77	file:
 capture_to_close	lsh/lua/lstrlib.c	/^static int capture_to_close (MatchState *ms) {$/;"	f	file:
 cast	lsh/lua/llimits.h	75;"	d
 cast_byte	lsh/lua/llimits.h	78;"	d
@@ -2586,9 +2611,9 @@ cell_superblock	src/include/linux/cell_common.h	/^struct cell_superblock{$/;"	s
 cellid	src/include/linux/cell_common.h	/^	int cellid;		\/* point to which cell *\/$/;"	m	struct:cell_dentry
 cellmbr	include/fs_cell.h	/^char *cellmbr;$/;"	v
 cellnum	src/include/linux/cell.h	/^	int cellnum;$/;"	m	struct:cell_sb_info
-cellnum	src/include/linux/cell_common.h	/^			int cellnum;$/;"	m	struct:cell_superblock::__anon19::__anon20
+cellnum	src/include/linux/cell_common.h	/^			int cellnum;$/;"	m	struct:cell_superblock::__anon20::__anon21
 cellsize	src/include/linux/cell.h	/^	int cellsize;$/;"	m	struct:cell_sb_info
-cellsize	src/include/linux/cell_common.h	/^			int cellsize;$/;"	m	struct:cell_superblock::__anon19::__anon20
+cellsize	src/include/linux/cell_common.h	/^			int cellsize;$/;"	m	struct:cell_superblock::__anon20::__anon21
 cflags	debug/makefile	/^cflags=$(Ih) -Wall -fno-builtin -gstabs -fpermissive -DCMPLER_C_PLUS -Wno-return-type -Wno-unused-function -Wno-sign-compare -Wno-unused-variable$/;"	m
 cflags	src/makefile	/^cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -Wno-implicit-function-declaration -g -fno-stack-protector -nostdinc$/;"	m
 changewhite	lsh/lua/lgc.h	72;"	d
@@ -2677,7 +2702,7 @@ collectvalidlines	lsh/lua/ldebug.c	/^static void collectvalidlines (lua_State *L
 colormod	src/lib/printf.c	/^struct colormod{$/;"	s	file:
 combine	lsh/lua/luac.c	/^static const Proto* combine(lua_State* L, int n)$/;"	f	file:
 command	include/hd.h	/^	u8 command;$/;"	m	struct:require
-command	include/hs.h	/^	u8 command;$/;"	m	struct:__anon46
+command	include/hs.h	/^	u8 command;$/;"	m	struct:__anon51
 command	src/include/linux/pci.h	/^	u16 command;$/;"	m	struct:pci_dev
 common	src/include/linux/fs.h	/^	char common[512];$/;"	m	struct:super_block
 common	src/include/linux/fs.h	/^	char common[INODE_COMMON_SIZE];$/;"	m	struct:inode
@@ -2709,19 +2734,19 @@ costatus	lsh/lua/lbaselib.c	/^static int costatus (lua_State *L, lua_State *co) 
 count	cmd/cell.c	/^	unsigned count;$/;"	m	struct:dp	file:
 count	include/blk.h	/^	int count;$/;"	m	struct:request
 count	include/hd.h	/^	u32 count;\/\/record the sector-num usr wants to r\/w,it will be decreased when a local-loop of r\/w finished,and hs will sleep again when count=0$/;"	m	struct:require
-count	include/hs.h	/^	u32 count;\/\/record the sector-num usr wants to r\/w,it will be decreased when a local-loop of r\/w finished,and hs will sleep again when count=0$/;"	m	struct:__anon46
+count	include/hs.h	/^	u32 count;\/\/record the sector-num usr wants to r\/w,it will be decreased when a local-loop of r\/w finished,and hs will sleep again when count=0$/;"	m	struct:__anon51
 count	src/include/linux/blkdev.h	/^	int count;$/;"	m	struct:request
 count	src/include/linux/fs.h	/^	int count;$/;"	m	struct:file
-count_drop_tok	src/include/linux/netdevice.h	/^		u32 count_drop_tok;$/;"	m	struct:net_device::__anon15
-counter	debug/include/valType.h	/^	volatile int counter;$/;"	m	struct:__anon55
-counter	include/valType.h	/^	volatile int counter;$/;"	m	struct:__anon37
+count_drop_tok	src/include/linux/netdevice.h	/^		u32 count_drop_tok;$/;"	m	struct:net_device::__anon16
+counter	debug/include/valType.h	/^	volatile int counter;$/;"	m	struct:__anon60
+counter	include/valType.h	/^	volatile int counter;$/;"	m	struct:__anon42
 countint	lsh/lua/ltable.c	/^static int countint (const TValue *key, int *nums) {$/;"	f	file:
 cow_shared	include/mm.h	/^	int cow_shared;	\/* I don't know the the mechanism of '_count' for temporary$/;"	m	struct:page
 cp_sym_to_heap	debug/stab.c	/^char *cp_sym_to_heap(strparser_t *parser){$/;"	f
 cpu	debug/kernel/t.c	/^enum jar{cpu = 8, pint =16,quart =32};$/;"	e	enum:jar	file:
 cpu_string	src/kernel.c	/^char cpu_string[16];$/;"	v
 cpuid_family	src/kernel.c	/^struct cpuid_family{$/;"	s	file:
-cr3	include/proc.h	/^			u32 *cr3;	\/*must be cr3, relied by pointer calculate*\/$/;"	m	struct:pcb::__anon44::__anon45
+cr3	include/proc.h	/^			u32 *cr3;	\/*must be cr3, relied by pointer calculate*\/$/;"	m	struct:pcb::__anon49::__anon50
 cr3	include/proc.h	/^		unsigned long cr3;$/;"	m	struct:tss
 crc16_compute_be	src/utils.c	/^u16 crc16_compute_be(void *area, int len){$/;"	f
 crc16_write_be	include/utils.h	/^static inline u16 crc16_write_be(void *area, int len, u16 *chksum){$/;"	f
@@ -2731,7 +2756,7 @@ create_typeobj	debug/stab.c	/^typeobj_t *create_typeobj(char typedesc){$/;"	f
 createmeta	lsh/lua/liolib.c	/^static void createmeta (lua_State *L) {$/;"	f	file:
 createmetatable	lsh/lua/lstrlib.c	/^static void createmetatable (lua_State *L) {$/;"	f	file:
 createstdfile	lsh/lua/liolib.c	/^static void createstdfile (lua_State *L, FILE *f, int k, const char *fname) {$/;"	f	file:
-cs	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon43
+cs	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon48
 cs	include/proc.h	/^	unsigned short cs, __csh;$/;"	m	struct:tss
 cstru	debug/kernel/t.c	/^static struct c_stru cstru = {.a=1,.b=2,.c=3};$/;"	v	typeref:struct:c_stru	file:
 ctor	src/mm/slab.c	/^	void (*ctor)(void *, struct slab_head *, unsigned);	\/* constructor func *\/$/;"	m	struct:slab_head	file:
@@ -2760,7 +2785,7 @@ d_lookup	src/fs/dcache.c	/^struct dentry *d_lookup(struct dentry *dir, struct qs
 d_rehash	src/fs/dcache.c	/^int d_rehash(struct dentry *dir, unsigned hash){$/;"	f
 d_stru	debug/kernel/d.h	/^typedef struct d_stru{$/;"	s
 d_stru_t	debug/kernel/d.h	/^}d_stru_t;$/;"	t	typeref:struct:d_stru
-data	lsh/lua/ldump.c	/^ void* data;$/;"	m	struct:__anon70	file:
+data	lsh/lua/ldump.c	/^ void* data;$/;"	m	struct:__anon75	file:
 data	lsh/lua/lzio.h	/^  void* data;			\/* additional data *\/$/;"	m	struct:Zio
 data	src/drivers/net/8139.c	/^	char data[0];$/;"	m	struct:raw_package	file:
 data	src/include/linux/blkdev.h	/^	void *data;		\/* set by driver programmers to help himself implement$/;"	m	struct:queue_getter
@@ -2768,6 +2793,8 @@ data	src/include/linux/cell_common.h	/^	char data[0];$/;"	m	struct:cell
 data	src/include/linux/fs.h	/^	void *data;$/;"	m	struct:file
 data	src/include/linux/skbuff.h	/^	char *data;			\/* i.e. buffer *\/$/;"	m	struct:sk_buff
 data	src/include/linux/timer.h	/^	void * data;$/;"	m	struct:timer
+data	src/include/net/icmp.h	/^	}data;$/;"	m	struct:icmphdr	typeref:union:icmphdr::__anon27
+data	src/include/net/tcp.h	/^	}data;$/;"	m	struct:tcp_opt	typeref:union:tcp_opt::__anon29
 data	src/include/net/udp.h	/^	char data[0];$/;"	m	struct:udphdr
 data	src/kernel/bh.c	/^	void *data;$/;"	m	struct:bh	file:
 db_debug	lsh/lua/ldblib.c	/^static int db_debug (lua_State *L) {$/;"	f	file:
@@ -2786,8 +2813,8 @@ db_setmetatable	lsh/lua/ldblib.c	/^static int db_setmetatable (lua_State *L) {$/
 db_setupvalue	lsh/lua/ldblib.c	/^static int db_setupvalue (lua_State *L) {$/;"	f	file:
 dblib	lsh/lua/ldblib.c	/^static const luaL_Reg dblib[] = {$/;"	v	file:
 deReserve2	include/ntfs.h	/^	int		deReserve2;$/;"	m	struct:tag_NONRESIDATTR
-debug	src/include/linux/netdevice.h	/^	}debug;$/;"	m	struct:net_device	typeref:struct:net_device::__anon15
-debug	src/include/linux/skbuff.h	/^	}debug;$/;"	m	struct:sk_buff	typeref:struct:sk_buff::__anon14
+debug	src/include/linux/netdevice.h	/^	}debug;$/;"	m	struct:net_device	typeref:struct:net_device::__anon16
+debug	src/include/linux/skbuff.h	/^	}debug;$/;"	m	struct:sk_buff	typeref:struct:sk_buff::__anon15
 decpoint	lsh/lua/llex.h	/^  char decpoint;  \/* locale decimal point *\/$/;"	m	struct:LexState
 del_hstd	debug/makefile	/^del_hstd=$(common_hpath:%=%.*hstd)$/;"	m
 del_node	src/pmm.c	/^void del_node(EMPTY_BLOCK*block){$/;"	f
@@ -2798,7 +2825,7 @@ dentry_cache	src/include/linux/dcache.h	/^struct slab_head *dentry_cache;$/;"	v	
 dentry_hashtable	src/include/linux/dcache.h	/^struct list_head *dentry_hashtable;$/;"	v	typeref:struct:list_head
 dentry_operations	src/include/linux/dcache.h	/^struct dentry_operations{$/;"	s
 desc	debug/include/stab.h	/^	char desc;		\/**'r','a','*','e','u','s'...*\/$/;"	m	struct:typeobj
-desc	debug/include/stab.h	/^	char desc;$/;"	m	struct:__anon54
+desc	debug/include/stab.h	/^	char desc;$/;"	m	struct:__anon59
 desc_of_bar	src/lib/printf.c	/^static struct bar_desc desc_of_bar[BAR_V_NR][BAR_H_NR];$/;"	v	typeref:struct:bar_desc	file:
 descriptorr	debug/include/valType.h	/^typedef struct descriptorr{$/;"	s
 descriptorr	include/valType.h	/^typedef struct descriptorr{$/;"	s
@@ -2814,10 +2841,10 @@ dev_alloc_skb2	src/net/core/skbuff.c	/^struct sk_buff *dev_alloc_skb2(u32 msgtyp
 dev_free_skb	src/net/core/skbuff.c	/^void dev_free_skb( struct sk_buff *skb){$/;"	f
 dev_id	src/include/linux/blkdev.h	/^	u16 dev_id;$/;"	m	struct:request
 device	include/hd.h	/^	u8 device;$/;"	m	struct:require
-device	include/hs.h	/^	u8 device;$/;"	m	struct:__anon46
+device	include/hs.h	/^	u8 device;$/;"	m	struct:__anon51
 device	src/include/linux/pci.h	/^	u16 device;$/;"	m	struct:pci_dev
 device	src/include/linux/pci.h	/^	u16 vendor, device;$/;"	m	struct:pci_device_id
-disable	include/irq.h	/^	void (*disable)(unsigned irq);$/;"	m	struct:__anon38
+disable	include/irq.h	/^	void (*disable)(unsigned irq);$/;"	m	struct:__anon43
 disable_8259A_irq	src/i8259.c	/^void disable_8259A_irq(u32 irq){$/;"	f
 discharge2anyreg	lsh/lua/lcode.c	/^static void discharge2anyreg (FuncState *fs, expdesc *e) {$/;"	f	file:
 discharge2reg	lsh/lua/lcode.c	/^static void discharge2reg (FuncState *fs, expdesc *e, int reg) {$/;"	f	file:
@@ -2825,6 +2852,7 @@ dischargejpc	lsh/lua/lcode.c	/^static void dischargejpc (FuncState *fs) {$/;"	f	
 divide_error	src/kernel.asm	/^divide_error:$/;"	l
 doNothing	src/boot.asm	/^doNothing:$/;"	l
 do_IRQ	src/irq.c	/^unsigned do_IRQ(stack_frame regs){$/;"	f
+do_ack	src/net/ipv4/tcp.cc	/^static void do_ack(void *_connect){$/;"	f	file:
 do_bh	src/kernel/bh.c	/^void do_bh(void){$/;"	f
 do_mount	src/fs/super.c	/^struct vfsmount * do_mount(u16 dev, char *dir, char *type){$/;"	f
 do_page_fault	src/mm.c	/^void do_page_fault(stack_frame *preg, unsigned err_code){$/;"	f
@@ -2843,7 +2871,7 @@ dp	cmd/cell.c	/^struct dp{$/;"	s	file:
 drive	src/include/linux/ide.h	/^	struct ide_drive drive[MAX_DRIVES];$/;"	m	struct:ide_hwif	typeref:struct:ide_hwif::ide_drive
 drv	include/hd.h	/^	u8 drv: 1;	\/* master:0  or slave:1 *\/$/;"	m	struct:select
 drv	src/include/linux/ide.h	/^	u8 drv: 1;	\/* master:0  or slave:1 *\/$/;"	m	struct:select
-ds	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon43
+ds	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon48
 ds	include/proc.h	/^	unsigned short ds, __dsh;$/;"	m	struct:tss
 dtor	src/mm/slab.c	/^	void (*dtor)(void *, struct slab_head *, unsigned); \/* de-constructor func *\/$/;"	m	struct:slab_head	file:
 dummy	lsh/lua/lobject.h	/^  L_Umaxalign dummy;  \/* ensures maximum alignment for `local' udata *\/$/;"	m	union:Udata
@@ -2873,6 +2901,8 @@ dwReserve4	include/ntfs.h	/^	u32		dwReserve4;$/;"	m	struct:tag_INDXATTR
 dwReserve4	include/ntfs.h	/^	u32		dwReserve4;$/;"	m	struct:tag_INDXENTRY
 dwSectoOfParti	include/ntfs.h	/^    unsigned int   dwSectoOfParti; \/\/����0$/;"	m	struct:tag_NTFS_header
 dwUseSize	include/ntfs.h	/^	u32		dwUseSize;$/;"	m	struct:tag_INDX
+dword	src/include/net/icmp.h	/^		u32 dword[0];$/;"	m	union:icmphdr::__anon27
+dword	src/include/net/tcp.h	/^		u32  dword[0];$/;"	m	union:tcp_opt::__anon29
 e1000_driver	src/drivers/net/e1000.c	/^static struct pci_driver e1000_driver = {$/;"	v	typeref:struct:pci_driver	file:
 e1000_id_tbl	src/drivers/net/e1000.c	/^static struct pci_device_id e1000_id_tbl[] = {$/;"	v	typeref:struct:pci_device_id	file:
 e1000_init_one	src/drivers/net/e1000.c	/^int e1000_init_one(struct pci_dev *pcidev, const struct pci_device_id *id){$/;"	f
@@ -2881,55 +2911,55 @@ e1000_private	src/drivers/net/e1000.c	/^struct e1000_private{$/;"	s	file:
 e1000_start_xmit	src/drivers/net/e1000.c	/^static int e1000_start_xmit(struct sk_buff *skb, struct net_device *netdev){$/;"	f	file:
 e1000_stop	src/drivers/net/e1000.c	/^static int e1000_stop(struct net_device *netdev){$/;"	f	file:
 e1000_tx_busy	src/drivers/net/e1000.c	/^static bool e1000_tx_busy(struct net_device *netdev){$/;"	f	file:
-e_ehsize	include/elf.h	/^  Elf32_Half	e_ehsize;		\/* ELF header size in bytes *\/$/;"	m	struct:__anon49
-e_entry	include/elf.h	/^  Elf32_Addr	e_entry;		\/* Entry point virtual address *\/$/;"	m	struct:__anon49
-e_flags	include/elf.h	/^  Elf32_Word	e_flags;		\/* Processor-specific flags *\/$/;"	m	struct:__anon49
-e_ident	include/elf.h	/^  u8	e_ident[16];	\/* Magic number and other info *\/$/;"	m	struct:__anon49
-e_machine	include/elf.h	/^  Elf32_Half	e_machine;		\/* Architecture *\/$/;"	m	struct:__anon49
-e_phentsize	include/elf.h	/^  Elf32_Half	e_phentsize;		\/* Program header table entry size *\/$/;"	m	struct:__anon49
-e_phnum	include/elf.h	/^  Elf32_Half	e_phnum;		\/* Program header table entry count *\/$/;"	m	struct:__anon49
-e_phoff	include/elf.h	/^  Elf32_Off	e_phoff;		\/* Program header table file offset *\/$/;"	m	struct:__anon49
-e_shentsize	include/elf.h	/^  Elf32_Half	e_shentsize;		\/* Section header table entry size *\/$/;"	m	struct:__anon49
-e_shnum	include/elf.h	/^  Elf32_Half	e_shnum;		\/* Section header table entry count *\/$/;"	m	struct:__anon49
-e_shoff	include/elf.h	/^  Elf32_Off	e_shoff;		\/* Section header table file offset *\/$/;"	m	struct:__anon49
-e_shstrndx	include/elf.h	/^  Elf32_Half	e_shstrndx;		\/* Section header string table index *\/$/;"	m	struct:__anon49
+e_ehsize	include/elf.h	/^  Elf32_Half	e_ehsize;		\/* ELF header size in bytes *\/$/;"	m	struct:__anon54
+e_entry	include/elf.h	/^  Elf32_Addr	e_entry;		\/* Entry point virtual address *\/$/;"	m	struct:__anon54
+e_flags	include/elf.h	/^  Elf32_Word	e_flags;		\/* Processor-specific flags *\/$/;"	m	struct:__anon54
+e_ident	include/elf.h	/^  u8	e_ident[16];	\/* Magic number and other info *\/$/;"	m	struct:__anon54
+e_machine	include/elf.h	/^  Elf32_Half	e_machine;		\/* Architecture *\/$/;"	m	struct:__anon54
+e_phentsize	include/elf.h	/^  Elf32_Half	e_phentsize;		\/* Program header table entry size *\/$/;"	m	struct:__anon54
+e_phnum	include/elf.h	/^  Elf32_Half	e_phnum;		\/* Program header table entry count *\/$/;"	m	struct:__anon54
+e_phoff	include/elf.h	/^  Elf32_Off	e_phoff;		\/* Program header table file offset *\/$/;"	m	struct:__anon54
+e_shentsize	include/elf.h	/^  Elf32_Half	e_shentsize;		\/* Section header table entry size *\/$/;"	m	struct:__anon54
+e_shnum	include/elf.h	/^  Elf32_Half	e_shnum;		\/* Section header table entry count *\/$/;"	m	struct:__anon54
+e_shoff	include/elf.h	/^  Elf32_Off	e_shoff;		\/* Section header table file offset *\/$/;"	m	struct:__anon54
+e_shstrndx	include/elf.h	/^  Elf32_Half	e_shstrndx;		\/* Section header string table index *\/$/;"	m	struct:__anon54
 e_stru	debug/kernel/e.h	/^typedef struct e_stru{$/;"	s
 e_stru_t	debug/kernel/e.h	/^}e_stru_t;$/;"	t	typeref:struct:e_stru
-e_type	include/elf.h	/^  Elf32_Half	e_type;			\/* Object file type *\/$/;"	m	struct:__anon49
-e_version	include/elf.h	/^  Elf32_Word	e_version;		\/* Object file version *\/$/;"	m	struct:__anon49
+e_type	include/elf.h	/^  Elf32_Half	e_type;			\/* Object file type *\/$/;"	m	struct:__anon54
+e_version	include/elf.h	/^  Elf32_Word	e_version;		\/* Object file version *\/$/;"	m	struct:__anon54
 eaddr	debug/include/stab.h	/^	unsigned eaddr;		\/**end address*\/$/;"	m	struct:fileobj
 eat_dec	include/ku_utils.h	31;"	d
 eat_dec_with_len	include/ku_utils.h	44;"	d
 eat_hex	include/ku_utils.h	8;"	d
-eax	include/proc.h	/^	u32 edi,ebp,eax;$/;"	m	struct:__anon43
+eax	include/proc.h	/^	u32 edi,ebp,eax;$/;"	m	struct:__anon48
 eax	include/proc.h	/^	unsigned long eax,ecx,edx,ebx;$/;"	m	struct:tss
-ebind	debug/include/stab.h	/^		struct ebind *ebind;$/;"	m	union:typeobj::__anon53	typeref:struct:typeobj::__anon53::ebind
+ebind	debug/include/stab.h	/^		struct ebind *ebind;$/;"	m	union:typeobj::__anon58	typeref:struct:typeobj::__anon58::ebind
 ebind	debug/include/stab.h	/^struct ebind{$/;"	s
-ebp	include/proc.h	/^	u32 edi,ebp,eax;$/;"	m	struct:__anon43
+ebp	include/proc.h	/^	u32 edi,ebp,eax;$/;"	m	struct:__anon48
 ebp	include/proc.h	/^	unsigned long ebp;$/;"	m	struct:tss
-ebx	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon43
+ebx	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon48
 ebx	include/proc.h	/^	unsigned long eax,ecx,edx,ebx;$/;"	m	struct:tss
-ecx	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon43
+ecx	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon48
 ecx	include/proc.h	/^	unsigned long eax,ecx,edx,ebx;$/;"	m	struct:tss
-edi	include/proc.h	/^	u32 edi,ebp,eax;$/;"	m	struct:__anon43
+edi	include/proc.h	/^	u32 edi,ebp,eax;$/;"	m	struct:__anon48
 edi	src/disp.c	/^unsigned edi;$/;"	v
 edii	include/proc.h	/^	unsigned long edii;$/;"	m	struct:tss
-edx	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon43
+edx	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon48
 edx	include/proc.h	/^	unsigned long eax,ecx,edx,ebx;$/;"	m	struct:tss
-eflags	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon43
+eflags	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon48
 eflags	include/proc.h	/^	unsigned long eflags;$/;"	m	struct:tss
 eflags_stack	include/proc.h	/^struct eflags_stack{$/;"	s
 eheader	src/elf.c	/^static Elf32_Ehdr *eheader;$/;"	v	file:
-eip	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon43
+eip	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon48
 eip	include/proc.h	/^	unsigned eip;$/;"	m	struct:thread
 eip	include/proc.h	/^	unsigned long eip;$/;"	m	struct:tss
 elem_tn	debug/include/stab.h	/^	typenumber_t elem_tn;$/;"	m	struct:abind
 empty_blockk	include/pmm.h	/^typedef struct empty_blockk{$/;"	s
 emptybuffer	lsh/lua/lauxlib.c	/^static int emptybuffer (luaL_Buffer *B) {$/;"	f	file:
-enable	include/irq.h	/^	void (*enable)(unsigned irq);$/;"	m	struct:__anon38
+enable	include/irq.h	/^	void (*enable)(unsigned irq);$/;"	m	struct:__anon43
 enable_8259A_irq	src/i8259.c	/^void enable_8259A_irq(u32 irq){$/;"	f
 enabled	src/include/linux/pci.h	/^	int enabled:	1;$/;"	m	struct:pci_config_addr
-end	include/irq.h	/^	void (*end)(unsigned irq);$/;"	m	struct:__anon38
+end	include/irq.h	/^	void (*end)(unsigned irq);$/;"	m	struct:__anon43
 end_8259A	src/i8259.c	/^static void end_8259A(u32 irq){$/;"	f	file:
 end_capture	lsh/lua/lstrlib.c	/^static const char *end_capture (MatchState *ms, const char *s,$/;"	f	file:
 end_ci	lsh/lua/lstate.h	/^  CallInfo *end_ci;  \/* points after end of ci array*\/$/;"	m	struct:lua_State
@@ -2948,10 +2978,10 @@ enterlevel	lsh/lua/lparser.c	/^static void enterlevel (LexState *ls) {$/;"	f	fil
 entpwd	cmd/cell.c	48;"	d	file:
 entrance	src/boot.asm	/^entrance:$/;"	l
 ents	src/include/linux/cell_common.h	/^	struct cell_dentry ents[0];$/;"	m	struct:cell	typeref:struct:cell::cell_dentry
-env	lsh/lua/lobject.h	/^    struct Table *env;$/;"	m	struct:Udata::__anon62	typeref:struct:Udata::__anon62::Table
+env	lsh/lua/lobject.h	/^    struct Table *env;$/;"	m	struct:Udata::__anon67	typeref:struct:Udata::__anon67::Table
 env	lsh/lua/lstate.h	/^  TValue env;  \/* temporary place for environments *\/$/;"	m	struct:lua_State
 equalobj	lsh/lua/lvm.h	21;"	d
-err_code	include/proc.h	/^	u32 err_code;$/;"	m	struct:__anon43
+err_code	include/proc.h	/^	u32 err_code;$/;"	m	struct:__anon48
 errfile	lsh/lua/lauxlib.c	/^static int errfile (lua_State *L, const char *what, int fnameindex) {$/;"	f	file:
 errfunc	lsh/lua/lstate.h	/^  ptrdiff_t errfunc;  \/* current error handling function (stack index) *\/$/;"	m	struct:lua_State
 error	lsh/lua/lundump.c	/^static void error(LoadState* S, const char* why)$/;"	f	file:
@@ -2961,12 +2991,12 @@ error_code	src/kernel.asm	/^error_code:$/;"	l
 error_expected	lsh/lua/lparser.c	/^static void error_expected (LexState *ls, int token) {$/;"	f	file:
 errorfromcode	lsh/lua/loadlib.c	/^static const char *errorfromcode (NSObjectFileImageReturnCode ret) {$/;"	f	file:
 errorlimit	lsh/lua/lparser.c	/^static void errorlimit (FuncState *fs, int limit, const char *what) {$/;"	f	file:
-es	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon43
+es	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon48
 es	include/proc.h	/^	unsigned short es, __esh;$/;"	m	struct:tss
-esi	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon43
+esi	include/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:__anon48
 esi	include/proc.h	/^	unsigned long esi;$/;"	m	struct:tss
 esp	include/proc.h	/^				int esp;	$/;"	m	struct:eflags_stack
-esp	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon43
+esp	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon48
 esp	include/proc.h	/^	unsigned esp;$/;"	m	struct:thread
 esp	include/proc.h	/^	unsigned long esp;$/;"	m	struct:tss
 esp0	include/proc.h	/^	unsigned long esp0;$/;"	m	struct:tss
@@ -2977,13 +3007,14 @@ ethhdr	src/include/linux/if_ether.h	/^struct ethhdr{$/;"	s
 ethhdr	src/include/linux/skbuff.h	/^	struct ethhdr *ethhdr;$/;"	m	struct:sk_buff	typeref:struct:sk_buff::ethhdr
 ethhdr	src/include/net/arp.h	/^	struct ethhdr ethhdr;$/;"	m	struct:arp_packet	typeref:struct:arp_packet::ethhdr
 event	lsh/lua/lua.h	/^  int event;$/;"	m	struct:lua_Debug
+example	src/net/ipv4/icmp.c	/^static struct sk_buff *example;$/;"	v	typeref:struct:sk_buff	file:
 exception_handler	src/kernel.asm	/^exception_handler:$/;"	l
 exception_handler_step1	src/kernel.asm	/^exception_handler_step1:$/;"	l
 exp1	lsh/lua/lparser.c	/^static int exp1 (LexState *ls) {$/;"	f	file:
 exp2reg	lsh/lua/lcode.c	/^static void exp2reg (FuncState *fs, expdesc *e, int reg) {$/;"	f	file:
 expdesc	lsh/lua/lparser.h	/^typedef struct expdesc {$/;"	s
 expdesc	lsh/lua/lparser.h	/^} expdesc;$/;"	t	typeref:struct:expdesc
-expkind	lsh/lua/lparser.h	/^} expkind;$/;"	t	typeref:enum:__anon67
+expkind	lsh/lua/lparser.h	/^} expkind;$/;"	t	typeref:enum:__anon72
 explist1	lsh/lua/lparser.c	/^static int explist1 (LexState *ls, expdesc *v) {$/;"	f	file:
 export_vi	lsh/lsh.c	/^void export_vi(lua_State *L){$/;"	f
 expr	lsh/lua/lparser.c	/^static void expr (LexState *ls, expdesc *v) {$/;"	f	file:
@@ -3030,16 +3061,16 @@ false	include/valType.h	9;"	d
 false	lsh/utils.h	5;"	d
 family	src/kernel.c	/^	u32 family:4;$/;"	m	struct:cpuid_family	file:
 family_extend	src/kernel.c	/^	u32 family_extend:8;$/;"	m	struct:cpuid_family	file:
-faqizhe_dengdaiqueren	cmd/tcp.cc	/^	 faqizhe_dengdaiqueren,$/;"	e	enum:__anon30	file:
-faqizhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 faqizhe_dengdaiqueren,$/;"	e	enum:__anon29	file:
+faqizhe_dengdaiqueren	cmd/tcp.cc	/^	 faqizhe_dengdaiqueren,$/;"	e	enum:__anon35	file:
+faqizhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 faqizhe_dengdaiqueren,$/;"	e	enum:__anon34	file:
 fasttm	lsh/lua/ltm.h	44;"	d
 fatal	lsh/lua/luac.c	/^static void fatal(const char* message)$/;"	f	file:
 fcheck	src/include/linux/fs.h	/^static inline struct file *fcheck(unsigned fd){$/;"	f
-fds	lsh/lsh.c	/^	int fds[2];$/;"	m	struct:__anon80	file:
+fds	lsh/lsh.c	/^	int fds[2];$/;"	m	struct:__anon85	file:
 fdsize	cmd/_dimg.c	/^static int fdsize(int fd){$/;"	f	file:
 fdsize	lsh/file.c	/^int fdsize(int fd){$/;"	f
 features	include/hd.h	/^	u8 features;$/;"	m	struct:require
-features	include/hs.h	/^	u8 features;$/;"	m	struct:__anon46
+features	include/hs.h	/^	u8 features;$/;"	m	struct:__anon51
 fg	src/lib/printf.c	/^			int fg: 3;$/;"	m	struct:colormod::__anon1::__anon2	file:
 fget	src/include/linux/fs.h	/^static inline struct file *fget(int fd){$/;"	f
 field	lsh/lua/lparser.c	/^static void field (LexState *ls, expdesc *v) {$/;"	f	file:
@@ -3048,16 +3079,16 @@ file_cache	src/include/linux/fs.h	/^struct slab_head *file_cache;$/;"	v	typeref:
 file_operations	src/include/linux/fs.h	/^struct file_operations{$/;"	s
 file_ops	src/include/linux/fs.h	/^	struct file_operations *file_ops;$/;"	m	struct:inode	typeref:struct:inode::file_operations
 file_system_type	src/include/linux/fs.h	/^struct file_system_type{$/;"	s
-file_type	include/fs_ext.h	/^	u8 file_type;$/;"	m	struct:__anon34
+file_type	include/fs_ext.h	/^	u8 file_type;$/;"	m	struct:__anon39
 fileerror	lsh/lua/liolib.c	/^static void fileerror (lua_State *L, int arg, const char *filename) {$/;"	f	file:
-fileid	debug/include/stab.h	/^		unsigned char fileid;$/;"	m	struct:typenumber::__anon51
+fileid	debug/include/stab.h	/^		unsigned char fileid;$/;"	m	struct:typenumber::__anon56
 fileid	debug/include/stab.h	/^	int fileid;$/;"	m	struct:fileobj
 fileobj	debug/include/stab.h	/^typedef struct fileobj{$/;"	s
 fileobj_t	debug/include/stab.h	/^}fileobj_t;$/;"	t	typeref:struct:fileobj
 fileobjs	debug/stab.c	/^fileobj_t *fileobjs;$/;"	v
 filep	include/proc.h	/^	struct file **filep;	\/* current file array *\/$/;"	m	struct:files_struct	typeref:struct:files_struct::file
 filepath	lsh/vi.h	/^	char *filepath;$/;"	m	struct:vi
-files	include/proc.h	/^			struct files_struct *files;$/;"	m	struct:pcb::__anon44::__anon45	typeref:struct:pcb::__anon44::__anon45::files_struct
+files	include/proc.h	/^			struct files_struct *files;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::files_struct
 files_struct	include/proc.h	/^struct files_struct{$/;"	s
 filesize	cmd/_dimg.c	/^static int filesize(char *name){$/;"	f	file:
 filesize	lsh/file.c	/^int filesize(char *name){$/;"	f
@@ -3066,30 +3097,31 @@ findindex	lsh/lua/ltable.c	/^static int findindex (lua_State *L, Table *t, StkId
 findlocal	lsh/lua/ldebug.c	/^static const char *findlocal (lua_State *L, CallInfo *ci, int n) {$/;"	f	file:
 fire	src/proc.c	/^void fire(struct pcb *p){$/;"	f
 fire_asm	src/proc.asm	/^fire_asm:$/;"	l
+first	src/net/ipv4/tcp.cc	/^	struct sk_buff *first;		\/* always point to the most left side sk_buff we $/;"	m	struct:recv_wnd	typeref:struct:recv_wnd::sk_buff	file:
 firstbuf	src/fs/cell/namei.c	/^	char *firstbuf, *lastbuf;$/;"	m	struct:buf2	file:
 fix_kernel	src/boot.asm	/^fix_kernel:$/;"	l
 fiximg_start_sector	include/bootinfo.h	28;"	d
 fixjump	lsh/lua/lcode.c	/^static void fixjump (FuncState *fs, int pc, int dest) {$/;"	f	file:
-flag_ack	src/include/net/tcp.h	/^		int flag_ack: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
-flag_cwr	src/include/net/tcp.h	/^		int flag_cwr: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
-flag_df	src/include/net/ip.h	/^			int flag_df: 1;					\/* don't fragment *\/$/;"	m	struct:iphdr::__anon21::__anon22
-flag_ece	src/include/net/tcp.h	/^		int flag_ece: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
-flag_fin	src/include/net/tcp.h	/^		int flag_fin: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
-flag_mf	src/include/net/ip.h	/^			int flag_mf: 1;					\/* more fragments *\/$/;"	m	struct:iphdr::__anon21::__anon22
-flag_off	src/include/net/ip.h	/^		u16 flag_off;$/;"	m	union:iphdr::__anon21
-flag_psh	src/include/net/tcp.h	/^		int flag_psh: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
-flag_reserved	src/include/net/ip.h	/^			int flag_reserved: 1;$/;"	m	struct:iphdr::__anon21::__anon22
-flag_rst	src/include/net/tcp.h	/^		int flag_rst: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
-flag_syn	src/include/net/tcp.h	/^		int flag_syn: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
-flag_urg	src/include/net/tcp.h	/^		int flag_urg: 1;$/;"	m	struct:tcphdr::__anon26::__anon27
+flag_ack	src/include/net/tcp.h	/^		int flag_ack: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
+flag_cwr	src/include/net/tcp.h	/^		int flag_cwr: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
+flag_df	src/include/net/ip.h	/^			int flag_df: 1;					\/* don't fragment *\/$/;"	m	struct:iphdr::__anon23::__anon24
+flag_ece	src/include/net/tcp.h	/^		int flag_ece: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
+flag_fin	src/include/net/tcp.h	/^		int flag_fin: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
+flag_mf	src/include/net/ip.h	/^			int flag_mf: 1;					\/* more fragments *\/$/;"	m	struct:iphdr::__anon23::__anon24
+flag_off	src/include/net/ip.h	/^		u16 flag_off;$/;"	m	union:iphdr::__anon23
+flag_psh	src/include/net/tcp.h	/^		int flag_psh: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
+flag_reserved	src/include/net/ip.h	/^			int flag_reserved: 1;$/;"	m	struct:iphdr::__anon23::__anon24
+flag_rst	src/include/net/tcp.h	/^		int flag_rst: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
+flag_syn	src/include/net/tcp.h	/^		int flag_syn: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
+flag_urg	src/include/net/tcp.h	/^		int flag_urg: 1;$/;"	m	struct:tcphdr::__anon30::__anon31
 flagi_pop	include/proc.h	/^static inline void flagi_pop(void){$/;"	f
 flags	include/irq.h	/^	unsigned flags;$/;"	m	struct:irqaction
 flags	lsh/lua/lobject.h	/^  lu_byte flags;  \/* 1<<p means tagmethod(p) is not present *\/ $/;"	m	struct:Table
 flags	lsh/vi.h	/^	unsigned flags;$/;"	m	struct:vi
-flags	src/include/linux/cell_common.h	/^			char flags[4];$/;"	m	struct:cell_superblock::__anon19::__anon20
+flags	src/include/linux/cell_common.h	/^			char flags[4];$/;"	m	struct:cell_superblock::__anon20::__anon21
 flags	src/include/linux/fs.h	/^	unsigned flags;$/;"	m	struct:file
 flags	src/include/linux/netdevice.h	/^	unsigned flags;$/;"	m	struct:net_device
-flags	src/include/net/tcp.h	/^		u8 flags;$/;"	m	union:tcphdr::__anon26
+flags	src/include/net/tcp.h	/^		u8 flags;$/;"	m	union:tcphdr::__anon30
 flib	lsh/lua/liolib.c	/^static const luaL_Reg flib[] = {$/;"	v	file:
 fnames	lsh/lua/liolib.c	/^static const char *const fnames[] = {"input", "output"};$/;"	v	file:
 fobj	debug/include/stab.h	/^	fileobj_t *fobj;$/;"	m	struct:locate_line_result
@@ -3101,8 +3133,8 @@ foreachi	lsh/lua/ltablib.c	/^static int foreachi (lua_State *L) {$/;"	f	file:
 forlist	lsh/lua/lparser.c	/^static void forlist (LexState *ls, TString *indexname) {$/;"	f	file:
 fornum	lsh/lua/lparser.c	/^static void fornum (LexState *ls, TString *varname, int line) {$/;"	f	file:
 forstat	lsh/lua/lparser.c	/^static void forstat (LexState *ls, int line) {$/;"	f	file:
-frag_begin	src/include/linux/skbuff.h	/^		struct sk_buff *frag_begin, *frag_end;$/;"	m	struct:sk_buff::__anon14	typeref:struct:sk_buff::__anon14::sk_buff
-frag_end	src/include/linux/skbuff.h	/^		struct sk_buff *frag_begin, *frag_end;$/;"	m	struct:sk_buff::__anon14	typeref:struct:sk_buff::__anon14::
+frag_begin	src/include/linux/skbuff.h	/^		struct sk_buff *frag_begin, *frag_end;$/;"	m	struct:sk_buff::__anon15	typeref:struct:sk_buff::__anon15::sk_buff
+frag_end	src/include/linux/skbuff.h	/^		struct sk_buff *frag_begin, *frag_end;$/;"	m	struct:sk_buff::__anon15	typeref:struct:sk_buff::__anon15::
 frealloc	lsh/lua/lstate.h	/^  lua_Alloc frealloc;  \/* function to reallocate memory *\/$/;"	m	struct:global_State
 free	src/mm/slab.c	/^	unsigned short free;	\/* indicate the first free object, for quick allocation*\/$/;"	m	struct:slab	file:
 free_area	include/mmzone.h	/^	free_area_t free_area[MAX_ORDER+1];	$/;"	m	struct:zone_struct
@@ -3121,14 +3153,14 @@ freereg	lsh/lua/lcode.c	/^static void freereg (FuncState *fs, int reg) {$/;"	f	f
 freereg	lsh/lua/lparser.h	/^  int freereg;  \/* first free register *\/$/;"	m	struct:FuncState
 freestack	lsh/lua/lstate.c	/^static void freestack (lua_State *L, lua_State *L1) {$/;"	f	file:
 fromstate	lsh/lua/lstate.c	28;"	d	file:
-fs	include/proc.h	/^			struct fs_struct *fs;$/;"	m	struct:pcb::__anon44::__anon45	typeref:struct:pcb::__anon44::__anon45::fs_struct
-fs	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon43
+fs	include/proc.h	/^			struct fs_struct *fs;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::fs_struct
+fs	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon48
 fs	include/proc.h	/^	unsigned short fs, __fsh;$/;"	m	struct:tss
 fs	lsh/lua/llex.h	/^  struct FuncState *fs;  \/* `FuncState' is private to the parser *\/$/;"	m	struct:LexState	typeref:struct:LexState::FuncState
 fs_struct	include/proc.h	/^struct fs_struct{$/;"	s
 fs_struct	src/include/linux/fs_struct.h	/^struct fs_struct{$/;"	s
 fs_types	src/fs/super.c	/^static  struct file_system_type *fs_types;$/;"	v	typeref:struct:file_system_type	file:
-fstack	include/proc.h	/^			struct eflags_stack fstack;$/;"	m	struct:pcb::__anon44::__anon45	typeref:struct:pcb::__anon44::__anon45::eflags_stack
+fstack	include/proc.h	/^			struct eflags_stack fstack;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::eflags_stack
 func	include/irq.h	/^	void (*func) (int irq, void *dev);$/;"	m	struct:irqaction
 func	lsh/lua/lapi.c	/^  StkId func;$/;"	m	struct:CallS	file:
 func	lsh/lua/lapi.c	/^  lua_CFunction func;$/;"	m	struct:CCallS	file:
@@ -3136,7 +3168,6 @@ func	lsh/lua/lauxlib.h	/^  lua_CFunction func;$/;"	m	struct:luaL_Reg
 func	lsh/lua/lstate.h	/^  StkId func;  \/* function index in the stack *\/$/;"	m	struct:CallInfo
 func	src/include/linux/pci.h	/^			unsigned func: 3;	\/* 8 ~ 10 *\/$/;"	m	struct:pci_config_addr::__anon8::__anon9
 func0	src/kernel.c	/^void func0(void){$/;"	f
-func1	src/kernel.c	/^void func1(void){$/;"	f
 func2	src/kernel.c	/^void func2(void){$/;"	f
 func_info	debug/include/stab.h	/^	unsigned *func_info;	\/**info:function address$/;"	m	struct:fileobj
 func_init	src/kernel.c	/^void func_init(void){$/;"	f
@@ -3163,12 +3194,13 @@ g_memseg_num	include/bootinfo.h	31;"	d
 g_read	lsh/lua/liolib.c	/^static int g_read (lua_State *L, FILE *f, int first) {$/;"	f	file:
 g_tss	include/proc.h	11;"	d
 g_write	lsh/lua/liolib.c	/^static int g_write (lua_State *L, FILE *f, int arg) {$/;"	f	file:
-gaotuizhe_baoliuzhenting	cmd/tcp.cc	/^	 gaotuizhe_baoliuzhenting$/;"	e	enum:__anon30	file:
-gaotuizhe_baoliuzhenting	src/net/ipv4/tcp.cc	/^	 gaotuizhe_baoliuzhenting$/;"	e	enum:__anon29	file:
-gaotuizhe_dengdaiqueren	cmd/tcp.cc	/^	 gaotuizhe_dengdaiqueren,$/;"	e	enum:__anon30	file:
-gaotuizhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 gaotuizhe_dengdaiqueren,$/;"	e	enum:__anon29	file:
+gaotuizhe_baoliuzhenting	cmd/tcp.cc	/^	 gaotuizhe_baoliuzhenting$/;"	e	enum:__anon35	file:
+gaotuizhe_baoliuzhenting	src/net/ipv4/tcp.cc	/^	 gaotuizhe_baoliuzhenting$/;"	e	enum:__anon34	file:
+gaotuizhe_dengdaiqueren	cmd/tcp.cc	/^	 gaotuizhe_dengdaiqueren,$/;"	e	enum:__anon35	file:
+gaotuizhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 gaotuizhe_dengdaiqueren,$/;"	e	enum:__anon34	file:
+gateway_ip	src/drivers/net/8139.c	/^	u32 gateway_ip;$/;"	m	struct:ipconfig	file:
 gateway_ip	src/include/linux/netdevice.h	/^	u32 gateway_ip;$/;"	m	struct:net_device
-gc	lsh/lua/lobject.h	/^  GCObject *gc;$/;"	m	union:__anon60
+gc	lsh/lua/lobject.h	/^  GCObject *gc;$/;"	m	union:__anon65
 gcdept	lsh/lua/lstate.h	/^  lu_mem gcdept;  \/* how much GC is `behind schedule' *\/$/;"	m	struct:global_State
 gch	lsh/lua/lstate.h	/^  GCheader gch;$/;"	m	union:GCObject
 gclist	lsh/lua/lobject.h	/^  GCObject *gclist;$/;"	m	struct:Proto
@@ -3211,7 +3243,7 @@ get_addr	debug/kernel/d.cpp	/^int get_addr(void){$/;"	f
 get_cmd_fullpath	lsh/lsh.c	/^bool get_cmd_fullpath(char *fullpath, char *cmd){$/;"	f
 get_compTM	lsh/lua/lvm.c	/^static const TValue *get_compTM (lua_State *L, Table *mt1, Table *mt2,$/;"	f	file:
 get_current	src/proc.c	/^struct pcb *get_current(void){$/;"	f
-get_dirfile	lsh/lsh.c	/^static char *get_dirfile(char *dir, char *filename, char *fullpath){$/;"	f	file:
+get_dirfile	lsh/file.c	/^char *get_dirfile(char *dir, char *filename, char *fullpath){$/;"	f
 get_dirfile_danger	lsh/lsh.c	/^static char *get_dirfile_danger(char *dir, char *filename){$/;"	f	file:
 get_eflags	include/utils.h	/^static inline unsigned get_eflags(void){$/;"	f
 get_excl_refer	debug/stab.c	/^unsigned get_excl_refer(char *hname, int file){$/;"	f
@@ -3220,6 +3252,7 @@ get_fobj	debug/pdb.c	/^fileobj_t *get_fobj(char *fname){$/;"	f
 get_free_request	src/drivers/block/ll_rw_blk.c	/^static struct request *get_free_request(void){$/;"	f	file:
 get_homefile	lsh/lsh.c	/^static char *get_homefile(){$/;"	f	file:
 get_info_ptr	src/drivers/ide/ide.c	/^static struct ide_drive *get_info_ptr(u16 dev_id){$/;"	f	file:
+get_iptype	src/net/core/skbuff.c	/^static char *get_iptype(struct iphdr *iphdr){$/;"	f	file:
 get_left_sister	lsh/utils.c	/^void * get_left_sister(unsigned *arr, unsigned x, int len){$/;"	f
 get_lshfile	lsh/lsh.c	/^static char *get_lshfile(char *filename){$/;"	f	file:
 get_memory_information	src/boot.asm	/^	get_memory_information:$/;"	l
@@ -3299,7 +3332,7 @@ gray	lsh/lua/lstate.h	/^  GCObject *gray;  \/* list of gray objects *\/$/;"	m	st
 gray2black	lsh/lua/lgc.h	73;"	d
 grayagain	lsh/lua/lstate.h	/^  GCObject *grayagain;  \/* list of objects to be traversed atomically *\/$/;"	m	struct:global_State
 growCI	lsh/lua/ldo.c	/^static CallInfo *growCI (lua_State *L) {$/;"	f	file:
-gs	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon43
+gs	include/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:__anon48
 gs	include/proc.h	/^	unsigned short gs, __gsh;$/;"	m	struct:tss
 gt	lsh/lua/lstate.h	22;"	d
 gval	lsh/lua/ltable.h	15;"	d
@@ -3315,7 +3348,7 @@ handle_luainit	lsh/lua/lua.c	/^static int handle_luainit (lua_State *L) {$/;"	f	
 handle_script	lsh/lua/lua.c	/^static int handle_script (lua_State *L, char **argv, int n) {$/;"	f	file:
 handler	src/include/linux/ide.h	/^	void (*handler)(struct ide_hwif *);$/;"	m	struct:ide_hwif
 hardware	src/include/net/arp.h	/^	u16 hardware;$/;"	m	struct:arphdr
-hash	lsh/lua/lobject.h	/^    unsigned int hash;$/;"	m	struct:TString::__anon61
+hash	lsh/lua/lobject.h	/^    unsigned int hash;$/;"	m	struct:TString::__anon66
 hash	lsh/lua/lstate.h	/^  GCObject **hash;$/;"	m	struct:stringtable
 hash	src/fs/inode.c	/^static int hash(struct super_block *sb, u32 ino){$/;"	f	file:
 hash	src/include/linux/dcache.h	/^	struct list_head hash;$/;"	m	struct:dentry	typeref:struct:dentry::list_head
@@ -3332,20 +3365,20 @@ hasjumps	lsh/lua/lcode.c	27;"	d	file:
 hasmultret	lsh/lua/lparser.c	30;"	d	file:
 hd_out	src/drivers/ide/ide.c	/^void hd_out(int *io_ports, int cmd, int drv, int lba, int count, void *buf){$/;"	f
 head	include/hd.h	/^	u8 head: 4;	\/* always 0 here, why? *\/$/;"	m	struct:select
-head	include/proc.h	/^	int head;$/;"	m	struct:__anon42
+head	include/proc.h	/^	int head;$/;"	m	struct:__anon47
 head	src/include/linux/ide.h	/^	u8 head: 4;	\/* always 0 here, why? *\/$/;"	m	struct:select
 header	src/include/net/icmp.h	/^	struct icmphdr header;$/;"	m	struct:icmpmsg_mask	typeref:struct:icmpmsg_mask::icmphdr
 header	src/include/net/icmp.h	/^	struct icmphdr header;$/;"	m	struct:icmpmsg_tstamp	typeref:struct:icmpmsg_tstamp::icmphdr
 header	src/include/net/icmp.h	/^	struct icmphdr header;$/;"	m	struct:icmpmsg_un	typeref:struct:icmpmsg_un::icmphdr
 header_heapCell	include/heap.h	/^typedef struct header_heapCell{$/;"	s
-header_id	debug/include/stab.h	/^		unsigned char header_id;	\/**the first header(id=0) means .c file*\/$/;"	m	struct:typenumber::__anon51
+header_id	debug/include/stab.h	/^		unsigned char header_id;	\/**the first header(id=0) means .c file*\/$/;"	m	struct:typenumber::__anon56
 header_name	debug/include/stab.h	/^	char* *header_name;$/;"	m	struct:fileobj
 header_num	debug/include/stab.h	/^	int header_num;$/;"	m	struct:fileobj
 heap_init	src/pmm.c	/^void heap_init(void){$/;"	f
 hex_int	src/ku_utils.c	/^int hex_int(char x){$/;"	f
-high	include/hd.h	/^			u8 high;$/;"	m	struct:require::__anon35::__anon36
+high	include/hd.h	/^			u8 high;$/;"	m	struct:require::__anon40::__anon41
 high	include/hd.h	/^	u8 high;$/;"	m	struct:lba
-high	include/hs.h	/^			u8 high;$/;"	m	struct:__anon46::__anon47::__anon48
+high	include/hs.h	/^			u8 high;$/;"	m	struct:__anon51::__anon52::__anon53
 high	src/include/linux/ide.h	/^	u8 high;$/;"	m	struct:lba
 higher_bound	debug/include/stab.h	/^	int higher_bound;$/;"	m	struct:abind
 higher_bound	debug/include/stab.h	/^	int higher_bound;$/;"	m	struct:rbind
@@ -3363,16 +3396,16 @@ hook	lsh/lua/lstate.h	/^  lua_Hook hook;$/;"	m	struct:lua_State
 hookcount	lsh/lua/lstate.h	/^  int hookcount;$/;"	m	struct:lua_State
 hookf	lsh/lua/ldblib.c	/^static void hookf (lua_State *L, lua_Debug *ar) {$/;"	f	file:
 hookmask	lsh/lua/lstate.h	/^  lu_byte hookmask;$/;"	m	struct:lua_State
-houtuizhe_dengdaiqueren	cmd/tcp.cc	/^	 houtuizhe_dengdaiqueren,$/;"	e	enum:__anon30	file:
-houtuizhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 houtuizhe_dengdaiqueren,$/;"	e	enum:__anon29	file:
+houtuizhe_dengdaiqueren	cmd/tcp.cc	/^	 houtuizhe_dengdaiqueren,$/;"	e	enum:__anon35	file:
+houtuizhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 houtuizhe_dengdaiqueren,$/;"	e	enum:__anon34	file:
 hpath	debug/makefile	/^hpath=$(Ih:-I%=%)$/;"	m
 htonl	src/include/linux/byteorder/generic.h	/^static inline u32 htonl(u32 hostlong){$/;"	f
 htons	src/include/linux/byteorder/generic.h	/^static inline u16 htons(u16 hostshort){$/;"	f
 human_memsize	src/ku_utils.c	/^int*human_memsize(int size,int initial_scale_count){$/;"	f
 human_memsize_into	src/ku_utils.c	/^void human_memsize_into(int*gmkb,int size,int initial_scale_count){$/;"	f
 hvalue	lsh/lua/lobject.h	99;"	d
-hw_handler	include/irq.h	/^	hw_irq_controller *hw_handler;	\/**觉得不放在结构体里也行，反正只有1个8259*\/$/;"	m	struct:__anon39
-hw_irq_controller	include/irq.h	/^}hw_irq_controller;$/;"	t	typeref:struct:__anon38
+hw_handler	include/irq.h	/^	hw_irq_controller *hw_handler;	\/**觉得不放在结构体里也行，反正只有1个8259*\/$/;"	m	struct:__anon44
+hw_irq_controller	include/irq.h	/^}hw_irq_controller;$/;"	t	typeref:struct:__anon43
 i20h	src/kernel.asm	/^i20h:$/;"	l
 i21h	src/kernel.asm	/^i21h:$/;"	l
 i22h	src/kernel.asm	/^i22h:$/;"	l
@@ -3399,27 +3432,29 @@ i8259_unmask	src/i8259.c	/^void i8259_unmask(unsigned char IRQline) {$/;"	f
 iABC	lsh/lua/lopcodes.h	/^enum OpMode {iABC, iABx, iAsBx};  \/* basic instruction format *\/$/;"	e	enum:OpMode
 iABx	lsh/lua/lopcodes.h	/^enum OpMode {iABC, iABx, iAsBx};  \/* basic instruction format *\/$/;"	e	enum:OpMode
 iAsBx	lsh/lua/lopcodes.h	/^enum OpMode {iABC, iABx, iAsBx};  \/* basic instruction format *\/$/;"	e	enum:OpMode
-i_atime	include/fs_ext.h	/^	__le32 i_atime; \/\/ 文件上次被访问的时间$/;"	m	struct:__anon33
+i_atime	include/fs_ext.h	/^	__le32 i_atime; \/\/ 文件上次被访问的时间$/;"	m	struct:__anon38
 i_ci	lsh/lua/lua.h	/^  int i_ci;  \/* active function *\/$/;"	m	struct:lua_Debug
-i_ctime	include/fs_ext.h	/^	__le32 i_ctime; \/\/ 文件创建时间$/;"	m	struct:__anon33
-i_dtime	include/fs_ext.h	/^	__le32 i_dtime; \/\/ 文件被删除的时间（如果存在则为0）$/;"	m	struct:__anon33
-i_flags	include/fs_ext.h	/^	__le32 i_flags; \/\/ 此inode访问数据时ext2的实现方式$/;"	m	struct:__anon33
-i_gid	include/fs_ext.h	/^	__le16 i_gid; \/\/ 文件所有组ID的低16位$/;"	m	struct:__anon33
+i_ctime	include/fs_ext.h	/^	__le32 i_ctime; \/\/ 文件创建时间$/;"	m	struct:__anon38
+i_dtime	include/fs_ext.h	/^	__le32 i_dtime; \/\/ 文件被删除的时间（如果存在则为0）$/;"	m	struct:__anon38
+i_flags	include/fs_ext.h	/^	__le32 i_flags; \/\/ 此inode访问数据时ext2的实现方式$/;"	m	struct:__anon38
+i_gid	include/fs_ext.h	/^	__le16 i_gid; \/\/ 文件所有组ID的低16位$/;"	m	struct:__anon38
 i_key	lsh/lua/lobject.h	/^  TKey i_key;$/;"	m	struct:Node
-i_links_count	include/fs_ext.h	/^	__le16 i_links_count; \/\/ 此inode被连接的次数$/;"	m	struct:__anon33
-i_mode	include/fs_ext.h	/^	__le16 i_mode; \/\/ 文件格式和访问权限$/;"	m	struct:__anon33
-i_mtime	include/fs_ext.h	/^	__le32 i_mtime; \/\/ 文件被修改的时间$/;"	m	struct:__anon33
-i_size	include/fs_ext.h	/^	__le32 i_size; \/\/ 文件字节数$/;"	m	struct:__anon33
-i_uid	include/fs_ext.h	/^	__le16 i_uid; \/\/ 文件所有者ID的低16位$/;"	m	struct:__anon33
+i_links_count	include/fs_ext.h	/^	__le16 i_links_count; \/\/ 此inode被连接的次数$/;"	m	struct:__anon38
+i_mode	include/fs_ext.h	/^	__le16 i_mode; \/\/ 文件格式和访问权限$/;"	m	struct:__anon38
+i_mtime	include/fs_ext.h	/^	__le32 i_mtime; \/\/ 文件被修改的时间$/;"	m	struct:__anon38
+i_size	include/fs_ext.h	/^	__le32 i_size; \/\/ 文件字节数$/;"	m	struct:__anon38
+i_uid	include/fs_ext.h	/^	__le16 i_uid; \/\/ 文件所有者ID的低16位$/;"	m	struct:__anon38
 i_val	lsh/lua/lobject.h	/^  TValue i_val;$/;"	m	struct:Node
-icmp_echo	src/net/ipv4/icmp.c	/^void icmp_echo(struct sk_buff *skb){$/;"	f
-icmp_receive	src/net/ipv4/icmp.c	/^void icmp_receive(struct sk_buff *skb){$/;"	f
+icmp_down	src/net/ipv4/icmp.c	/^static void icmp_down(struct sk_buff *skb, u32 dest_ip, u32 src_ip){$/;"	f	file:
+icmp_echo	src/net/ipv4/icmp.c	/^void icmp_echo(u32 dest_ip){$/;"	f
+icmp_echo_down	src/net/ipv4/icmp.c	/^static void icmp_echo_down(struct sk_buff *skb){$/;"	f	file:
+icmp_receive	src/net/ipv4/icmp.c	/^void icmp_receive(struct sk_buff *comer){$/;"	f
 icmphdr	src/include/linux/skbuff.h	/^		struct icmphdr *icmphdr;$/;"	m	union:sk_buff::__anon13	typeref:struct:sk_buff::__anon13::icmphdr
 icmphdr	src/include/net/icmp.h	/^struct icmphdr{$/;"	s
 icmpmsg_mask	src/include/net/icmp.h	/^struct icmpmsg_mask{$/;"	s
 icmpmsg_tstamp	src/include/net/icmp.h	/^struct icmpmsg_tstamp{$/;"	s
 icmpmsg_un	src/include/net/icmp.h	/^struct icmpmsg_un{$/;"	s
-id	src/include/net/icmp.h	/^			u16 id;$/;"	m	struct:icmphdr::__anon23::__anon24
+id	src/include/net/icmp.h	/^			u16 id;$/;"	m	struct:icmphdr::__anon25::__anon26
 id_table	src/include/linux/pci.h	/^	struct pci_device_id *id_table;	\/* the driver use this field to tell kernel the $/;"	m	class:pci_dev::__anon10	typeref:struct:pci_dev::__anon10::pci_device_id
 id_table_matched	src/drivers/pci/pci.c	/^id_table_matched(struct pci_device_id *id_table, struct pci_dev *dev){$/;"	f	file:
 ide_do_request	src/drivers/ide/ide.c	/^static void ide_do_request(u16 dev_id){$/;"	f	file:
@@ -3438,11 +3473,11 @@ idt	src/kernel.asm	/^idt:$/;"	l
 idtPtr	src/kernel.asm	/^idtPtr:$/;"	l
 ifstat	lsh/lua/lparser.c	/^static void ifstat (LexState *ls, int line) {$/;"	f	file:
 iget	src/fs/inode.c	/^struct inode *iget(struct super_block *sb, unsigned ino){$/;"	f
-ignore	src/include/net/icmp.h	/^		u32 ignore;$/;"	m	union:icmphdr::__anon23
+ignore	src/include/net/icmp.h	/^		u32 ignore;$/;"	m	union:icmphdr::__anon25
 ignore	src/include/net/ip.h	/^	u8 ignore;$/;"	m	struct:iphdr
-ill_data	src/include/net/icmp.h	/^		char ill_data[8];$/;"	m	union:icmpmsg_un::__anon25
+ill_data	src/include/net/icmp.h	/^		char ill_data[8];$/;"	m	union:icmpmsg_un::__anon28
 ill_iphdr	src/include/net/icmp.h	/^	struct iphdr ill_iphdr;$/;"	m	struct:icmpmsg_un	typeref:struct:icmpmsg_un::iphdr
-ill_udphdr	src/include/net/icmp.h	/^		struct udphdr ill_udphdr;$/;"	m	union:icmpmsg_un::__anon25	typeref:struct:icmpmsg_un::__anon25::udphdr
+ill_udphdr	src/include/net/icmp.h	/^		struct udphdr ill_udphdr;$/;"	m	union:icmpmsg_un::__anon28	typeref:struct:icmpmsg_un::__anon28::udphdr
 in_byte	src/utils.asm	/^in_byte: ;char in_byte(int port)$/;"	l
 in_dir	src/include/linux/fs.h	/^struct in_dir{$/;"	s
 in_dw	src/utils.asm	/^in_dw: ;u32 in_dw(int port)$/;"	l
@@ -3454,20 +3489,23 @@ incr_top	lsh/lua/ldo.h	22;"	d
 index2adr	lsh/lua/lapi.c	/^static TValue *index2adr (lua_State *L, int idx) {$/;"	f	file:
 index_tn	debug/include/stab.h	/^	typenumber_t index_tn;$/;"	m	struct:abind
 indexupvalue	lsh/lua/lparser.c	/^static int indexupvalue (FuncState *fs, TString *name, expdesc *v) {$/;"	f	file:
-info	lsh/lua/lparser.h	/^    struct { int info, aux; } s;$/;"	m	struct:expdesc::__anon68::__anon69
+info	lsh/lua/lparser.h	/^    struct { int info, aux; } s;$/;"	m	struct:expdesc::__anon73::__anon74
 info	lsh/lua/lparser.h	/^  lu_byte info;$/;"	m	struct:upvaldesc
 info_heap	src/pmm.c	/^void info_heap(void){$/;"	f
+info_nic	src/net/core/dev.c	/^void info_nic(struct net_device *netdev){$/;"	f
 info_regs	src/drivers/net/8139.c	/^void info_regs(struct net_device *netdev){$/;"	f
+info_skb	src/net/core/skbuff.c	/^void info_skb(struct sk_buff *skb){$/;"	f
 info_tailcall	lsh/lua/ldebug.c	/^static void info_tailcall (lua_Debug *ar) {$/;"	f	file:
 info_udpmsg	src/net/ipv4/udp.c	/^static void info_udpmsg(struct udphdr *udphdr){$/;"	f	file:
 info_zone	src/mmzone.c	/^void info_zone(int zone_id){$/;"	f
-init	lsh/lua/lstrlib.c	/^    const char *init;$/;"	m	struct:MatchState::__anon72	file:
+init	lsh/lua/lstrlib.c	/^    const char *init;$/;"	m	struct:MatchState::__anon77	file:
 init8253	src/utils.asm	/^init8253:$/;"	l
 init8259A	src/utils.asm	/^init8259A:$/;"	l
 init_8259A	src/i8259.c	/^void init_8259A(int x){$/;"	f
 init_ISA_irqs	src/i8259.c	/^void init_ISA_irqs(void){$/;"	f
-init_arp_msg	src/net/ipv4/arp.c	/^static void init_arp_msg(struct sk_buff *arpmsg, $/;"	f	file:
+init_arp_msg	src/net/ipv4/arp.c	/^static void init_arp_msg(struct sk_buff *arpmsg,  int operation){$/;"	f	file:
 init_asciis_buffer	src/disp.c	/^void init_asciis_buffer(void){$/;"	f
+init_connect_with_syn	src/net/ipv4/tcp.cc	/^static void init_connect_with_syn(struct connect *connect, struct sk_buff *comer){$/;"	f	file:
 init_display	src/lib/printf.c	/^void init_display(void){$/;"	f
 init_dp	cmd/cell.c	/^static void init_dp(void){$/;"	f	file:
 init_exp	lsh/lua/lparser.c	/^static void init_exp (expdesc *e, expkind k, int i) {$/;"	f	file:
@@ -3482,7 +3520,7 @@ init_time	src/time.c	/^void init_time(void){$/;"	f
 init_vfs	src/fs/super.c	/^void init_vfs(void){$/;"	f
 init_zone	src/mmzone.c	/^void init_zone(void){$/;"	f
 ino	src/include/linux/fs.h	/^	unsigned ino;	$/;"	m	struct:inode
-inode	include/fs_ext.h	/^	int inode;$/;"	m	struct:__anon34
+inode	include/fs_ext.h	/^	int inode;$/;"	m	struct:__anon39
 inode	src/include/linux/dcache.h	/^	struct inode *inode;$/;"	m	struct:dentry	typeref:struct:dentry::inode
 inode	src/include/linux/fs.h	/^struct inode{$/;"	s
 inode_cache	src/include/linux/fs.h	/^struct slab_head *inode_cache;$/;"	v	typeref:struct:slab_head
@@ -3490,6 +3528,7 @@ inode_hashtable	src/include/linux/fs.h	/^struct list_head *inode_hashtable;	$/;"
 inode_operations	src/include/linux/fs.h	/^struct inode_operations{$/;"	s
 input_head	lsh/lsh.c	/^char input_head[64];$/;"	v
 insert_after	src/pmm.c	/^void insert_after(EMPTY_BLOCK*mother,EMPTY_BLOCK*block){$/;"	f
+inside_window	src/net/ipv4/tcp.cc	/^static inline bool inside_window(struct sk_buff *skb, struct recv_wnd *recv_wnd){$/;"	f	file:
 int64_t	debug/include/valType.h	/^typedef long long int64_t;$/;"	t
 int64_t	include/valType.h	/^typedef long long int64_t;$/;"	t
 int_arr_a	lsh/utils.c	/^int int_arr_a(int *arr, int N, int at, int len){$/;"	f
@@ -3518,25 +3557,31 @@ io_type	lsh/lua/liolib.c	/^static int io_type (lua_State *L) {$/;"	f	file:
 io_write	lsh/lua/liolib.c	/^static int io_write (lua_State *L) {$/;"	f	file:
 iolib	lsh/lua/liolib.c	/^static const luaL_Reg iolib[] = {$/;"	v	file:
 ioremap	src/arch/x86/mm/ioremap.c	/^void * ioremap(unsigned phys_addr, int size, unsigned flags){$/;"	f
+ip	src/drivers/net/8139.c	/^	u32 ip;$/;"	m	struct:ipconfig	file:
 ip	src/include/linux/netdevice.h	/^	u32 ip;$/;"	m	struct:net_device
 ip_adopt_one	src/net/ipv4/ip.c	/^static struct sk_buff *ip_adopt_one(struct sk_buff *skb){$/;"	f	file:
 ip_down	src/net/ipv4/ip.c	/^int ip_down(struct sk_buff *skb, u8 me_protocol, $/;"	f
-ip_echo	src/net/ipv4/ip.c	/^int ip_echo(struct sk_buff *skb, u8 me_protocol, u8 ttl){$/;"	f
-ip_fragment	src/net/ipv4/ip.c	/^static struct sk_buff *ip_fragment(struct sk_buff *orgin){$/;"	f	file:
+ip_echo_down	src/net/ipv4/ip.c	/^int ip_echo_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){$/;"	f
+ip_fragment	src/net/ipv4/ip.c	/^static struct sk_buff *ip_fragment(struct sk_buff *origin){$/;"	f	file:
 ip_identifier	src/include/linux/netdevice.h	/^	u32 ip_identifier;$/;"	m	struct:net_device
 ip_layer_init	src/net/ipv4/ip.c	/^void ip_layer_init(void){$/;"	f
 ip_layer_receive	src/net/ipv4/ip.c	/^void ip_layer_receive(struct sk_buff *skb){$/;"	f
 ip_reassemble	src/net/ipv4/ip.c	/^static struct sk_buff * ip_reassemble(struct sk_buff *group_head){$/;"	f	file:
 ip_up	src/net/ipv4/ip.c	/^static void ip_up(struct sk_buff *skb){$/;"	f	file:
 ipairsaux	lsh/lua/lbaselib.c	/^static int ipairsaux (lua_State *L) {$/;"	f	file:
+ipconfig	src/drivers/net/8139.c	/^static struct ipconfig{$/;"	s	file:
+ipconfigs	src/drivers/net/8139.c	/^} ipconfigs[] ={$/;"	v	typeref:struct:ipconfig	file:
 iphash	src/include/net/ip.h	/^static inline unsigned iphash(unsigned ip){$/;"	f
 iphdr	src/include/linux/skbuff.h	/^		struct iphdr *iphdr;$/;"	m	union:sk_buff::__anon12	typeref:struct:sk_buff::__anon12::iphdr
 iphdr	src/include/net/ip.h	/^struct iphdr{$/;"	s
+ipmask	src/drivers/net/8139.c	/^	u32 ipmask;$/;"	m	struct:ipconfig	file:
 ipmask	src/include/linux/netdevice.h	/^	u32 ipmask;$/;"	m	struct:net_device
+ipstr	src/utils.c	/^static char *ipstr = ipstr_buf;$/;"	v	file:
+ipstr_buf	src/utils.c	/^static char ipstr_buf[128];$/;"	v	file:
 iretd	src/proc.asm	/^iretd$/;"	l
 irq	src/include/linux/netdevice.h	/^	char irq;$/;"	m	struct:net_device
 irq_desc	include/irq.h	/^irq_desc_t irq_desc[NR_IRQS];$/;"	v
-irq_desc_t	include/irq.h	/^}irq_desc_t;$/;"	t	typeref:struct:__anon39
+irq_desc_t	include/irq.h	/^}irq_desc_t;$/;"	t	typeref:struct:__anon44
 irqaction	include/irq.h	/^struct irqaction{$/;"	s
 isLfunction	lsh/lua/lobject.h	316;"	d
 isLua	lsh/lua/lstate.h	62;"	d
@@ -3592,6 +3637,7 @@ key2tval	lsh/lua/ltable.h	18;"	d
 kfree	src/pmm.c	/^void kfree(void*pt){$/;"	f
 kfree2	src/mm/slab.c	/^void kfree2(void *obj){$/;"	f
 kfree_pg	include/mm.h	23;"	d
+kind	src/include/net/tcp.h	/^	u8 kind;$/;"	m	struct:tcp_opt
 kmalloc	src/pmm.c	/^void*kmalloc(int byte){$/;"	f
 kmalloc0	src/pmm.c	/^void * kmalloc0(int bytes){$/;"	f
 kmalloc2	src/mm/slab.c	/^void *kmalloc2(unsigned size, unsigned flags){$/;"	f
@@ -3605,13 +3651,14 @@ kmem_cache_test	src/mm/slab.c	/^void kmem_cache_test(void){$/;"	f
 kname	lsh/lua/ldebug.c	/^static const char *kname (Proto *p, int c) {$/;"	f	file:
 kp_sleep	src/schedule.c	/^void kp_sleep(u32 msg_type,u32 msg_bind){$/;"	f
 kthread_sleep	src/schedule.c	/^void kthread_sleep(u32 msg_type, u32 msg_bind){$/;"	f
-l	lsh/lua/lobject.h	/^    } l;$/;"	m	union:UpVal::__anon63	typeref:struct:UpVal::__anon63::__anon64
+l	lsh/lua/lobject.h	/^    } l;$/;"	m	union:UpVal::__anon68	typeref:struct:UpVal::__anon68::__anon69
 l	lsh/lua/lobject.h	/^  LClosure l;$/;"	m	union:Closure
 l	lsh/lua/lstate.c	/^  lua_State l;$/;"	m	struct:LG	file:
 l_G	lsh/lua/lstate.h	/^  global_State *l_G;$/;"	m	struct:lua_State
 l_alloc	lsh/lua/lauxlib.c	/^static void *l_alloc (void *ud, void *ptr, size_t osize, size_t nsize) {$/;"	f	file:
 l_d	lsh/lua/luaconf.h	/^union luai_Cast { double l_d; long l_l; };$/;"	m	union:luai_Cast
 l_gt	lsh/lua/lstate.h	/^  TValue l_gt;  \/* table of globals *\/$/;"	m	struct:lua_State
+l_in_L	src/net/ipv4/tcp.cc	/^static inline int l_in_L(unsigned l_start, int len, unsigned L_start, int LEN){$/;"	f	file:
 l_isfalse	lsh/lua/lobject.h	103;"	d
 l_l	lsh/lua/luaconf.h	/^union luai_Cast { double l_d; long l_l; };$/;"	m	union:luai_Cast
 l_mem	lsh/lua/llimits.h	/^typedef LUAI_MEM l_mem;$/;"	t
@@ -3635,14 +3682,14 @@ later_down	src/net/ipv4/arp.c	/^static struct sk_buff **later_down;$/;"	v	typere
 lauxlib_c	lsh/lua/lauxlib.c	20;"	d	file:
 lauxlib_h	lsh/lua/lauxlib.h	9;"	d
 lba	include/blk.h	/^	unsigned lba;$/;"	m	struct:request
-lba	include/hd.h	/^		u32 lba;$/;"	m	union:require::__anon35
+lba	include/hd.h	/^		u32 lba;$/;"	m	union:require::__anon40
 lba	include/hd.h	/^	u8 lba: 1;	\/* CHS:0 LBA:1*\/$/;"	m	struct:select
 lba	include/hd.h	/^struct lba{$/;"	s
-lba	include/hs.h	/^		u32 lba;$/;"	m	union:__anon46::__anon47
+lba	include/hs.h	/^		u32 lba;$/;"	m	union:__anon51::__anon52
 lba	src/include/linux/ide.h	/^	u8 lba: 1;	\/* CHS:0 LBA:1*\/$/;"	m	struct:select
 lba	src/include/linux/ide.h	/^struct lba{$/;"	s
-lba_stru	include/hd.h	/^		}lba_stru;$/;"	m	union:require::__anon35	typeref:struct:require::__anon35::__anon36
-lba_stru	include/hs.h	/^		}lba_stru;$/;"	m	union:__anon46::__anon47	typeref:struct:__anon46::__anon47::__anon48
+lba_stru	include/hd.h	/^		}lba_stru;$/;"	m	union:require::__anon40	typeref:struct:require::__anon40::__anon41
+lba_stru	include/hs.h	/^		}lba_stru;$/;"	m	union:__anon51::__anon52	typeref:struct:__anon51::__anon52::__anon53
 lbaselib_c	lsh/lua/lbaselib.c	14;"	d	file:
 lcode_c	lsh/lua/lcode.c	10;"	d	file:
 lcode_h	lsh/lua/lcode.h	8;"	d
@@ -3657,14 +3704,17 @@ ldump_c	lsh/lua/ldump.c	9;"	d	file:
 lea	src/proc.asm	/^lea eax,[esp+ebx]$/;"	l
 leaveblock	lsh/lua/lparser.c	/^static void leaveblock (FuncState *fs) {$/;"	f	file:
 leavelevel	lsh/lua/lparser.c	282;"	d	file:
-left	lsh/lua/lparser.c	/^  lu_byte left;  \/* left priority for each binary operator *\/$/;"	m	struct:__anon59	file:
-len	lsh/lua/lobject.h	/^    size_t len;$/;"	m	struct:TString::__anon61
-len	lsh/lua/lobject.h	/^    size_t len;$/;"	m	struct:Udata::__anon62
-len	lsh/lua/lstrlib.c	/^    ptrdiff_t len;$/;"	m	struct:MatchState::__anon72	file:
+left	lsh/lua/lparser.c	/^  lu_byte left;  \/* left priority for each binary operator *\/$/;"	m	struct:__anon64	file:
+left	src/net/ipv4/tcp.cc	/^	u32 left;				\/* left edge *\/$/;"	m	struct:recv_wnd	file:
+left	src/net/ipv4/tcp.cc	/^	u32 left;$/;"	m	struct:send_wnd	file:
+len	lsh/lua/lobject.h	/^    size_t len;$/;"	m	struct:TString::__anon66
+len	lsh/lua/lobject.h	/^    size_t len;$/;"	m	struct:Udata::__anon67
+len	lsh/lua/lstrlib.c	/^    ptrdiff_t len;$/;"	m	struct:MatchState::__anon77	file:
 len	src/include/linux/cell_common.h	/^	int len;$/;"	m	struct:cell_dentry
 len	src/include/linux/dcache.h	/^	int len;$/;"	m	struct:qstr
 len	src/include/net/ip.h	/^	u32 len: 4;						\/* header length *\/$/;"	m	struct:iphdr
-len	src/include/net/tcp.h	/^	int	len:  4;	$/;"	m	struct:tcphdr
+len	src/include/net/tcp.h	/^	int	len:  4;			\/* by unit of 4-bytes *\/$/;"	m	struct:tcphdr
+len	src/include/net/tcp.h	/^	u8 len;$/;"	m	struct:tcp_opt
 len_bounds_check	src/kernel.asm	/^len_bounds_check equ $ - bounds_check$/;"	d
 len_breakPoint	src/kernel.asm	/^len_breakPoint equ $ - breakPoint$/;"	d
 len_copr_error	src/kernel.asm	/^len_copr_error equ $ - copr_error$/;"	d
@@ -3681,11 +3731,11 @@ len_inval_opcode	src/kernel.asm	/^len_inval_opcode equ $ - inval_opcode$/;"	d
 len_inval_tss	src/kernel.asm	/^len_inval_tss equ $ - inval_tss$/;"	d
 len_low	include/mm.h	/^	u32 len_low, len_high;$/;"	m	struct:mem_seginfo
 len_nmi	src/kernel.asm	/^len_nmi equ $ - nmi$/;"	d
-len_of_line	lsh/vi.h	/^	union{int *len_of_line; int *len_of_lines;};$/;"	m	union:vi::__anon76
-len_of_lines	lsh/vi.h	/^	union{int *len_of_line; int *len_of_lines;};$/;"	m	union:vi::__anon76
-len_of_yline	lsh/vi.h	/^	union{int *len_of_yline;int *len_of_ylines;};	$/;"	m	union:vi::__anon79
+len_of_line	lsh/vi.h	/^	union{int *len_of_line; int *len_of_lines;};$/;"	m	union:vi::__anon81
+len_of_lines	lsh/vi.h	/^	union{int *len_of_line; int *len_of_lines;};$/;"	m	union:vi::__anon81
+len_of_yline	lsh/vi.h	/^	union{int *len_of_yline;int *len_of_ylines;};	$/;"	m	union:vi::__anon84
 len_of_yline_fix	lsh/vi.h	/^	int *len_of_yline_fix;$/;"	m	struct:vi
-len_of_ylines	lsh/vi.h	/^	union{int *len_of_yline;int *len_of_ylines;};	$/;"	m	union:vi::__anon79
+len_of_ylines	lsh/vi.h	/^	union{int *len_of_yline;int *len_of_ylines;};	$/;"	m	union:vi::__anon84
 len_overflow	src/kernel.asm	/^len_overflow equ $ - overflow$/;"	d
 len_page_fault	src/kernel.asm	/^len_page_fault equ  $ - page_fault$/;"	d
 len_segment_not_present	src/kernel.asm	/^len_segment_not_present equ $ - segment_not_present$/;"	d
@@ -3705,13 +3755,13 @@ lgc_h	lsh/lua/lgc.h	8;"	d
 lgdt	src/boot.asm	/^lgdt [gdtPtr]$/;"	l
 lgdt	src/kernel.asm	/^lgdt [gdtPtr]   ; switch gdt,selector for ds prepared during boot.bin$/;"	l
 lianjiebiao	cmd/tcp.cc	/^static connect *lianjiebiao;$/;"	v	file:
-lianjiebiao	src/net/ipv4/tcp.cc	/^static struct connect *lianjiebiao;$/;"	v	typeref:struct:connect	file:
+lianjiebiao	src/net/ipv4/tcp.cc	/^static struct connect **lianjiebiao;$/;"	v	typeref:struct:connect	file:
 lianjiebiaochang	cmd/tcp.cc	30;"	d	file:
-lianjiebiaochang	src/net/ipv4/tcp.cc	31;"	d	file:
-lianjiebucunzai	cmd/tcp.cc	/^	 lianjiebucunzai,$/;"	e	enum:__anon30	file:
-lianjiebucunzai	src/net/ipv4/tcp.cc	/^	 lianjiebucunzai,$/;"	e	enum:__anon29	file:
-lianjieyijianli	cmd/tcp.cc	/^	 lianjieyijianli,$/;"	e	enum:__anon30	file:
-lianjieyijianli	src/net/ipv4/tcp.cc	/^	 lianjieyijianli,$/;"	e	enum:__anon29	file:
+lianjiebiaochang	src/net/ipv4/tcp.cc	123;"	d	file:
+lianjiebucunzai	cmd/tcp.cc	/^	 lianjiebucunzai,$/;"	e	enum:__anon35	file:
+lianjiebucunzai	src/net/ipv4/tcp.cc	/^	 lianjiebucunzai,$/;"	e	enum:__anon34	file:
+lianjieyijianli	cmd/tcp.cc	/^	 lianjieyijianli,$/;"	e	enum:__anon35	file:
+lianjieyijianli	src/net/ipv4/tcp.cc	/^	 lianjieyijianli,$/;"	e	enum:__anon34	file:
 libo	debug/makefile	/^libo=\/home\/wws\/src\/.*.oo$/;"	m
 libsize	lsh/lua/lauxlib.c	/^static int libsize (const luaL_Reg *l) {$/;"	f	file:
 lidt	src/kernel.asm	/^lidt [idtPtr]$/;"	l
@@ -3739,6 +3789,7 @@ list_expire	include/schedule.h	/^struct pcb *list_expire;$/;"	v	typeref:struct:p
 list_head	include/list.h	/^typedef struct list_head{$/;"	s
 list_head_t	include/list.h	/^}list_head_t;$/;"	t	typeref:struct:list_head
 list_meet_tail	include/list.h	/^static inline int list_meet_tail(list_head_t *first, list_head_t *entry){$/;"	f
+list_nic	src/net/core/dev.c	/^void list_nic(void){$/;"	f
 list_sleep	src/schedule.c	/^static struct pcb *list_sleep;$/;"	v	typeref:struct:pcb	file:
 listfield	lsh/lua/lparser.c	/^static void listfield (LexState *ls, struct ConsControl *cc) {$/;"	f	file:
 listing	lsh/lua/luac.c	/^static int listing=0;			\/* list bytecodes? *\/$/;"	v	file:
@@ -3791,13 +3842,13 @@ loop	src/boot.asm	/^loop search_ph_typeLoaded$/;"	l
 lopcodes_c	lsh/lua/lopcodes.c	7;"	d	file:
 lopcodes_h	lsh/lua/lopcodes.h	8;"	d
 loslib_c	lsh/lua/loslib.c	14;"	d	file:
-low	include/hd.h	/^			u8 low;$/;"	m	struct:require::__anon35::__anon36
+low	include/hd.h	/^			u8 low;$/;"	m	struct:require::__anon40::__anon41
 low	include/hd.h	/^	u8 low;$/;"	m	struct:lba
-low	include/hs.h	/^			u8 low;$/;"	m	struct:__anon46::__anon47::__anon48
+low	include/hs.h	/^			u8 low;$/;"	m	struct:__anon51::__anon52::__anon53
 low	src/include/linux/ide.h	/^	u8 low;$/;"	m	struct:lba
 lower_bound	debug/include/stab.h	/^	int lower_bound;$/;"	m	struct:abind
 lower_bound	debug/include/stab.h	/^	int lower_bound;$/;"	m	struct:rbind
-lowest_bit	debug/include/stab.h	/^		unsigned lowest_bit:1;$/;"	m	struct:typenumber::__anon51
+lowest_bit	debug/include/stab.h	/^		unsigned lowest_bit:1;$/;"	m	struct:typenumber::__anon56
 lparser_c	lsh/lua/lparser.c	10;"	d	file:
 lparser_h	lsh/lua/lparser.h	8;"	d
 lru	include/mm.h	/^	struct list_head lru;$/;"	m	struct:page	typeref:struct:page::list_head
@@ -4287,8 +4338,9 @@ lzio_h	lsh/lua/lzio.h	9;"	d
 m	debug/kernel/t.h	/^	}m;$/;"	m	struct:foo	typeref:struct:foo::outside
 m1	debug/kernel/t.h	/^	}m1;$/;"	m	struct:foo	typeref:struct:foo::outside1
 m_regs	lsh/vi.h	/^	struct mark_register *m_regs;$/;"	m	struct:vi	typeref:struct:vi::mark_register
-mac	src/include/linux/netdevice.h	/^	u8 mac[6];$/;"	m	struct:net_device
-magic	include/proc.h	/^			u32 magic;		\/*for debug*\/$/;"	m	struct:pcb::__anon44::__anon45
+mac	src/drivers/net/8139.c	/^	u8 mac[7];$/;"	m	struct:ipconfig	file:
+mac	src/include/linux/netdevice.h	/^	u8 mac[7];$/;"	m	struct:net_device
+magic	include/proc.h	/^			u32 magic;		\/*for debug*\/$/;"	m	struct:pcb::__anon49::__anon50
 magic_color	cmd/_dimg.c	/^void magic_color(void){$/;"	f
 main	cmd/_dimg.c	/^int main(int argc, char *argv[]){$/;"	f
 main	cmd/cell.c	/^int main(int argc, char *argv[]){$/;"	f
@@ -4365,35 +4417,38 @@ mathlib	lsh/lua/lmathlib.c	/^static const luaL_Reg mathlib[] = {$/;"	v	file:
 max	src/include/asm/resource.h	/^	unsigned max;	\/* hard limit *\/$/;"	m	struct:rlimit
 max_expand	lsh/lua/lstrlib.c	/^static const char *max_expand (MatchState *ms, const char *s,$/;"	f	file:
 max_fds	include/proc.h	/^	int max_fds;$/;"	m	struct:files_struct
+max_seg_size	src/net/ipv4/tcp.cc	/^	u16 max_seg_size;	\/\/xieshanghoudeMSS$/;"	m	struct:connect	file:
 maxn	lsh/lua/ltablib.c	/^static int maxn (lua_State *L) {$/;"	f	file:
 maxstacksize	lsh/lua/lobject.h	/^  lu_byte maxstacksize;$/;"	m	struct:Proto
 mbrHead	src/boot.asm	/^mbrHead:$/;"	l
 mbr_extend	src/boot.asm	/^mbr_extend:		;sector 2,3,4 => 0x7d00,0x7e00,0x7f00$/;"	l
 mbrbuf	cmd/cell.c	/^char mbrbuf[1024];	\/*512 is not enough, we collect all ebr and put after gdp*\/$/;"	v
 mdelay	include/utils.h	/^static inline void mdelay(int ms){$/;"	f
-me_offset	src/include/net/ip.h	/^			u16 me_offset: 13;				\/* the offset of this IP fragment *\/$/;"	m	struct:iphdr::__anon21::__anon22
+me_offset	src/include/net/ip.h	/^			u16 me_offset: 13;				\/* the offset of this IP fragment *\/$/;"	m	struct:iphdr::__anon23::__anon24
 mem_entity	include/ku_utils.h	/^char mem_entity[4];$/;"	v
 mem_map	include/mm.h	/^struct page *mem_map;$/;"	v	typeref:struct:page
-mem_seginfo	include/bootinfo.h	/^		struct mem_seginfo mem_seginfo[10];$/;"	m	union:realmod_info_struct::__anon41	typeref:struct:realmod_info_struct::__anon41::mem_seginfo
+mem_seginfo	include/bootinfo.h	/^		struct mem_seginfo mem_seginfo[10];$/;"	m	union:realmod_info_struct::__anon46	typeref:struct:realmod_info_struct::__anon46::mem_seginfo
 mem_seginfo	include/mm.h	/^struct mem_seginfo{$/;"	s
 mem_seginfo_arr	src/bootinfo.asm	/^mem_seginfo_arr equ  realmod_info + realmod_info_stru.mem_seginfo_arr$/;"	d
 mem_segnum	include/bootinfo.h	/^	unsigned mem_segnum;$/;"	m	struct:realmod_info_struct
 mem_segnum	src/bootinfo.asm	/^mem_segnum  equ realmod_info + realmod_info_stru.mem_segnum$/;"	d
+memcmp	src/utils.c	/^int memcmp(void *_s1, void *_s2, int len){$/;"	f
 memcp	src/ku_utils.c	/^void memcp(char*dest,char*src,int byte){$/;"	f
 memcpy	src/utils.c	/^void memcpy(void* dest,void *src,int bytes){$/;"	f
 memset	src/ku_utils.c	/^void memset(void*dest,unsigned value,unsigned n){$/;"	f
 memsetw	src/ku_utils.c	/^void memsetw(u16*dest,int word,u16 value){$/;"	f
 memtest	src/utils.c	/^void memtest(void *start, int len){$/;"	f
-metatable	lsh/lua/lobject.h	/^    struct Table *metatable;$/;"	m	struct:Udata::__anon62	typeref:struct:Udata::__anon62::Table
+metatable	lsh/lua/lobject.h	/^    struct Table *metatable;$/;"	m	struct:Udata::__anon67	typeref:struct:Udata::__anon67::Table
 metatable	lsh/lua/lobject.h	/^  struct Table *metatable;$/;"	m	struct:Table	typeref:struct:Table::Table
 mft_head	include/ntfs.h	/^} mft_head;$/;"	t	typeref:struct:tag_MFTHEAD
-mid	include/hd.h	/^			u8 mid;$/;"	m	struct:require::__anon35::__anon36
-mid	include/hs.h	/^			u8 mid;$/;"	m	struct:__anon46::__anon47::__anon48
+mid	include/hd.h	/^			u8 mid;$/;"	m	struct:require::__anon40::__anon41
+mid	include/hs.h	/^			u8 mid;$/;"	m	struct:__anon51::__anon52::__anon53
 middle	include/hd.h	/^	u8 middle;$/;"	m	struct:lba
 middle	src/include/linux/ide.h	/^	u8 middle;$/;"	m	struct:lba
 min	include/ku_utils.h	4;"	d
 min_expand	lsh/lua/lstrlib.c	/^static const char *min_expand (MatchState *ms, const char *s,$/;"	f	file:
 mix2lua	lsh/lsh.c	/^int mix2lua(char *mixbuf, char *luabuf){$/;"	f
+mk_ipstr	src/utils.c	/^char * mk_ipstr(u32 ip){$/;"	f
 mk_piece	cmd/draw.lua	/^local function mk_piece(len, head, padden)$/;"	f
 mkfuncname	lsh/lua/loadlib.c	/^static const char *mkfuncname (lua_State *L, const char *modname) {$/;"	f	file:
 mktime	src/include/linux/cell_common.h	/^	unsigned mktime;$/;"	m	struct:cell
@@ -4454,13 +4509,14 @@ mov	src/proc.asm	/^mov al,20h$/;"	l
 mov	src/proc.asm	/^mov dword [tss+tss_esp0_offset],eax;register pcb.stackframe.bottom in tss.esp0$/;"	l
 mov	src/proc.asm	/^mov ebx,[size_stackframe]  $/;"	l
 mov	src/proc.asm	/^mov esp,[esp+4];point esp to addr_pcb,and reset kernel stack$/;"	l
-msg_bind	include/proc.h	/^			u32 msg_type,msg_bind;$/;"	m	struct:pcb::__anon44::__anon45
-msg_type	include/proc.h	/^			u32 msg_type,msg_bind;$/;"	m	struct:pcb::__anon44::__anon45
+msg_bind	include/proc.h	/^			u32 msg_type,msg_bind;$/;"	m	struct:pcb::__anon49::__anon50
+msg_type	include/proc.h	/^			u32 msg_type,msg_bind;$/;"	m	struct:pcb::__anon49::__anon50
 msgid	src/include/net/ip.h	/^	u16 msgid;						\/* IP datagram identification *\/$/;"	m	struct:iphdr
 mt	lsh/lua/lstate.h	/^  struct Table *mt[NUM_TAGS];  \/* metatables for basic types *\/$/;"	m	struct:global_State	typeref:struct:global_State::Table
 my_timerlist	src/kernel/timer.c	/^static struct list_head my_timerlist;$/;"	v	typeref:struct:list_head	file:
 my_timerlist_dida	src/kernel/timer.c	/^void my_timerlist_dida(void){$/;"	f
 myip	cmd/tcp.cc	/^	u32 myip;$/;"	m	struct:connect	file:
+myip	src/include/linux/skbuff.h	/^	u32 myip;$/;"	m	struct:pseudo_hdr
 myip	src/include/net/arp.h	/^	u32 myip;$/;"	m	struct:arphdr
 myip	src/include/net/ip.h	/^	u32 myip;$/;"	m	struct:iphdr
 myip	src/net/ipv4/tcp.cc	/^	u32 myip;$/;"	m	struct:connect	file:
@@ -4470,35 +4526,36 @@ myport	cmd/tcp.cc	/^	u16 myport;$/;"	m	struct:connect	file:
 myport	src/include/net/tcp.h	/^	u16 myport;$/;"	m	struct:tcphdr
 myport	src/include/net/udp.h	/^	u16 myport;	$/;"	m	struct:udphdr
 myport	src/net/ipv4/tcp.cc	/^	u16 myport;$/;"	m	struct:connect	file:
-n	lsh/lua/lobject.h	/^  lua_Number n;$/;"	m	union:__anon60
+n	lsh/lua/lobject.h	/^  lua_Number n;$/;"	m	union:__anon65
 n	lsh/lua/lzio.h	/^  size_t n;			\/* bytes still unread *\/$/;"	m	struct:Zio
 n	lsh/lua/lzio.h	/^  size_t n;$/;"	m	struct:Mbuffer
 nCcalls	lsh/lua/lstate.h	/^  unsigned short nCcalls;  \/* number of nested C calls *\/$/;"	m	struct:lua_State
 na	lsh/lua/lparser.c	/^  int na;  \/* total number of array elements *\/$/;"	m	struct:ConsControl	file:
 nactvar	lsh/lua/lparser.c	/^  lu_byte nactvar;  \/* # active locals outside the breakable structure *\/$/;"	m	struct:BlockCnt	file:
 nactvar	lsh/lua/lparser.h	/^  lu_byte nactvar;  \/* number of active local variables *\/$/;"	m	struct:FuncState
-name	debug/include/stab.h	/^	char *name;$/;"	m	struct:__anon54
+name	debug/include/stab.h	/^	char *name;$/;"	m	struct:__anon59
 name	debug/include/stab.h	/^	char *name;$/;"	m	struct:ebind
 name	debug/include/stab.h	/^	char *name;$/;"	m	struct:subind
 name	debug/include/stab.h	/^	char *name;$/;"	m	struct:typeobj
-name	include/fs_ext.h	/^	char name[128];$/;"	m	struct:__anon34
+name	include/fs_ext.h	/^	char name[128];$/;"	m	struct:__anon39
 name	lsh/lua/lauxlib.h	/^  const char *name;$/;"	m	struct:luaL_Reg
 name	lsh/lua/ldo.c	/^  const char *name;$/;"	m	struct:SParser	file:
 name	lsh/lua/lua.h	/^  const char *name;	\/* (n) *\/$/;"	m	struct:lua_Debug
-name	lsh/lua/lundump.c	/^ const char* name;$/;"	m	struct:__anon57	file:
+name	lsh/lua/lundump.c	/^ const char* name;$/;"	m	struct:__anon62	file:
 name	src/include/linux/cell_common.h	/^	char name[0];$/;"	m	struct:cell_dentry
 name	src/include/linux/dcache.h	/^	const char *name;		\/*TODO intialized with memcpy when do d_alloc *\/$/;"	m	struct:qstr
 name	src/include/linux/dcache.h	/^	struct qstr name;		\/* partial name *\/$/;"	m	struct:dentry	typeref:struct:dentry::qstr
 name	src/include/linux/fs.h	/^	char name[16];$/;"	m	struct:file_system_type
 name	src/include/linux/pci.h	/^	char *name;$/;"	m	class:pci_dev::__anon10
 name	src/mm/slab.c	/^	const char *name;$/;"	m	struct:slab_head	file:
-name_len	include/fs_ext.h	/^	u8 name_len;$/;"	m	struct:__anon34
+name_len	include/fs_ext.h	/^	u8 name_len;$/;"	m	struct:__anon39
 namewhat	lsh/lua/lua.h	/^  const char *namewhat;	\/* (n) `global', `local', `field', `method' *\/$/;"	m	struct:lua_Debug
 ncc	src/drivers/net/8139.c	/^			int ncc: 4;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
-need_resched	include/proc.h	/^			int need_resched;$/;"	m	struct:pcb::__anon44::__anon45
+need_resched	include/proc.h	/^			int need_resched;$/;"	m	struct:pcb::__anon49::__anon50
 need_value	lsh/lua/lcode.c	/^static int need_value (FuncState *fs, int list) {$/;"	f	file:
 net_device	src/include/linux/netdevice.h	/^struct net_device{$/;"	s
 net_init	src/net/core/dev.c	/^void net_init(void){$/;"	f
+netdev	src/net/ipv4/tcp.cc	/^	struct net_device *netdev;	\/\/XXX init it$/;"	m	struct:connect	typeref:struct:connect::net_device	file:
 new	lsh/init.lua	/^function new(...)$/;"	f
 new_localvar	lsh/lua/lparser.c	/^static void new_localvar (LexState *ls, TString *name, int n) {$/;"	f	file:
 new_localvarliteral	lsh/lua/lparser.c	156;"	d	file:
@@ -4512,23 +4569,22 @@ next	debug/kernel/t.c	/^	struct c_stru next;$/;"	m	struct:arrstru	typeref:struct
 next	include/irq.h	/^	struct irqaction *next;$/;"	m	struct:irqaction	typeref:struct:irqaction::irqaction
 next	include/list.h	/^	struct list_head *next;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
 next	include/pmm.h	/^	struct empty_blockk*next;$/;"	m	struct:empty_blockk	typeref:struct:empty_blockk::empty_blockk
-next	include/proc.h	/^			struct pcb *next;$/;"	m	struct:pcb::__anon44::__anon45	typeref:struct:pcb::__anon44::__anon45::pcb
+next	include/proc.h	/^			struct pcb *next;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::pcb
 next	lsh/lua/llex.c	28;"	d	file:
-next	lsh/lua/lobject.h	/^      struct UpVal *next;$/;"	m	struct:UpVal::__anon63::__anon64	typeref:struct:UpVal::__anon63::__anon64::UpVal
-next	lsh/lua/lobject.h	/^    struct Node *next;  \/* for chaining *\/$/;"	m	struct:TKey::__anon65	typeref:struct:TKey::__anon65::Node
+next	lsh/lua/lobject.h	/^      struct UpVal *next;$/;"	m	struct:UpVal::__anon68::__anon69	typeref:struct:UpVal::__anon68::__anon69::UpVal
+next	lsh/lua/lobject.h	/^    struct Node *next;  \/* for chaining *\/$/;"	m	struct:TKey::__anon70	typeref:struct:TKey::__anon70::Node
 next	src/include/linux/fs.h	/^	struct file_system_type *next, *prev;$/;"	m	struct:file_system_type	typeref:struct:file_system_type::file_system_type
 next	src/include/linux/skbuff.h	/^	struct sk_buff *next, *prev;$/;"	m	struct:sk_buff	typeref:struct:sk_buff::sk_buff
 next	src/net/ipv4/arp.c	/^	struct arp_record *prev, *next;$/;"	m	struct:arp_record	typeref:struct:arp_record::	file:
+next	src/net/ipv4/tcp.cc	/^	struct connect *next;$/;"	m	struct:connect	typeref:struct:connect::connect	file:
 next_ack	cmd/tcp.cc	/^	u32 next_ack;$/;"	m	struct:connect	file:
-next_ack	src/net/ipv4/tcp.cc	/^	u32 next_ack;$/;"	m	struct:connect	file:
 next_seq	cmd/tcp.cc	/^	u32 next_seq;$/;"	m	struct:connect	file:
-next_seq	src/net/ipv4/tcp.cc	/^	u32 next_seq;$/;"	m	struct:connect	file:
 ngcotouv	lsh/lua/lstate.h	157;"	d
 nh	lsh/lua/lparser.c	/^  int nh;  \/* total number of `record' elements *\/$/;"	m	struct:ConsControl	file:
 nic_wake_queue	src/net/core/dev.c	/^void nic_wake_queue(struct net_device *netdev){$/;"	f
 nice_ascii_serial	lsh/utils.c	/^char *nice_ascii_serial(char *str, char replacer){$/;"	f
 nilK	lsh/lua/lcode.c	/^static int nilK (FuncState *fs) {$/;"	f	file:
-nk	lsh/lua/lobject.h	/^  } nk;$/;"	m	union:TKey	typeref:struct:TKey::__anon65
+nk	lsh/lua/lobject.h	/^  } nk;$/;"	m	union:TKey	typeref:struct:TKey::__anon70
 nk	lsh/lua/lparser.h	/^  int nk;  \/* number of elements in `k' *\/$/;"	m	struct:FuncState
 nlocvars	lsh/lua/lparser.h	/^  short nlocvars;  \/* number of elements in `locvars' *\/$/;"	m	struct:FuncState
 nmi	src/kernel.asm	/^nmi:$/;"	l
@@ -4544,7 +4600,7 @@ nresults	lsh/lua/lstate.h	/^  int nresults;  \/* expected number of results from
 ntfs_header	include/ntfs.h	/^} ntfs_header, *pntfs_header;$/;"	t	typeref:struct:tag_NTFS_header
 ntohl	src/include/linux/byteorder/generic.h	20;"	d
 ntohs	src/include/linux/byteorder/generic.h	19;"	d
-num	include/proc.h	/^	int num;$/;"	m	struct:__anon42
+num	include/proc.h	/^	int num;$/;"	m	struct:__anon47
 numints	lsh/lua/ltable.c	69;"	d	file:
 numparams	lsh/lua/lobject.h	/^  lu_byte numparams;$/;"	m	struct:Proto
 numusearray	lsh/lua/ltable.c	/^static int numusearray (const Table *t, int *nums) {$/;"	f	file:
@@ -4552,7 +4608,7 @@ numusehash	lsh/lua/ltable.c	/^static int numusehash (const Table *t, int *nums, 
 nups	lsh/lua/lobject.h	/^  lu_byte nups;  \/* number of upvalues *\/$/;"	m	struct:Proto
 nups	lsh/lua/lua.h	/^  int nups;		\/* (u) number of upvalues *\/$/;"	m	struct:lua_Debug
 nuse	lsh/lua/lstate.h	/^  lu_int32 nuse;  \/* number of elements *\/$/;"	m	struct:stringtable
-nval	lsh/lua/lparser.h	/^    lua_Number nval;$/;"	m	union:expdesc::__anon68
+nval	lsh/lua/lparser.h	/^    lua_Number nval;$/;"	m	union:expdesc::__anon73
 nvalue	lsh/lua/lobject.h	93;"	d
 o1a	debug/kernel/t.h	/^		int o1a;$/;"	m	struct:foo::outside1
 o1b	debug/kernel/t.h	/^		char o1b;$/;"	m	struct:foo::outside1
@@ -4594,6 +4650,7 @@ opmode	lsh/lua/lopcodes.c	59;"	d	file:
 oprintf	src/disp.c	/^void oprintf(char*format,...){$/;"	f
 oprintf	src/lib/printf.c	/^int oprintf(char *format, ...){$/;"	f
 ops	lsh/vi.h	/^	char *ops;	\/*op serial buffer for normal operation*\/$/;"	m	struct:vi
+opt_area	src/include/net/tcp.h	/^	struct tcp_opt opt_area[0];$/;"	m	struct:tcphdr	typeref:struct:tcphdr::tcp_opt
 options	lsh/makefile	/^options=-std=c99 -g -Wall -Wno-char-subscripts -Wno-unused-function  -funsigned-char$/;"	m
 or	src/boot.asm	/^or eax,0x80000000$/;"	l
 org	src/boot.asm	/^org 0x7c00$/;"	l
@@ -4604,7 +4661,7 @@ os_difftime	lsh/lua/loslib.c	/^static int os_difftime (lua_State *L) {$/;"	f	fil
 os_execute	lsh/lua/loslib.c	/^static int os_execute (lua_State *L) {$/;"	f	file:
 os_exit	lsh/lua/loslib.c	/^static int os_exit (lua_State *L) {$/;"	f	file:
 os_getenv	lsh/lua/loslib.c	/^static int os_getenv (lua_State *L) {$/;"	f	file:
-os_information	include/fs_ext.h	/^	int os_information;$/;"	m	struct:__anon33
+os_information	include/fs_ext.h	/^	int os_information;$/;"	m	struct:__anon38
 os_pushresult	lsh/lua/loslib.c	/^static int os_pushresult (lua_State *L, int i, const char *filename) {$/;"	f	file:
 os_remove	lsh/lua/loslib.c	/^static int os_remove (lua_State *L) {$/;"	f	file:
 os_rename	lsh/lua/loslib.c	/^static int os_rename (lua_State *L) {$/;"	f	file:
@@ -4622,31 +4679,31 @@ overflow	src/kernel.asm	/^overflow:$/;"	l
 p	lsh/lua/lauxlib.h	/^  char *p;			\/* current position in buffer *\/$/;"	m	struct:luaL_Buffer
 p	lsh/lua/lobject.h	/^  struct Proto **p;  \/* functions defined inside the function *\/$/;"	m	struct:Proto	typeref:struct:Proto::Proto
 p	lsh/lua/lobject.h	/^  struct Proto *p;$/;"	m	struct:LClosure	typeref:struct:LClosure::Proto
-p	lsh/lua/lobject.h	/^  void *p;$/;"	m	union:__anon60
+p	lsh/lua/lobject.h	/^  void *p;$/;"	m	union:__anon65
 p	lsh/lua/lstate.h	/^  struct Proto p;$/;"	m	union:GCObject	typeref:struct:GCObject::Proto
 p	lsh/lua/lzio.h	/^  const char *p;		\/* current position in buffer *\/$/;"	m	struct:Zio
-p_align	include/elf.h	/^  Elf32_Word	p_align;		\/* Segment alignment *\/$/;"	m	struct:__anon50
+p_align	include/elf.h	/^  Elf32_Word	p_align;		\/* Segment alignment *\/$/;"	m	struct:__anon55
 p_count	cmd/cell.c	/^int p_count;		\/* current partation's sector count *\/$/;"	v
 p_ext_id	cmd/cell.c	/^int p_ext_id;		\/* extened partation id *\/$/;"	v
-p_filesz	include/elf.h	/^  Elf32_Word	p_filesz;		\/* Segment size in file *\/$/;"	m	struct:__anon50
-p_flags	include/elf.h	/^  Elf32_Word	p_flags;		\/* Segment flags *\/$/;"	m	struct:__anon50
+p_filesz	include/elf.h	/^  Elf32_Word	p_filesz;		\/* Segment size in file *\/$/;"	m	struct:__anon55
+p_flags	include/elf.h	/^  Elf32_Word	p_flags;		\/* Segment flags *\/$/;"	m	struct:__anon55
 p_id	cmd/cell.c	/^int p_id;			\/*current partation id, start from 0*\/$/;"	v
-p_memsz	include/elf.h	/^  Elf32_Word	p_memsz;		\/* Segment size in memory *\/$/;"	m	struct:__anon50
-p_name	include/proc.h	/^			char *p_name;$/;"	m	struct:pcb::__anon44::__anon45
-p_offset	include/elf.h	/^  Elf32_Off	p_offset;		\/* Segment file offset *\/$/;"	m	struct:__anon50
-p_paddr	include/elf.h	/^  Elf32_Addr	p_paddr;		\/* Segment physical address *\/$/;"	m	struct:__anon50
+p_memsz	include/elf.h	/^  Elf32_Word	p_memsz;		\/* Segment size in memory *\/$/;"	m	struct:__anon55
+p_name	include/proc.h	/^			char *p_name;$/;"	m	struct:pcb::__anon49::__anon50
+p_offset	include/elf.h	/^  Elf32_Off	p_offset;		\/* Segment file offset *\/$/;"	m	struct:__anon55
+p_paddr	include/elf.h	/^  Elf32_Addr	p_paddr;		\/* Segment physical address *\/$/;"	m	struct:__anon55
 p_start	cmd/cell.c	/^int p_start;		\/* current partation start sector id*\/$/;"	v
-p_type	include/elf.h	/^  Elf32_Word	p_type;			\/* Segment type *\/$/;"	m	struct:__anon50
-p_vaddr	include/elf.h	/^  Elf32_Addr	p_vaddr;		\/* Segment virtual address *\/$/;"	m	struct:__anon50
+p_type	include/elf.h	/^  Elf32_Word	p_type;			\/* Segment type *\/$/;"	m	struct:__anon55
+p_vaddr	include/elf.h	/^  Elf32_Addr	p_vaddr;		\/* Segment virtual address *\/$/;"	m	struct:__anon55
 pa_idx	include/page.h	6;"	d
 pa_of_zone	src/mmzone.c	/^static unsigned pa_of_zone[3] = {ZONE_DMA_PA, ZONE_NORMAL_PA, ZONE_HIGHMEM_PA};$/;"	v	file:
 pa_pg	include/page.h	7;"	d
-padden	include/hd.h	/^			u8 padden;$/;"	m	struct:require::__anon35::__anon36
-padden	include/hs.h	/^			u8 padden;$/;"	m	struct:__anon46::__anon47::__anon48
+padden	include/hd.h	/^			u8 padden;$/;"	m	struct:require::__anon40::__anon41
+padden	include/hs.h	/^			u8 padden;$/;"	m	struct:__anon51::__anon52::__anon53
 padden	include/mm.h	/^	int padden:28;$/;"	m	struct:page
-padden	include/proc.h	/^		char padden[PCB_SIZE-sizeof(stack_frame)];$/;"	m	union:pcb::__anon44
-padden1	include/fs_ext.h	/^	int padden1[128\/4-25];\/\/ERR for right struct$/;"	m	struct:__anon33
-padding	include/bootinfo.h	/^		char padding[256];$/;"	m	union:realmod_info_struct::__anon41
+padden	include/proc.h	/^		char padden[PCB_SIZE-sizeof(stack_frame)];$/;"	m	union:pcb::__anon49
+padden1	include/fs_ext.h	/^	int padden1[128\/4-25];\/\/ERR for right struct$/;"	m	struct:__anon38
+padding	include/bootinfo.h	/^		char padding[256];$/;"	m	union:realmod_info_struct::__anon46
 paddr_len	src/include/net/arp.h	/^	u8 paddr_len;$/;"	m	struct:arphdr
 page	include/mm.h	/^typedef struct page{$/;"	s
 page_fault	src/kernel.asm	/^page_fault:$/;"	l
@@ -4666,6 +4723,7 @@ partition	src/include/linux/blkdev.h	/^struct partition{$/;"	s
 patchlistaux	lsh/lua/lcode.c	/^static void patchlistaux (FuncState *fs, int list, int vtarget, int reg,$/;"	f	file:
 patchtestreg	lsh/lua/lcode.c	/^static int patchtestreg (FuncState *fs, int node, int reg) {$/;"	f	file:
 pathwalk	src/fs/namei.c	/^int pathwalk(char *path, struct in_dir *indir, int flags){$/;"	f
+payload_len	src/include/linux/skbuff.h	/^	u16 payload_len;$/;"	m	struct:pseudo_hdr
 pc	lsh/lua/lparser.h	/^  int pc;  \/* next position to code (equivalent to `ncode') *\/$/;"	m	struct:FuncState
 pcRel	lsh/lua/ldebug.h	14;"	d
 pcb	include/proc.h	/^struct pcb{$/;"	s
@@ -4700,11 +4758,12 @@ pdb_not_inited	debug/pdb.c	/^static bool pdb_not_inited = true;$/;"	v	file:
 pfn_page	include/mm.h	14;"	d
 pgerr_count	src/mm.c	/^static int pgerr_count;$/;"	v	file:
 pheader	src/elf.c	/^static Elf32_Phdr *pheader;$/;"	v	file:
+pianweixuhao	src/net/ipv4/tcp.cc	18;"	d	file:
 pic_get_irr	src/i8259.c	/^u16 pic_get_irr(void)$/;"	f
 pic_get_isr	src/i8259.c	/^u16 pic_get_isr(void)$/;"	f
-pick_nic	src/net/core/dev.c	/^struct net_device *pick_nic(void){$/;"	f
+pick_nic	src/net/core/dev.c	/^struct net_device *pick_nic(u32 dest_ip, u32 src_ip){$/;"	f
 pid	include/ku_mm.h	/^	unsigned pid;$/;"	m	struct:usr_psp_struct
-pid	include/proc.h	/^			u32 pid;$/;"	m	struct:pcb::__anon44::__anon45
+pid	include/proc.h	/^			u32 pid;$/;"	m	struct:pcb::__anon49::__anon50
 pint	debug/kernel/t.c	/^enum jar{cpu = 8, pint =16,quart =32};$/;"	e	enum:jar	file:
 pinyin_of	lsh/word.h	/^const char *pinyin_of[] = { $/;"	v
 pk_funcs	lsh/lua/loadlib.c	/^static const luaL_Reg pk_funcs[] = {$/;"	v	file:
@@ -4722,18 +4781,20 @@ posrelat	lsh/lua/lstrlib.c	/^static ptrdiff_t posrelat (ptrdiff_t pos, size_t le
 pow_int	src/ku_utils.c	/^int pow_int(int base,int exp){$/;"	f
 precheck	lsh/lua/ldebug.c	/^static int precheck (const Proto *pt) {$/;"	f	file:
 prefixexp	lsh/lua/lparser.c	/^static void prefixexp (LexState *ls, expdesc *v) {$/;"	f	file:
-pregs	include/proc.h	/^		 	stack_frame *pregs;		\/**when a ring0 process interrupted by a$/;"	m	struct:pcb::__anon44::__anon45
+pregs	include/proc.h	/^		 	stack_frame *pregs;		\/**when a ring0 process interrupted by a$/;"	m	struct:pcb::__anon49::__anon50
 preinit_state	lsh/lua/lstate.c	/^static void preinit_state (lua_State *L, global_State *g) {$/;"	f	file:
+prepare_acksyn	src/net/ipv4/tcp.cc	/^prepare_acksyn(struct connect * connect, struct sk_buff *comer){$/;"	f	file:
 present	src/include/linux/ide.h	/^	unsigned present: 1;$/;"	m	struct:ide_drive
 prev	include/list.h	/^	struct list_head *prev;$/;"	m	struct:list_head	typeref:struct:list_head::list_head
 prev	include/pmm.h	/^	struct empty_blockk*prev;$/;"	m	struct:empty_blockk	typeref:struct:empty_blockk::empty_blockk
-prev	include/proc.h	/^			struct pcb *prev;$/;"	m	struct:pcb::__anon44::__anon45	typeref:struct:pcb::__anon44::__anon45::pcb
-prev	lsh/lua/lobject.h	/^      struct UpVal *prev;$/;"	m	struct:UpVal::__anon63::__anon64	typeref:struct:UpVal::__anon63::__anon64::UpVal
+prev	include/proc.h	/^			struct pcb *prev;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::pcb
+prev	lsh/lua/lobject.h	/^      struct UpVal *prev;$/;"	m	struct:UpVal::__anon68::__anon69	typeref:struct:UpVal::__anon68::__anon69::UpVal
 prev	lsh/lua/lparser.c	/^  struct LHS_assign *prev;$/;"	m	struct:LHS_assign	typeref:struct:LHS_assign::LHS_assign	file:
 prev	lsh/lua/lparser.h	/^  struct FuncState *prev;  \/* enclosing function *\/$/;"	m	struct:FuncState	typeref:struct:FuncState::FuncState
 prev	src/include/linux/fs.h	/^	struct file_system_type *next, *prev;$/;"	m	struct:file_system_type	typeref:struct:file_system_type::
 prev	src/include/linux/skbuff.h	/^	struct sk_buff *next, *prev;$/;"	m	struct:sk_buff	typeref:struct:sk_buff::
 prev	src/net/ipv4/arp.c	/^	struct arp_record *prev, *next;$/;"	m	struct:arp_record	typeref:struct:arp_record::arp_record	file:
+prev	src/net/ipv4/tcp.cc	/^	struct connect *prev;$/;"	m	struct:connect	typeref:struct:connect::connect	file:
 previous	lsh/lua/ldo.c	/^  struct lua_longjmp *previous;$/;"	m	struct:lua_longjmp	typeref:struct:lua_longjmp::lua_longjmp	file:
 previous	lsh/lua/lparser.c	/^  struct BlockCnt *previous;  \/* chain *\/$/;"	m	struct:BlockCnt	typeref:struct:BlockCnt::BlockCnt	file:
 primaryexp	lsh/lua/lparser.c	/^static void primaryexp (LexState *ls, expdesc *v) {$/;"	f	file:
@@ -4746,7 +4807,6 @@ print_mac	include/utils.h	/^static inline void print_mac(u8 * mac){$/;"	f
 print_stab	debug/stab.c	/^void print_stab(NLIST *stab, char *stabstr){$/;"	f
 print_sym	debug/stab.c	/^void print_sym(Elf32_Sym *sym, char *strtab){$/;"	f
 print_tcpmsg	cmd/tcp.cc	/^static void print_tcpmsg(struct sk_buff *skb){$/;"	f	file:
-print_tcpmsg	src/net/ipv4/tcp.cc	/^static void print_tcpmsg(struct sk_buff *skb){$/;"	f	file:
 print_tn	debug/stab.c	/^void print_tn(typenumber_t tn){$/;"	f
 print_type	debug/pdb.c	/^void print_type(char *name){$/;"	f
 print_typeobj	debug/stab.c	/^void print_typeobj(typenumber_t tn){$/;"	f
@@ -4756,8 +4816,8 @@ print_version	lsh/lua/lua.c	/^static void print_version (void) {$/;"	f	file:
 printf_mem	debug/stab.c	/^unsigned printf_mem(typenumber_t tn, bool brief_mod){$/;"	f
 printrf_mem	debug/stab.c	/^unsigned printrf_mem(unsigned addr, int _typeid){$/;"	f
 printx	cmd/old/han2pinyin.lua	/^local function printx(value)$/;"	f
-prio	include/proc.h	/^			u32 prio;$/;"	m	struct:pcb::__anon44::__anon45
-priority	lsh/lua/lparser.c	/^} priority[] = {  \/* ORDER OPR *\/$/;"	v	typeref:struct:__anon59	file:
+prio	include/proc.h	/^			u32 prio;$/;"	m	struct:pcb::__anon49::__anon50
+priority	lsh/lua/lparser.c	/^} priority[] = {  \/* ORDER OPR *\/$/;"	v	typeref:struct:__anon64	file:
 probe	src/include/linux/pci.h	/^	int (*probe)(struct pci_dev *dev, const struct pci_device_id *id);$/;"	m	class:pci_dev::__anon10
 probe	src/kernel.c	/^static void probe(void){$/;"	f	file:
 proc_init	src/proc.c	/^void proc_init(void){$/;"	f
@@ -4765,16 +4825,19 @@ process$	lsh/lsh.c	/^void process$(void){$/;"	f
 process_colon	lsh/lsh.c	/^static int process_colon(){$/;"	f	file:
 process_if	lsh/lsh.c	/^static int process_if(){$/;"	f	file:
 process_rx_queue	src/net/core/dev.c	/^void process_rx_queue( struct net_device *netdev){$/;"	f
-prog	src/include/linux/pci_vendor.h	/^			u8 prog;$/;"	m	struct:pci_classcode::__anon16::__anon17
+prog	src/include/linux/pci_vendor.h	/^			u8 prog;$/;"	m	struct:pci_classcode::__anon17::__anon18
 progname	lsh/lua/lua.c	/^static const char *progname = LUA_PROGNAME;$/;"	v	file:
 progname	lsh/lua/luac.c	/^static const char* progname=PROGNAME;	\/* actual program name *\/$/;"	v	file:
 propagateall	lsh/lua/lgc.c	/^static size_t propagateall (global_State *g) {$/;"	f	file:
 propagatemark	lsh/lua/lgc.c	/^static l_mem propagatemark (global_State *g) {$/;"	f	file:
 protocol	src/include/linux/if_ether.h	/^	u16 protocol;$/;"	m	struct:ethhdr
+protocol	src/include/linux/skbuff.h	/^	u8 protocol;$/;"	m	struct:pseudo_hdr
 protocol	src/include/net/arp.h	/^	u16 protocol;$/;"	m	struct:arphdr
 protocol	src/include/net/ip.h	/^	u8 protocol;$/;"	m	struct:iphdr
+pseudo_hdr	src/include/linux/skbuff.h	/^		struct pseudo_hdr *pseudo_hdr;$/;"	m	union:sk_buff::__anon14	typeref:struct:sk_buff::__anon14::pseudo_hdr
+pseudo_hdr	src/include/linux/skbuff.h	/^struct pseudo_hdr{$/;"	s
 pt_curr	include/hd.h	/^	char*pt_curr;\/\/不被用户进程制定，由hs内部使用$/;"	m	struct:require
-pt_curr	include/hs.h	/^	char*pt_curr;\/\/不被用户进程制定，由hs内部使用$/;"	m	struct:__anon46
+pt_curr	include/hs.h	/^	char*pt_curr;\/\/不被用户进程制定，由hs内部使用$/;"	m	struct:__anon51
 pt_next	include/heap.h	/^	struct header_heapCell* pt_next;$/;"	m	struct:header_heapCell	typeref:struct:header_heapCell::header_heapCell
 pt_prev	include/heap.h	/^	struct header_heapCell* pt_prev;$/;"	m	struct:header_heapCell	typeref:struct:header_heapCell::header_heapCell
 pt_video	src/disp.c	/^static char* pt_video=(char*)0xc00b8000;$/;"	v	file:
@@ -4804,15 +4867,15 @@ queue	src/include/linux/ide.h	/^	struct request_queue queue;		\/*one for each di
 queue_getter	src/include/linux/blkdev.h	/^struct queue_getter{$/;"	s
 queue_getters	src/drivers/block/ll_rw_blk.c	/^static struct queue_getter queue_getters[MAX_BLKDEV];$/;"	v	typeref:struct:queue_getter	file:
 queue_head	src/include/linux/blkdev.h	/^	struct list_head  queue_head;	$/;"	m	struct:request_queue	typeref:struct:request_queue::list_head
-quick_insert	src/include/linux/netdevice.h	/^		u32 quick_insert;$/;"	m	struct:net_device::__anon15
-r	lsh/lua/llex.h	/^  lua_Number r;$/;"	m	union:__anon58
+quick_insert	src/include/linux/netdevice.h	/^		u32 quick_insert;$/;"	m	struct:net_device::__anon16
+r	lsh/lua/llex.h	/^  lua_Number r;$/;"	m	union:__anon63
 ramdisk_init	src/ramdisk.c	/^void ramdisk_init(unsigned addr){$/;"	f
 raw_package	src/drivers/net/8139.c	/^struct raw_package{$/;"	s	file:
 rawgco2ts	lsh/lua/lstate.h	149;"	d
 rawgco2u	lsh/lua/lstate.h	151;"	d
 rawtsvalue	lsh/lua/lobject.h	94;"	d
 rawuvalue	lsh/lua/lobject.h	96;"	d
-rbind	debug/include/stab.h	/^		struct rbind *rbind;$/;"	m	union:typeobj::__anon53	typeref:struct:typeobj::__anon53::rbind
+rbind	debug/include/stab.h	/^		struct rbind *rbind;$/;"	m	union:typeobj::__anon58	typeref:struct:typeobj::__anon58::rbind
 rbind	debug/include/stab.h	/^struct rbind{$/;"	s
 rdev	src/include/linux/fs.h	/^	u16 rdev;$/;"	m	struct:inode
 read	src/fs/cell/namei.c	/^static int read(struct file *file, char *buf, unsigned size, unsigned *ppos){$/;"	f	file:
@@ -4843,12 +4906,16 @@ real_lookup	src/fs/namei.c	/^static struct dentry *real_lookup(struct dentry *di
 reallymarkobject	lsh/lua/lgc.c	/^static void reallymarkobject (global_State *g, GCObject *o) {$/;"	f	file:
 realmod_info	include/bootinfo.h	19;"	d
 realmod_info_struct	include/bootinfo.h	/^struct realmod_info_struct{$/;"	s
+realsize	src/net/ipv4/tcp.cc	/^	int realsize;				\/* realsize = size << scale *\/$/;"	m	struct:recv_wnd	file:
+realsize	src/net/ipv4/tcp.cc	/^	int realsize;$/;"	m	struct:send_wnd	file:
 recfield	lsh/lua/lparser.c	/^static void recfield (LexState *ls, struct ConsControl *cc) {$/;"	f	file:
-record_len	include/fs_ext.h	/^	u16 record_len;$/;"	m	struct:__anon34
-refer_tn	debug/include/stab.h	/^		typenumber_t refer_tn;	\/**for int, char... for pt*\/$/;"	m	union:typeobj::__anon52
+record_len	include/fs_ext.h	/^	u16 record_len;$/;"	m	struct:__anon39
+recv_wnd	src/net/ipv4/tcp.cc	/^	struct recv_wnd recv_wnd;$/;"	m	struct:connect	typeref:struct:connect::recv_wnd	file:
+recv_wnd	src/net/ipv4/tcp.cc	/^struct recv_wnd{$/;"	s	file:
+refer_tn	debug/include/stab.h	/^		typenumber_t refer_tn;	\/**for int, char... for pt*\/$/;"	m	union:typeobj::__anon57
 reg	src/include/linux/pci.h	/^	unsigned reg: 6;	\/* 2 ~ 7 *\/$/;"	m	struct:pci_config_addr
 reg_count	include/hd.h	/^	u32 reg_count;\/\/不被用户进程制定，而由hs自动计算出来,1~256,当它是256时，hs_cmd_out函数会向REG_COUNT寄存器写入0$/;"	m	struct:require
-reg_count	include/hs.h	/^	u32 reg_count;\/\/不被用户进程制定，而由hs自动计算出来,1~256,当它是256时，hs_cmd_out函数会向REG_COUNT寄存器写入0$/;"	m	struct:__anon46
+reg_count	include/hs.h	/^	u32 reg_count;\/\/不被用户进程制定，而由hs自动计算出来,1~256,当它是256时，hs_cmd_out函数会向REG_COUNT寄存器写入0$/;"	m	struct:__anon51
 register_e1000_driver	src/drivers/net/e1000.c	/^void register_e1000_driver(void){$/;"	f
 register_filesystem	src/fs/super.c	/^void register_filesystem(char *name, int (*read_super)(struct super_block *)){$/;"	f
 register_nic	src/net/core/dev.c	/^void register_nic(struct net_device *netdev){$/;"	f
@@ -4877,7 +4944,7 @@ request_queue	src/include/linux/blkdev.h	/^	struct request_queue request_queue;	
 request_queue	src/include/linux/blkdev.h	/^struct request_queue{$/;"	s
 require	include/hd.h	/^struct require{$/;"	s
 reschedule	src/kernel.asm	/^reschedule:$/;"	l
-reserved	lsh/lua/lobject.h	/^    lu_byte reserved;$/;"	m	struct:TString::__anon61
+reserved	lsh/lua/lobject.h	/^    lu_byte reserved;$/;"	m	struct:TString::__anon66
 reserved	src/drivers/net/8139.c	/^			int reserved: 2;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
 reserved	src/include/linux/pci.h	/^	unsigned reserved:	7;$/;"	m	struct:pci_config_addr
 reset2bits	lsh/lua/lgc.h	36;"	d
@@ -4901,24 +4968,24 @@ ret_from_sys_call	src/kernel.asm	/^ret_from_sys_call:$/;"	l
 ret_with_reschedule	src/kernel.asm	/^ret_with_reschedule:$/;"	l
 retstat	lsh/lua/lparser.c	/^static void retstat (LexState *ls) {$/;"	f	file:
 return_say	cmd/cell.c	63;"	d	file:
-return_say	include/utils.h	58;"	d
-returnx_say	include/utils.h	59;"	d
+return_say	include/utils.h	59;"	d
+returnx_say	include/utils.h	60;"	d
 revision	src/include/linux/pci.h	/^	char revision;$/;"	m	struct:pci_dev
-revision	src/include/linux/pci_vendor.h	/^			u8 revision;$/;"	m	struct:pci_classcode::__anon16::__anon17
-right	lsh/lua/lparser.c	/^  lu_byte right; \/* right priority *\/$/;"	m	struct:__anon59	file:
-ring	include/proc.h	/^			u32 ring;$/;"	m	struct:pcb::__anon44::__anon45
+revision	src/include/linux/pci_vendor.h	/^			u8 revision;$/;"	m	struct:pci_classcode::__anon17::__anon18
+right	lsh/lua/lparser.c	/^  lu_byte right; \/* right priority *\/$/;"	m	struct:__anon64	file:
+ring	include/proc.h	/^			u32 ring;$/;"	m	struct:pcb::__anon49::__anon50
 ring0_smallstack_bottom	src/kernel.asm	/^ring0_smallstack_bottom:$/;"	l
 ring0_smallstack_iretd	src/kernel.asm	/^ring0_smallstack_iretd:$/;"	l
 ring0_smallstack_top	src/kernel.asm	/^ring0_smallstack_top:$/;"	l
 rlimit	src/include/asm/resource.h	/^struct rlimit{$/;"	s
-rlimits	include/proc.h	/^			struct rlimit rlimits[RLIMIT_MAX];$/;"	m	struct:pcb::__anon44::__anon45	typeref:struct:pcb::__anon44::__anon45::rlimit
-room	src/include/linux/cell_common.h	/^		char room[1024];$/;"	m	union:cell_superblock::__anon19
+rlimits	include/proc.h	/^			struct rlimit rlimits[RLIMIT_MAX];$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::rlimit
+room	src/include/linux/cell_common.h	/^		char room[1024];$/;"	m	union:cell_superblock::__anon20
 root	include/proc.h	/^	struct dentry *root, *pwd, *altroot;$/;"	m	struct:fs_struct	typeref:struct:fs_struct::dentry
 root	src/include/linux/fs.h	/^	struct dentry *root;$/;"	m	struct:super_block	typeref:struct:super_block::dentry
 root	src/include/linux/fs_struct.h	/^	struct dentry *root, *pwd;$/;"	m	struct:fs_struct	typeref:struct:fs_struct::dentry
 root	src/include/linux/netdevice.h	/^	struct sk_buff *root;$/;"	m	struct:skb_queue	typeref:struct:skb_queue::sk_buff
 rootcell	src/include/linux/cell.h	/^	int rootcell;$/;"	m	struct:cell_sb_info
-rootcell	src/include/linux/cell_common.h	/^			int rootcell;		\/*单位是字节，rootcell相对分区最起始的字节偏移*\/$/;"	m	struct:cell_superblock::__anon19::__anon20
+rootcell	src/include/linux/cell_common.h	/^			int rootcell;		\/*单位是字节，rootcell相对分区最起始的字节偏移*\/$/;"	m	struct:cell_superblock::__anon20::__anon21
 rootgc	lsh/lua/lstate.h	/^  GCObject *rootgc;  \/* list of all collectable objects *\/$/;"	m	struct:global_State
 rootmnt	include/proc.h	/^	struct vfsmount *rootmnt, *pwdmnt, *altrootmnt;$/;"	m	struct:fs_struct	typeref:struct:fs_struct::vfsmount
 rootmnt	src/include/linux/fs_struct.h	/^	struct vfsmount *rootmnt, *pwdmnt;$/;"	m	struct:fs_struct	typeref:struct:fs_struct::vfsmount
@@ -4947,7 +5014,7 @@ rx_ring_dma	src/drivers/net/8139.c	/^	void *rx_ring_dma;$/;"	m	struct:rtl8139_pr
 rx_ring_len	src/drivers/net/8139.c	/^	int rx_ring_len;$/;"	m	struct:rtl8139_private	file:
 rx_status	src/drivers/net/8139.c	/^	u16 rx_status;$/;"	m	struct:raw_package	file:
 s	lsh/lua/lauxlib.c	/^  const char *s;$/;"	m	struct:LoadS	file:
-s	lsh/lua/lparser.h	/^    struct { int info, aux; } s;$/;"	m	union:expdesc::__anon68	typeref:struct:expdesc::__anon68::__anon69
+s	lsh/lua/lparser.h	/^    struct { int info, aux; } s;$/;"	m	union:expdesc::__anon73	typeref:struct:expdesc::__anon73::__anon74
 s16	debug/include/valType.h	/^typedef signed short s16;$/;"	t
 s16	include/valType.h	/^typedef signed short s16;$/;"	t
 s32	debug/include/valType.h	/^typedef signed int s32;$/;"	t
@@ -4958,59 +5025,60 @@ s:cpo_save	cmd/c.vim	/^let s:cpo_save = &cpo$/;"	v
 s:cpo_save	cmd/cn.vim	/^let s:cpo_save = &cpo$/;"	v
 s:ft	cmd/c.vim	/^let s:ft = matchstr(&ft, '^\\([^.]\\)\\+')$/;"	v
 s:ft	cmd/cn.vim	/^let s:ft = matchstr(&ft, '^\\([^.]\\)\\+')$/;"	v
-s_algorithm_usage_bitmap	include/fs_ext.h	/^	 __le32 s_algorithm_usage_bitmap; \/\/ 文件系统采用的压缩算法$/;"	m	struct:__anon31
-s_block_group_nr	include/fs_ext.h	/^	 __le16 s_block_group_nr; \/\/ 保存此超级块的块组号$/;"	m	struct:__anon31
-s_blocks_count	include/fs_ext.h	/^	__le32 s_blocks_count; \/\/ 文件系统中块的总数$/;"	m	struct:__anon31
-s_blocks_per_group	include/fs_ext.h	/^	__le32 s_blocks_per_group; \/\/ 每个块组中块的总数$/;"	m	struct:__anon31
+s_algorithm_usage_bitmap	include/fs_ext.h	/^	 __le32 s_algorithm_usage_bitmap; \/\/ 文件系统采用的压缩算法$/;"	m	struct:__anon36
+s_block_group_nr	include/fs_ext.h	/^	 __le16 s_block_group_nr; \/\/ 保存此超级块的块组号$/;"	m	struct:__anon36
+s_blocks_count	include/fs_ext.h	/^	__le32 s_blocks_count; \/\/ 文件系统中块的总数$/;"	m	struct:__anon36
+s_blocks_per_group	include/fs_ext.h	/^	__le32 s_blocks_per_group; \/\/ 每个块组中块的总数$/;"	m	struct:__anon36
 s_char_t	debug/kernel/t.c	/^static char s_char_t = 1;$/;"	v	file:
-s_checkinterval	include/fs_ext.h	/^	__le32 s_checkinterval; \/\/ POSIX中定义的文件系统最近检查的最大时间间隔$/;"	m	struct:__anon31
-s_creator_os	include/fs_ext.h	/^	__le32 s_creator_os; \/\/ 生成该文件系统的操作系统$/;"	m	struct:__anon31
-s_def_hash_version	include/fs_ext.h	/^	 __u8 s_def_hash_version; \/\/ 默认使用的散列函数$/;"	m	struct:__anon31
-s_def_resgid	include/fs_ext.h	/^	__le16 s_def_resgid; \/\/ 保留块的默认组ID$/;"	m	struct:__anon31
-s_def_resuid	include/fs_ext.h	/^	__le16 s_def_resuid; \/\/ 报留块的默认用户ID$/;"	m	struct:__anon31
-s_default_mount_opts	include/fs_ext.h	/^	 __le32 s_default_mount_opts;$/;"	m	struct:__anon31
-s_errors	include/fs_ext.h	/^	__le16 s_errors; \/\/ 文件系统发生错误时驱动程式应该执行的操作$/;"	m	struct:__anon31
-s_feature_compat	include/fs_ext.h	/^	 __le32 s_feature_compat; \/\/ 兼容特性掩码$/;"	m	struct:__anon31
-s_feature_incompat	include/fs_ext.h	/^	 __le32 s_feature_incompat; \/\/ 不兼容特性掩码$/;"	m	struct:__anon31
-s_feature_ro_compat	include/fs_ext.h	/^	 __le32 s_feature_ro_compat; \/\/ 只读特性掩码$/;"	m	struct:__anon31
-s_first_data_block	include/fs_ext.h	/^	__le32 s_first_data_block; \/\/ 块ID，在小于1KB的文件系统中为0，大于1KB的文件系统中为1$/;"	m	struct:__anon31
-s_first_ino	include/fs_ext.h	/^	 __le32 s_first_ino; \/\/ 标准文件的第一个可用inode的索引（非动态为11）$/;"	m	struct:__anon31
-s_first_meta_bg	include/fs_ext.h	/^	 __le32 s_first_meta_bg; \/\/ 块组的第一个元块$/;"	m	struct:__anon31
-s_frags_per_group	include/fs_ext.h	/^	__le32 s_frags_per_group; \/\/ 每个块组中段的总数$/;"	m	struct:__anon31
-s_free_blocks_count	include/fs_ext.h	/^	__le32 s_free_blocks_count; \/\/ 未使用的块的总数（包括保留块）$/;"	m	struct:__anon31
-s_free_inodes_count	include/fs_ext.h	/^	__le32 s_free_inodes_count; \/\/ 未使用的inode的总数$/;"	m	struct:__anon31
-s_hash_seed	include/fs_ext.h	/^	 __u32 s_hash_seed[4]  ; \/\/ HTREE散列种子$/;"	m	struct:__anon31
-s_inode_size	include/fs_ext.h	/^	 __le16 s_inode_size; \/\/ inode结构的大小（非动态为128）$/;"	m	struct:__anon31
-s_inodes_count	include/fs_ext.h	/^	__le32 s_inodes_count; \/\/ 文件系统中inode的总数$/;"	m	struct:__anon31
-s_inodes_per_group	include/fs_ext.h	/^	__le32 s_inodes_per_group; \/\/ 每个块组中inode的总数$/;"	m	struct:__anon31
+s_checkinterval	include/fs_ext.h	/^	__le32 s_checkinterval; \/\/ POSIX中定义的文件系统最近检查的最大时间间隔$/;"	m	struct:__anon36
+s_creator_os	include/fs_ext.h	/^	__le32 s_creator_os; \/\/ 生成该文件系统的操作系统$/;"	m	struct:__anon36
+s_def_hash_version	include/fs_ext.h	/^	 __u8 s_def_hash_version; \/\/ 默认使用的散列函数$/;"	m	struct:__anon36
+s_def_resgid	include/fs_ext.h	/^	__le16 s_def_resgid; \/\/ 保留块的默认组ID$/;"	m	struct:__anon36
+s_def_resuid	include/fs_ext.h	/^	__le16 s_def_resuid; \/\/ 报留块的默认用户ID$/;"	m	struct:__anon36
+s_default_mount_opts	include/fs_ext.h	/^	 __le32 s_default_mount_opts;$/;"	m	struct:__anon36
+s_errors	include/fs_ext.h	/^	__le16 s_errors; \/\/ 文件系统发生错误时驱动程式应该执行的操作$/;"	m	struct:__anon36
+s_feature_compat	include/fs_ext.h	/^	 __le32 s_feature_compat; \/\/ 兼容特性掩码$/;"	m	struct:__anon36
+s_feature_incompat	include/fs_ext.h	/^	 __le32 s_feature_incompat; \/\/ 不兼容特性掩码$/;"	m	struct:__anon36
+s_feature_ro_compat	include/fs_ext.h	/^	 __le32 s_feature_ro_compat; \/\/ 只读特性掩码$/;"	m	struct:__anon36
+s_first_data_block	include/fs_ext.h	/^	__le32 s_first_data_block; \/\/ 块ID，在小于1KB的文件系统中为0，大于1KB的文件系统中为1$/;"	m	struct:__anon36
+s_first_ino	include/fs_ext.h	/^	 __le32 s_first_ino; \/\/ 标准文件的第一个可用inode的索引（非动态为11）$/;"	m	struct:__anon36
+s_first_meta_bg	include/fs_ext.h	/^	 __le32 s_first_meta_bg; \/\/ 块组的第一个元块$/;"	m	struct:__anon36
+s_frags_per_group	include/fs_ext.h	/^	__le32 s_frags_per_group; \/\/ 每个块组中段的总数$/;"	m	struct:__anon36
+s_free_blocks_count	include/fs_ext.h	/^	__le32 s_free_blocks_count; \/\/ 未使用的块的总数（包括保留块）$/;"	m	struct:__anon36
+s_free_inodes_count	include/fs_ext.h	/^	__le32 s_free_inodes_count; \/\/ 未使用的inode的总数$/;"	m	struct:__anon36
+s_hash_seed	include/fs_ext.h	/^	 __u32 s_hash_seed[4]  ; \/\/ HTREE散列种子$/;"	m	struct:__anon36
+s_inode_size	include/fs_ext.h	/^	 __le16 s_inode_size; \/\/ inode结构的大小（非动态为128）$/;"	m	struct:__anon36
+s_inodes_count	include/fs_ext.h	/^	__le32 s_inodes_count; \/\/ 文件系统中inode的总数$/;"	m	struct:__anon36
+s_inodes_per_group	include/fs_ext.h	/^	__le32 s_inodes_per_group; \/\/ 每个块组中inode的总数$/;"	m	struct:__anon36
 s_int_t1	debug/kernel/t1.c	/^static int s_int_t1 = 2;$/;"	v	file:
-s_journal_dev	include/fs_ext.h	/^	 __u32 s_journal_dev; \/\/ 日志文件的设备数$/;"	m	struct:__anon31
-s_journal_inum	include/fs_ext.h	/^	 __u32 s_journal_inum; \/\/ 日志文件的inode数目$/;"	m	struct:__anon31
-s_journal_uuid	include/fs_ext.h	/^	 __u8 s_journal_uuid[16]  ; \/\/ 日志超级块的卷ID$/;"	m	struct:__anon31
-s_last_mounted	include/fs_ext.h	/^	 char s_last_mounted[64]  ; \/\/ 最近被安装的目录$/;"	m	struct:__anon31
-s_last_orphan	include/fs_ext.h	/^	 __u32 s_last_orphan; \/\/ 要删除的inode列表的起始位置$/;"	m	struct:__anon31
-s_lastcheck	include/fs_ext.h	/^	__le32 s_lastcheck; \/\/ POSIX中定义的文件系统最近一次检查的时间$/;"	m	struct:__anon31
-s_log_block_size	include/fs_ext.h	/^	__le32 s_log_block_size; \/\/ 用以计算块的大小（1024算术左移该值即为块大小）$/;"	m	struct:__anon31
-s_log_frag_size	include/fs_ext.h	/^	__le32 s_log_frag_size; \/\/ 用以计算段大小（为正则1024算术左移该值，否则右移）$/;"	m	struct:__anon31
-s_magic	include/fs_ext.h	/^	__le16 s_magic; \/\/ 文件系统标志，ext2中为0xEF53$/;"	m	struct:__anon31
-s_max_mnt_count	include/fs_ext.h	/^	__le16 s_max_mnt_count; \/\/ 在进行完整校验前还能被装载的次数$/;"	m	struct:__anon31
-s_minor_rev_level	include/fs_ext.h	/^	__le16 s_minor_rev_level; \/\/ 局部修订级别$/;"	m	struct:__anon31
-s_mnt_count	include/fs_ext.h	/^	__le16 s_mnt_count; \/\/ 最近一次完整校验后被装载的次数$/;"	m	struct:__anon31
-s_mtime	include/fs_ext.h	/^	__le32 s_mtime; \/\/ POSIX中定义的文件系统装载时间$/;"	m	struct:__anon31
-s_padding1	include/fs_ext.h	/^	 __u16 s_padding1;$/;"	m	struct:__anon31
+s_journal_dev	include/fs_ext.h	/^	 __u32 s_journal_dev; \/\/ 日志文件的设备数$/;"	m	struct:__anon36
+s_journal_inum	include/fs_ext.h	/^	 __u32 s_journal_inum; \/\/ 日志文件的inode数目$/;"	m	struct:__anon36
+s_journal_uuid	include/fs_ext.h	/^	 __u8 s_journal_uuid[16]  ; \/\/ 日志超级块的卷ID$/;"	m	struct:__anon36
+s_last_mounted	include/fs_ext.h	/^	 char s_last_mounted[64]  ; \/\/ 最近被安装的目录$/;"	m	struct:__anon36
+s_last_orphan	include/fs_ext.h	/^	 __u32 s_last_orphan; \/\/ 要删除的inode列表的起始位置$/;"	m	struct:__anon36
+s_lastcheck	include/fs_ext.h	/^	__le32 s_lastcheck; \/\/ POSIX中定义的文件系统最近一次检查的时间$/;"	m	struct:__anon36
+s_log_block_size	include/fs_ext.h	/^	__le32 s_log_block_size; \/\/ 用以计算块的大小（1024算术左移该值即为块大小）$/;"	m	struct:__anon36
+s_log_frag_size	include/fs_ext.h	/^	__le32 s_log_frag_size; \/\/ 用以计算段大小（为正则1024算术左移该值，否则右移）$/;"	m	struct:__anon36
+s_magic	include/fs_ext.h	/^	__le16 s_magic; \/\/ 文件系统标志，ext2中为0xEF53$/;"	m	struct:__anon36
+s_max_mnt_count	include/fs_ext.h	/^	__le16 s_max_mnt_count; \/\/ 在进行完整校验前还能被装载的次数$/;"	m	struct:__anon36
+s_minor_rev_level	include/fs_ext.h	/^	__le16 s_minor_rev_level; \/\/ 局部修订级别$/;"	m	struct:__anon36
+s_mnt_count	include/fs_ext.h	/^	__le16 s_mnt_count; \/\/ 最近一次完整校验后被装载的次数$/;"	m	struct:__anon36
+s_mtime	include/fs_ext.h	/^	__le32 s_mtime; \/\/ POSIX中定义的文件系统装载时间$/;"	m	struct:__anon36
+s_padding1	include/fs_ext.h	/^	 __u16 s_padding1;$/;"	m	struct:__anon36
 s_pchar	debug/kernel/t.c	/^static char *s_pchar = &un_g_var;$/;"	v	file:
-s_prealloc_blocks	include/fs_ext.h	/^	 __u8 s_prealloc_blocks; \/\/ 预分配的块数$/;"	m	struct:__anon31
-s_prealloc_dir_blocks	include/fs_ext.h	/^	 __u8 s_prealloc_dir_blocks; \/\/ 给目录预分配的块数$/;"	m	struct:__anon31
-s_r_blocks_count	include/fs_ext.h	/^	__le32 s_r_blocks_count; \/\/ 保留块的总数$/;"	m	struct:__anon31
-s_reserved	include/fs_ext.h	/^	 __u32 s_reserved[190]  ;$/;"	m	struct:__anon31
-s_reserved_char_pad	include/fs_ext.h	/^	 __u8 s_reserved_char_pad;$/;"	m	struct:__anon31
-s_reserved_word_pad	include/fs_ext.h	/^	 __u16 s_reserved_word_pad;$/;"	m	struct:__anon31
-s_rev_level	include/fs_ext.h	/^	__le32 s_rev_level; \/\/ 修订级别$/;"	m	struct:__anon31
-s_state	include/fs_ext.h	/^	__le16 s_state; \/\/ 文件系统的状态$/;"	m	struct:__anon31
+s_prealloc_blocks	include/fs_ext.h	/^	 __u8 s_prealloc_blocks; \/\/ 预分配的块数$/;"	m	struct:__anon36
+s_prealloc_dir_blocks	include/fs_ext.h	/^	 __u8 s_prealloc_dir_blocks; \/\/ 给目录预分配的块数$/;"	m	struct:__anon36
+s_r_blocks_count	include/fs_ext.h	/^	__le32 s_r_blocks_count; \/\/ 保留块的总数$/;"	m	struct:__anon36
+s_reserved	include/fs_ext.h	/^	 __u32 s_reserved[190]  ;$/;"	m	struct:__anon36
+s_reserved_char_pad	include/fs_ext.h	/^	 __u8 s_reserved_char_pad;$/;"	m	struct:__anon36
+s_reserved_word_pad	include/fs_ext.h	/^	 __u16 s_reserved_word_pad;$/;"	m	struct:__anon36
+s_rev_level	include/fs_ext.h	/^	__le32 s_rev_level; \/\/ 修订级别$/;"	m	struct:__anon36
+s_state	include/fs_ext.h	/^	__le16 s_state; \/\/ 文件系统的状态$/;"	m	struct:__anon36
 s_u32_t1	debug/kernel/t1.c	/^static u32 s_u32_t1 = 32;$/;"	v	file:
-s_uuid	include/fs_ext.h	/^	 __u8 s_uuid[16]  ; \/\/ 卷ID，应尽可能使每个文件系统的格式唯一$/;"	m	struct:__anon31
-s_volume_name	include/fs_ext.h	/^	 char s_volume_name[16]  ; \/\/ 卷名（只能为ISO-Latin-1字符集，以’＼0’结束）$/;"	m	struct:__anon31
-s_wtime	include/fs_ext.h	/^	__le32 s_wtime; \/\/ POSIX中定义的文件系统最近被写入的时间$/;"	m	struct:__anon31
+s_uuid	include/fs_ext.h	/^	 __u8 s_uuid[16]  ; \/\/ 卷ID，应尽可能使每个文件系统的格式唯一$/;"	m	struct:__anon36
+s_volume_name	include/fs_ext.h	/^	 char s_volume_name[16]  ; \/\/ 卷名（只能为ISO-Latin-1字符集，以’＼0’结束）$/;"	m	struct:__anon36
+s_wtime	include/fs_ext.h	/^	__le32 s_wtime; \/\/ POSIX中定义的文件系统最近被写入的时间$/;"	m	struct:__anon36
+sack_permit	src/net/ipv4/tcp.cc	/^	bool sack_permit;	\/\/duifangzhichiSACKma.buxuyaolingyigeme_sack_permit.womenziji$/;"	m	struct:connect	file:
 saddr	debug/include/stab.h	/^	unsigned saddr;		\/**start address of file*\/$/;"	m	struct:fileobj
 sarr	debug/kernel/t.c	/^static struct c_stru sarr[10];$/;"	v	typeref:struct:c_stru	file:
 save	lsh/lua/llex.c	/^static void save (LexState *ls, int c) {$/;"	f	file:
@@ -5023,7 +5091,9 @@ sb	cmd/cell.c	/^struct cell_superblock sb;$/;"	v	typeref:struct:cell_superblock
 sb	src/include/linux/dcache.h	/^	struct super_block *sb;$/;"	m	struct:dentry	typeref:struct:dentry::super_block
 sb	src/include/linux/fs.h	/^	struct super_block *sb;$/;"	m	struct:inode	typeref:struct:inode::super_block
 sb	src/include/linux/mount.h	/^	struct super_block *sb;		\/* super-block of the baby device *\/$/;"	m	struct:vfsmount	typeref:struct:vfsmount::super_block
-sbind	debug/include/stab.h	/^		struct subind *sbind, *ubind;$/;"	m	union:typeobj::__anon53	typeref:struct:typeobj::__anon53::subind
+sbind	debug/include/stab.h	/^		struct subind *sbind, *ubind;$/;"	m	union:typeobj::__anon58	typeref:struct:typeobj::__anon58::subind
+scale	src/net/ipv4/tcp.cc	/^	char scale;$/;"	m	struct:send_wnd	file:
+scale	src/net/ipv4/tcp.cc	/^	u8 scale;				\/* the 'Window Scale' option appears only in the $/;"	m	struct:recv_wnd	file:
 scan_dirty_machine_words	src/kernel.c	/^static int scan_dirty_machine_words(unsigned start, unsigned end){$/;"	f	file:
 scan_symtab	debug/stab.c	/^void scan_symtab(void){$/;"	f
 scanformat	lsh/lua/lstrlib.c	/^static const char *scanformat (lua_State *L, const char *strfrmt, char *form) {$/;"	f	file:
@@ -5034,9 +5104,9 @@ search_ph_typeLoaded	src/boot.asm	/^search_ph_typeLoaded:$/;"	l
 searchvar	lsh/lua/lparser.c	/^static int searchvar (FuncState *fs, TString *n) {$/;"	f	file:
 sec_data	src/kernel.asm	/^sec_data:$/;"	l
 second_hdr	src/include/linux/skbuff.h	/^		void *second_hdr;$/;"	m	union:sk_buff::__anon12
-seedblock1	include/fs_ext.h	/^	int seedblock1;$/;"	m	struct:__anon33
-seedblock2	include/fs_ext.h	/^	int seedblock2;$/;"	m	struct:__anon33
-seedblock3	include/fs_ext.h	/^	int seedblock3;$/;"	m	struct:__anon33
+seedblock1	include/fs_ext.h	/^	int seedblock1;$/;"	m	struct:__anon38
+seedblock2	include/fs_ext.h	/^	int seedblock2;$/;"	m	struct:__anon38
+seedblock3	include/fs_ext.h	/^	int seedblock3;$/;"	m	struct:__anon38
 segment_not_present	src/kernel.asm	/^segment_not_present:$/;"	l
 select	include/hd.h	/^	struct select select;$/;"	m	struct:lba	typeref:struct:lba::select
 select	include/hd.h	/^struct select{$/;"	s
@@ -5059,10 +5129,14 @@ selector_tss	src/kernel.asm	/^selector_tss        equ gdt.desc_tss - gdt$/;"	d
 selector_video	src/kernel.asm	/^selector_video      equ gdt.desc_video - gdt$/;"	d
 seminfo	lsh/lua/llex.h	/^  SemInfo seminfo;$/;"	m	struct:Token
 send_data	src/net/core/testnet.c	/^void send_data(char *data){$/;"	f
+send_wnd	src/net/ipv4/tcp.cc	/^	struct send_wnd send_wnd;$/;"	m	struct:connect	typeref:struct:connect::send_wnd	file:
+send_wnd	src/net/ipv4/tcp.cc	/^struct send_wnd{$/;"	s	file:
 sentinel	lsh/lua/loadlib.c	448;"	d	file:
 sentinel_	lsh/lua/loadlib.c	/^static const int sentinel_ = 0;$/;"	v	file:
 seq	src/include/net/tcp.h	/^	u32 seq;$/;"	m	struct:tcphdr
-sequence	src/include/net/icmp.h	/^			u16 sequence;$/;"	m	struct:icmphdr::__anon23::__anon24
+seq_got	src/net/ipv4/tcp.cc	/^	u32 seq_got;		\/\/zuijinyigeshoudaodebaowendesequence number$/;"	m	struct:connect	file:
+seq_out	src/net/ipv4/tcp.cc	/^	u32 seq_out;		\/\/zuijinyigefachudebaowendesequence number$/;"	m	struct:connect	file:
+sequence	src/include/net/icmp.h	/^			u16 sequence;$/;"	m	struct:icmphdr::__anon25::__anon26
 set	src/elf.c	/^static int set(char *img){$/;"	f	file:
 set2	lsh/lua/ltablib.c	/^static void set2 (lua_State *L, int i, int j) {$/;"	f	file:
 set2bits	lsh/lua/lgc.h	35;"	d
@@ -5113,14 +5187,14 @@ show_asciis_buffer	src/disp.c	/^void show_asciis_buffer(void){$/;"	f
 show_elf	src/boot.asm	/^show_elf:$/;"	l
 sighandler_ctrl	lsh/lsh.c	/^void  sighandler_ctrl(int x){$/;"	f
 signal_return	src/kernel.asm	/^signal_return:$/;"	l
-sigpending	include/proc.h	/^			int sigpending;$/;"	m	struct:pcb::__anon44::__anon45
+sigpending	include/proc.h	/^			int sigpending;$/;"	m	struct:pcb::__anon49::__anon50
 simpleexp	lsh/lua/lparser.c	/^static void simpleexp (LexState *ls, expdesc *v) {$/;"	f	file:
 single_step	src/kernel.asm	/^single_step:$/;"	l
 singlematch	lsh/lua/lstrlib.c	/^static int singlematch (int c, const char *p, const char *ep) {$/;"	f	file:
 singlestep	lsh/lua/lgc.c	/^static l_mem singlestep (lua_State *L) {$/;"	f	file:
 singlevar	lsh/lua/lparser.c	/^static void singlevar (LexState *ls, expdesc *var) {$/;"	f	file:
 singlevaraux	lsh/lua/lparser.c	/^static int singlevaraux (FuncState *fs, TString *n, expdesc *var, int base) {$/;"	f	file:
-size	debug/include/stab.h	/^		unsigned size;	\/**for structure*\/$/;"	m	union:typeobj::__anon52
+size	debug/include/stab.h	/^		unsigned size;	\/**for structure*\/$/;"	m	union:typeobj::__anon57
 size	include/heap.h	/^	unsigned int size;	$/;"	m	struct:header_heapCell
 size	include/pmm.h	/^	int size;$/;"	m	struct:empty_blockk
 size	lsh/lua/lauxlib.c	/^  size_t size;$/;"	m	struct:LoadS	file:
@@ -5130,16 +5204,18 @@ size	src/drivers/net/8139.c	/^	u16 size;$/;"	m	struct:raw_package	file:
 size	src/include/linux/cell_common.h	/^	unsigned size;$/;"	m	struct:cell
 size	src/include/linux/fs.h	/^	u32 size;$/;"	m	struct:inode
 size	src/mm/slab.c	/^	int size;$/;"	m	struct:cache_size	file:
+size	src/net/ipv4/tcp.cc	/^	u16 size;				\/* tcphdr->wndsize *\/$/;"	m	struct:recv_wnd	file:
+size	src/net/ipv4/tcp.cc	/^	u16 size;$/;"	m	struct:send_wnd	file:
 size2pages	include/mm.h	/^static inline int size2pages(int size){$/;"	f
 sizeCclosure	lsh/lua/lfunc.h	14;"	d
 sizeLclosure	lsh/lua/lfunc.h	17;"	d
 size_buffer	include/proc.h	21;"	d
 size_ci	lsh/lua/lstate.h	/^  int size_ci;  \/* size of array `base_ci' *\/$/;"	m	struct:lua_State
-size_of_line	lsh/vi.h	/^	union{int *size_of_line;int *size_of_lines;};$/;"	m	union:vi::__anon77
-size_of_lines	lsh/vi.h	/^	union{int *size_of_line;int *size_of_lines;};$/;"	m	union:vi::__anon77
-size_of_yline	lsh/vi.h	/^	union{int *size_of_yline;int *size_of_ylines;};$/;"	m	union:vi::__anon78
+size_of_line	lsh/vi.h	/^	union{int *size_of_line;int *size_of_lines;};$/;"	m	union:vi::__anon82
+size_of_lines	lsh/vi.h	/^	union{int *size_of_line;int *size_of_lines;};$/;"	m	union:vi::__anon82
+size_of_yline	lsh/vi.h	/^	union{int *size_of_yline;int *size_of_ylines;};$/;"	m	union:vi::__anon83
 size_of_yline_fix	lsh/vi.h	/^	int *size_of_yline_fix;$/;"	m	struct:vi
-size_of_ylines	lsh/vi.h	/^	union{int *size_of_yline;int *size_of_ylines;};$/;"	m	union:vi::__anon78
+size_of_ylines	lsh/vi.h	/^	union{int *size_of_yline;int *size_of_ylines;};$/;"	m	union:vi::__anon83
 size_of_zone	include/mmzone.h	/^unsigned size_of_zone[3];$/;"	v
 size_t	include/valType.h	/^typedef unsigned size_t;$/;"	t
 sizearray	lsh/lua/lobject.h	/^  int sizearray;  \/* size of `array' array *\/$/;"	m	struct:Table
@@ -5182,7 +5258,7 @@ spin	src/utils.c	/^void spin(char *msg){$/;"	f
 sprintf	src/lib/vsprintf.c	/^int sprintf(char *buf, char *format, ...){$/;"	f
 src_end	lsh/lua/lstrlib.c	/^  const char *src_end;  \/* end (`\\0') of source string *\/$/;"	m	struct:MatchState	file:
 src_init	lsh/lua/lstrlib.c	/^  const char *src_init;  \/* init of source string *\/$/;"	m	struct:MatchState	file:
-ss	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon43
+ss	include/proc.h	/^	u32 eip,cs,eflags,esp,ss;	\/**auto pushed by hardware*\/$/;"	m	struct:__anon48
 ss	include/proc.h	/^	unsigned short ss, __ssh;$/;"	m	struct:tss
 ss0	include/proc.h	/^	unsigned short ss0,__ss0h;$/;"	m	struct:tss
 ss1	include/proc.h	/^	unsigned short ss1,__ss1h;$/;"	m	struct:tss
@@ -5192,7 +5268,7 @@ stab_getstr	debug/stab.c	25;"	d	file:
 stab_init	debug/stab.c	/^void stab_init(void){$/;"	f
 stack	lsh/lua/lstate.h	/^  StkId stack;  \/* stack base *\/$/;"	m	struct:lua_State
 stack_error	src/kernel.asm	/^stack_error:$/;"	l
-stack_frame	include/proc.h	/^}stack_frame;$/;"	t	typeref:struct:__anon43
+stack_frame	include/proc.h	/^}stack_frame;$/;"	t	typeref:struct:__anon48
 stack_init	lsh/lua/lstate.c	/^static void stack_init (lua_State *L1, lua_State *L) {$/;"	f	file:
 stack_last	lsh/lua/lstate.h	/^  StkId stack_last;  \/* last free slot in the stack *\/$/;"	m	struct:lua_State
 stacksize	lsh/lua/lstate.h	/^  int stacksize;$/;"	m	struct:lua_State
@@ -5214,15 +5290,16 @@ start_xmit	src/include/linux/netdevice.h	/^	int		(*start_xmit) (struct sk_buff *
 startpc	lsh/lua/lobject.h	/^  int startpc;  \/* first point where variable is active *\/$/;"	m	struct:LocVar
 stat_wnd	src/lib/printf.c	/^struct cell stat_wnd[STAT_WND_H][PAGE_W];$/;"	v	typeref:struct:cell
 state	cmd/tcp.cc	/^	int state;$/;"	m	struct:connect	file:
+state	src/include/linux/timer.h	/^	int state;$/;"	m	struct:timer
 state	src/net/ipv4/tcp.cc	/^	int state;$/;"	m	struct:connect	file:
 state_size	lsh/lua/lstate.c	27;"	d	file:
 statement	lsh/lua/lparser.c	/^static int statement (LexState *ls) {$/;"	f	file:
 static_alloc	src/mm/slab.c	/^void * static_alloc(int objsize, int objnum){$/;"	f
 static_cursor_up	src/include/linux/slab.h	28;"	d
 statnames	lsh/lua/lbaselib.c	/^static const char *const statnames[] =$/;"	v	file:
-status	include/irq.h	/^	unsigned status;$/;"	m	struct:__anon39
+status	include/irq.h	/^	unsigned status;$/;"	m	struct:__anon44
 status	lsh/lua/ldo.c	/^  volatile int status;  \/* error code *\/$/;"	m	struct:lua_longjmp	file:
-status	lsh/lua/ldump.c	/^ int status;$/;"	m	struct:__anon70	file:
+status	lsh/lua/ldump.c	/^ int status;$/;"	m	struct:__anon75	file:
 status	lsh/lua/lstate.h	/^  lu_byte status;$/;"	m	struct:lua_State
 status	lsh/lua/lua.c	/^  int status;$/;"	m	struct:Smain	file:
 status	src/include/linux/pci.h	/^	u16 status;$/;"	m	struct:pci_dev
@@ -5263,7 +5340,7 @@ strcpy	src/utils.c	/^char*strcpy(char*dest,char*src){$/;"	f
 stringmark	lsh/lua/lgc.c	40;"	d	file:
 stringtable	lsh/lua/lstate.h	/^typedef struct stringtable {$/;"	s
 stringtable	lsh/lua/lstate.h	/^} stringtable;$/;"	t	typeref:struct:stringtable
-strip	lsh/lua/ldump.c	/^ int strip;$/;"	m	struct:__anon70	file:
+strip	lsh/lua/ldump.c	/^ int strip;$/;"	m	struct:__anon75	file:
 strip_space	cmd/old/han2pinyin.lua	/^local function strip_space(str)$/;"	f
 stripping	lsh/lua/luac.c	/^static int stripping=0;			\/* strip debug information? *\/$/;"	v	file:
 strlen	src/utils.c	/^int strlen(char*str){$/;"	f
@@ -5276,7 +5353,7 @@ strncpy	src/utils.c	/^char *strncpy(char *dest, const char *src, int n){$/;"	f
 strnstr	lsh/utils.c	/^char *strnstr(char* s1, char* s2, int n)  $/;"	f
 strt	lsh/lua/lstate.h	/^  stringtable strt;  \/* hash table for strings *\/$/;"	m	struct:global_State
 struc	src/bootinfo.asm	/^struc realmod_info_stru$/;"	l
-sub	src/include/linux/pci_vendor.h	/^			u8 sub;$/;"	m	struct:pci_classcode::__anon16::__anon17
+sub	src/include/linux/pci_vendor.h	/^			u8 sub;$/;"	m	struct:pci_classcode::__anon17::__anon18
 subdevice	src/include/linux/pci.h	/^	u16 subvendor, subdevice;$/;"	m	struct:pci_device_id
 subexpr	lsh/lua/lparser.c	/^static BinOpr subexpr (LexState *ls, expdesc *v, unsigned int limit) {$/;"	f	file:
 subind	debug/include/stab.h	/^struct subind{	\/**sbind and ubind has same structure*\/$/;"	s
@@ -5327,19 +5404,27 @@ tag_NONRESIDATTR	include/ntfs.h	/^typedef struct tag_NONRESIDATTR {$/;"	s
 tag_NTFS_header	include/ntfs.h	/^typedef struct	tag_NTFS_header{$/;"	s
 tag_RESIDATTR	include/ntfs.h	/^typedef struct tag_RESIDATTR {$/;"	s
 tag_error	lsh/lua/lauxlib.c	/^static void tag_error (lua_State *L, int narg, int tag) {$/;"	f	file:
-tail	include/proc.h	/^	int tail;$/;"	m	struct:__anon42
+tail	include/proc.h	/^	int tail;$/;"	m	struct:__anon47
 tail	src/include/linux/netdevice.h	/^	struct sk_buff *tail;$/;"	m	struct:skb_queue	typeref:struct:skb_queue::sk_buff
-tail_pipe	lsh/lsh.c	/^}tail_pipe;$/;"	v	typeref:struct:__anon80	file:
+tail_pipe	lsh/lsh.c	/^}tail_pipe;$/;"	v	typeref:struct:__anon85	file:
 tailcalls	lsh/lua/lstate.h	/^  int tailcalls;  \/* number of tail calls lost under this entry *\/$/;"	m	struct:CallInfo
 target	debug/makefile	/^target=t$/;"	m
 task_available	src/lib/printf.c	/^bool task_available = false;$/;"	v
 taste_decimal	src/lib/vsprintf.c	/^static u32 taste_decimal(char *ptr, int *charnum){$/;"	f	file:
 taste_digit	lsh/utils.c	/^int taste_digit(char *at){$/;"	f
 tconcat	lsh/lua/ltablib.c	/^static int tconcat (lua_State *L) {$/;"	f	file:
+tcp_ack_fin	src/net/ipv4/tcp.cc	/^static void tcp_ack_fin(struct connect *connect, struct sk_buff *comer){}$/;"	f	file:
+tcp_checksum	src/net/ipv4/tcp.cc	/^static int tcp_checksum(struct sk_buff *comer){$/;"	f	file:
+tcp_down	src/net/ipv4/tcp.cc	/^static int tcp_down(struct sk_buff *skb, u32 dest_ip, u32 src_ip){$/;"	f	file:
+tcp_dup_ack	src/net/ipv4/tcp.cc	/^void tcp_dup_ack(struct connect *connect, struct sk_buff *trigger){$/;"	f
+tcp_echo_down	src/net/ipv4/tcp.cc	/^static int tcp_echo_down(struct sk_buff *skb){$/;"	f	file:
 tcp_layer_recv	cmd/tcp.cc	/^void tcp_layer_recv(struct sk_buff *comer){$/;"	f
 tcp_layer_recv	src/net/ipv4/tcp.cc	/^void tcp_layer_recv(struct sk_buff *comer){$/;"	f
+tcp_opt	src/include/net/tcp.h	/^struct tcp_opt{$/;"	s
+tcphash	src/include/net/tcp.h	/^static inline u32 tcphash(u32 hisip, u16 hisport, u32 myport){$/;"	f
 tcphdr	src/include/linux/skbuff.h	/^		struct tcphdr *tcphdr;$/;"	m	union:sk_buff::__anon13	typeref:struct:sk_buff::__anon13::tcphdr
 tcphdr	src/include/net/tcp.h	/^struct tcphdr{$/;"	s
+tcpxiachenrukou	src/net/ipv4/tcp.cc	/^static void tcpxiachenrukou(struct sk_buff *skb){$/;"	f	file:
 temp_mmio_map	src/mm.c	/^void temp_mmio_map(void){$/;"	f
 tentacle	src/include/linux/blkdev.h	/^	struct list_head tentacle;$/;"	m	struct:request	typeref:struct:request::list_head
 tentacle	src/mm/slab.c	/^	struct list_head tentacle;$/;"	m	struct:slab	typeref:struct:slab::list_head	file:
@@ -5353,23 +5438,23 @@ testbit	lsh/lua/lgc.h	34;"	d
 testbits	lsh/lua/lgc.h	29;"	d
 testbuf	src/kernel.c	/^char *testbuf;$/;"	v
 testbuf	src/mm.c	/^char testbuf[1024];$/;"	v
-testnd	src/drivers/net/8139.c	/^static struct net_device *testnd;$/;"	v	typeref:struct:net_device	file:
 testnet	src/net/core/testnet.c	/^void testnet(void){$/;"	f
 testnext	lsh/lua/lparser.c	/^static int testnext (LexState *ls, int c) {$/;"	f	file:
-text	lsh/lsh.c	/^	char *text;$/;"	m	struct:__anon80	file:
-textlen	lsh/lsh.c	/^	int textlen;$/;"	m	struct:__anon80	file:
+text	lsh/lsh.c	/^	char *text;$/;"	m	struct:__anon85	file:
+textlen	lsh/lsh.c	/^	int textlen;$/;"	m	struct:__anon85	file:
 th	lsh/lua/lstate.h	/^  struct lua_State th;  \/* thread *\/$/;"	m	union:GCObject	typeref:struct:GCObject::lua_State
 third_hdr	src/include/linux/skbuff.h	/^		void *third_hdr;$/;"	m	union:sk_buff::__anon13
-thread	include/proc.h	/^			struct thread thread;$/;"	m	struct:pcb::__anon44::__anon45	typeref:struct:pcb::__anon44::__anon45::thread
+thread	include/proc.h	/^			struct thread thread;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::thread
 thread	include/proc.h	/^struct thread{$/;"	s
 threshold	src/drivers/net/8139.c	/^			int threshold: 6;$/;"	m	struct:TxStatusReg::__anon5::__anon6	file:
 thvalue	lsh/lua/lobject.h	101;"	d
 ticks	src/schedule.c	/^unsigned ticks;$/;"	v
 time_bh	src/time.c	/^static int time_bh;$/;"	v	file:
 time_bottomhalf	src/time.c	/^void time_bottomhalf(void *data){$/;"	f
-time_slice	include/proc.h	/^			u32 time_slice,time_slice_full;$/;"	m	struct:pcb::__anon44::__anon45
-time_slice_full	include/proc.h	/^			u32 time_slice,time_slice_full;$/;"	m	struct:pcb::__anon44::__anon45
+time_slice	include/proc.h	/^			u32 time_slice,time_slice_full;$/;"	m	struct:pcb::__anon49::__anon50
+time_slice_full	include/proc.h	/^			u32 time_slice,time_slice_full;$/;"	m	struct:pcb::__anon49::__anon50
 timer	src/include/linux/timer.h	/^struct timer{$/;"	s
+timer	src/net/ipv4/tcp.cc	/^	struct timer *timer;	\/*delay for issue acknowledgement*\/$/;"	m	struct:recv_wnd	typeref:struct:recv_wnd::timer	file:
 timer_handler	src/kernel.c	/^void timer_handler(void *data){$/;"	f
 timer_interrupt	src/time.c	/^static void timer_interrupt(int irq){$/;"	f	file:
 times	src/boot.asm	/^times 512-($-$$) db 0$/;"	l
@@ -5383,6 +5468,7 @@ tmp_tbl_addr	src/boot.asm	/^tmp_tbl_addr equ 0x200000-0x1000$/;"	d
 tmudata	lsh/lua/lstate.h	/^  GCObject *tmudata;  \/* last element of list of userdata to be GC *\/$/;"	m	struct:global_State
 tn_map	debug/include/stab.h	/^	typenumber_t* *tn_map;$/;"	m	struct:fileobj
 tnum_of_header	debug/include/stab.h	/^	int *tnum_of_header;$/;"	m	struct:fileobj
+to_ack	src/net/ipv4/tcp.cc	/^	struct sk_buff *to_ack;		\/* to be acknowledged, zhixiangyuleft edgeliantongdezuiyouyige$/;"	m	struct:recv_wnd	typeref:struct:recv_wnd::sk_buff	file:
 tofile	lsh/lua/liolib.c	/^static FILE *tofile (lua_State *L) {$/;"	f	file:
 tofilep	lsh/lua/liolib.c	54;"	d	file:
 token	lsh/lua/llex.h	/^  int token;$/;"	m	struct:Token
@@ -5408,6 +5494,7 @@ traversestack	lsh/lua/lgc.c	/^static void traversestack (global_State *g, lua_St
 traversetable	lsh/lua/lgc.c	/^static int traversetable (global_State *g, Table *h) {$/;"	f	file:
 treatstackoption	lsh/lua/ldblib.c	/^static void treatstackoption (lua_State *L, lua_State *L1, const char *fname) {$/;"	f	file:
 tremove	lsh/lua/ltablib.c	/^static int tremove (lua_State *L) {$/;"	f	file:
+trigger_mytimer	src/kernel/timer.c	/^void trigger_mytimer(struct timer *timer){$/;"	f
 trip_pairs_core	lsh/lsh.c	/^static int trip_pairs_core(char *replacer){$/;"	f	file:
 true	debug/include/valType.h	6;"	d
 true	include/valType.h	8;"	d
@@ -5415,11 +5502,12 @@ true	lsh/utils.h	6;"	d
 try_parse_cmd	debug/pdb.c	/^int try_parse_cmd(char *cmd){$/;"	f
 trydecpoint	lsh/lua/llex.c	/^static void trydecpoint (LexState *ls, SemInfo *seminfo) {$/;"	f	file:
 tryfuncTM	lsh/lua/ldo.c	/^static StkId tryfuncTM (lua_State *L, StkId func) {$/;"	f	file:
-ts	lsh/lua/llex.h	/^  TString *ts;$/;"	m	union:__anon58
+ts	lsh/lua/llex.h	/^  TString *ts;$/;"	m	union:__anon63
 ts	lsh/lua/lstate.h	/^  union TString ts;$/;"	m	union:GCObject	typeref:union:GCObject::TString
 tss	include/proc.h	/^struct tss{$/;"	s
 tss	src/kernel.asm	/^tss:$/;"	l
-tsv	lsh/lua/lobject.h	/^  } tsv;$/;"	m	union:TString	typeref:struct:TString::__anon61
+tstamp_permit	src/net/ipv4/tcp.cc	/^	bool tstamp_permit;	\/\/bencilianjiezhichitime stampma.yifangbuzhichi,jiushuangfangguanbi.$/;"	m	struct:connect	file:
+tsv	lsh/lua/lobject.h	/^  } tsv;$/;"	m	union:TString	typeref:struct:TString::__anon66
 tsvalue	lsh/lua/lobject.h	95;"	d
 tsym_hash	debug/include/stab.h	/^	stringhash_t tsym_hash;$/;"	m	struct:fileobj
 tsym_num	debug/include/stab.h	/^	int tsym_num;$/;"	m	struct:fileobj
@@ -5455,14 +5543,14 @@ type	src/include/linux/cell_common.h	/^	unsigned type;$/;"	m	struct:cell
 type	src/include/net/icmp.h	/^	u8 type;$/;"	m	struct:icmphdr
 type	src/kernel.c	/^	u32 type:2;$/;"	m	struct:cpuid_family	file:
 typenumber	debug/include/stab.h	/^	typenumber_t typenumber;	\/**record the type-$/;"	m	struct:typeobj
-typenumber	debug/include/stab.h	/^	typenumber_t typenumber;$/;"	m	struct:__anon54
+typenumber	debug/include/stab.h	/^	typenumber_t typenumber;$/;"	m	struct:__anon59
 typenumber	debug/include/stab.h	/^	typenumber_t typenumber;$/;"	m	struct:subind
 typenumber	debug/include/stab.h	/^typedef union typenumber{$/;"	u
 typenumber_t	debug/include/stab.h	/^}typenumber_t;$/;"	t	typeref:union:typenumber
 typeobj	debug/include/stab.h	/^typedef struct typeobj{$/;"	s
 typeobj_t	debug/include/stab.h	/^}typeobj_t;$/;"	t	typeref:struct:typeobj
-u	lsh/lua/lobject.h	/^  } u;$/;"	m	struct:UpVal	typeref:union:UpVal::__anon63
-u	lsh/lua/lparser.h	/^  } u;$/;"	m	struct:expdesc	typeref:union:expdesc::__anon68
+u	lsh/lua/lobject.h	/^  } u;$/;"	m	struct:UpVal	typeref:union:UpVal::__anon68
+u	lsh/lua/lparser.h	/^  } u;$/;"	m	struct:expdesc	typeref:union:expdesc::__anon73
 u	lsh/lua/lstate.h	/^  union Udata u;$/;"	m	union:GCObject	typeref:union:GCObject::Udata
 u16	debug/include/valType.h	/^typedef unsigned short u16;$/;"	t
 u16	include/valType.h	/^typedef unsigned short u16;$/;"	t
@@ -5474,7 +5562,7 @@ u32	src/kernel.c	/^	u32 :4;$/;"	m	struct:cpuid_family	file:
 u8	debug/include/valType.h	/^typedef unsigned char u8;$/;"	t
 u8	include/valType.h	/^typedef unsigned char u8;$/;"	t
 u8	lsh/han2pinyin.c	/^typedef unsigned char u8;$/;"	t	file:
-ubind	debug/include/stab.h	/^		struct subind *sbind, *ubind;$/;"	m	union:typeobj::__anon53	typeref:struct:typeobj::__anon53::
+ubind	debug/include/stab.h	/^		struct subind *sbind, *ubind;$/;"	m	union:typeobj::__anon58	typeref:struct:typeobj::__anon58::
 uchar	lsh/lua/lstrlib.c	24;"	d	file:
 ud	lsh/lua/lapi.c	/^  void *ud;$/;"	m	struct:CCallS	file:
 ud	lsh/lua/lstate.h	/^  void *ud;         \/* auxiliary data to `frealloc' *\/$/;"	m	struct:global_State
@@ -5535,7 +5623,7 @@ upvals	lsh/lua/lobject.h	/^  UpVal *upvals[1];$/;"	m	struct:LClosure
 upvalue	lsh/lua/lobject.h	/^  TValue upvalue[1];$/;"	m	struct:CClosure
 upvalues	lsh/lua/lobject.h	/^  TString **upvalues;  \/* upvalue names *\/$/;"	m	struct:Proto
 upvalues	lsh/lua/lparser.h	/^  upvaldesc upvalues[LUAI_MAXUPVALUES];  \/* upvalues *\/$/;"	m	struct:FuncState
-urg_ptr	src/include/net/tcp.h	/^	u16 urg_ptr;$/;"	m	struct:tcphdr
+urgptr	src/include/net/tcp.h	/^	u16 urgptr;$/;"	m	struct:tcphdr
 usAttrOffset	include/ntfs.h	/^	u16 usAttrOffset;\/\/��һ�����Ե�ƫ�Ƶ�ַ$/;"	m	struct:tag_MFTHEAD
 usAttrSize	include/ntfs.h	/^	u16	usAttrSize;\/\/���Դ�С����������ͷ��$/;"	m	struct:tag_MFTATTR
 usDataOffset	include/ntfs.h	/^	u16	usDataOffset; 	\/\/ ������ƫ��$/;"	m	struct:tag_MFTATTR
@@ -5556,7 +5644,7 @@ utils1_stru	debug/kernel/utils1.h	/^typedef struct utils1_stru{$/;"	s
 utils1_stru_t	debug/kernel/utils1.h	/^}utils1_stru_t;$/;"	t	typeref:struct:utils1_stru
 utils_stru	debug/kernel/utils.h	/^typedef struct utils_stru{$/;"	s
 utils_stru_t	debug/kernel/utils.h	/^}utils_stru_t;$/;"	t	typeref:struct:utils_stru
-uv	lsh/lua/lobject.h	/^  } uv;$/;"	m	union:Udata	typeref:struct:Udata::__anon62
+uv	lsh/lua/lobject.h	/^  } uv;$/;"	m	union:Udata	typeref:struct:Udata::__anon67
 uv	lsh/lua/lstate.h	/^  struct UpVal uv;$/;"	m	union:GCObject	typeref:struct:GCObject::UpVal
 uvalue	lsh/lua/lobject.h	97;"	d
 uvhead	lsh/lua/lstate.h	/^  UpVal uvhead;  \/* head of double-linked list of all open upvalues *\/$/;"	m	struct:global_State
@@ -5565,23 +5653,23 @@ v	lsh/lua/lparser.c	/^  expdesc v;  \/* last list item read *\/$/;"	m	struct:Con
 v	lsh/lua/lparser.c	/^  expdesc v;  \/* variable (global, local, upvalue, or indexed) *\/$/;"	m	struct:LHS_assign	file:
 v_begin	lsh/vi.h	/^	char *v_begin;	\/* 0 on reset *\/$/;"	m	struct:vi
 v_beginl	lsh/vi.h	/^	int v_beginl;	\/* -1 on reset*\/$/;"	m	struct:vi
-v_head	lsh/vi.h	/^	union{char *v_head; char *v_start;};$/;"	m	union:vi::__anon75
+v_head	lsh/vi.h	/^	union{char *v_head; char *v_start;};$/;"	m	union:vi::__anon80
 v_m	lsh/vi.h	/^	int v_m; int v_n;	\/*buffer smaller\/bigger line for mod 'v'*\/$/;"	m	struct:vi
 v_n	lsh/vi.h	/^	int v_m; int v_n;	\/*buffer smaller\/bigger line for mod 'v'*\/$/;"	m	struct:vi
-v_start	lsh/vi.h	/^	union{char *v_head; char *v_start;};$/;"	m	union:vi::__anon75
+v_start	lsh/vi.h	/^	union{char *v_head; char *v_start;};$/;"	m	union:vi::__anon80
 v_tail	lsh/vi.h	/^	char *v_tail;	\/*buffer smaller\/bigger anchor for mod 'v',$/;"	m	struct:vi
 valiswhite	lsh/lua/lgc.h	75;"	d
 value	debug/include/stab.h	/^	int value;	$/;"	m	struct:ebind
 value	debug/include/stab.h	/^	unsigned value;		\/**common value mode*\/$/;"	m	union:typenumber
-value	lsh/lua/lobject.h	/^    TValue value;  \/* the value (when closed) *\/$/;"	m	union:UpVal::__anon63
+value	lsh/lua/lobject.h	/^    TValue value;  \/* the value (when closed) *\/$/;"	m	union:UpVal::__anon68
 value	src/drivers/net/8139.c	/^		unsigned value;$/;"	m	union:TxStatusReg::__anon5	file:
 value	src/include/linux/pci.h	/^		u16 value;$/;"	m	union:pci_config_addr::__anon8
-value	src/include/linux/pci_vendor.h	/^			unsigned value: 24;$/;"	m	struct:pci_classcode::__anon16::__anon18
+value	src/include/linux/pci_vendor.h	/^			unsigned value: 24;$/;"	m	struct:pci_classcode::__anon17::__anon19
 value	src/lib/printf.c	/^		char value;$/;"	m	union:colormod::__anon1	file:
 value	src/lib/printf.c	/^		u16 value;$/;"	m	union:cell::__anon3	file:
 value2str	src/lib/vsprintf.c	/^static char *value2str(u32 value, char t_flag, char *ascii_buf,  int buflen ){$/;"	f	file:
 varname	lsh/lua/lobject.h	/^  TString *varname;$/;"	m	struct:LocVar
-varobj_t	debug/include/stab.h	/^}varobj_t;$/;"	t	typeref:struct:__anon54
+varobj_t	debug/include/stab.h	/^}varobj_t;$/;"	t	typeref:struct:__anon59
 vendor	src/include/linux/pci.h	/^	u16 vendor, device;$/;"	m	struct:pci_device_id
 vendor	src/include/linux/pci.h	/^	u16 vendor;$/;"	m	struct:pci_dev
 version	src/include/net/ip.h	/^	int version: 4;$/;"	m	struct:iphdr
@@ -5771,6 +5859,7 @@ wSectorPerFat	include/ntfs.h	/^    short    wSectorPerFat;	    \/\/����0	$/;"	m	
 wSectorPerTrack	include/ntfs.h	/^    short    wSectorPerTrack;   \/\/	$/;"	m	struct:tag_NTFS_header
 wUnknownAttrIndexID	include/ntfs.h	/^	short wUnknownAttrIndexID; $/;"	m	struct:tag_RESIDATTR
 wUnknownSeqNum	include/ntfs.h	/^	u16 wUnknownSeqNum; \/\/$/;"	m	struct:tag_MFTHEAD
+waiting_for_it	src/net/ipv4/tcp.cc	/^static inline bool waiting_for_it(struct sk_buff *it, struct connect *connect){$/;"	f	file:
 waiting_for_transmit	src/net/core/dev.c	/^void waiting_for_transmit(struct sk_buff *skb){$/;"	f
 wake_up	src/schedule.c	/^void wake_up(struct pcb *p){$/;"	f
 wcbSize	include/ntfs.h	/^	short		wcbSize;$/;"	m	struct:tag_INDXATTR
@@ -5778,9 +5867,12 @@ weak	lsh/lua/lstate.h	/^  GCObject *weak;  \/* list of weak tables (to be cleare
 what	lsh/lua/lua.h	/^  const char *what;	\/* (S) `Lua', `C', `main', `tail' *\/$/;"	m	struct:lua_Debug
 whilestat	lsh/lua/lparser.c	/^static void whilestat (LexState *ls, int line) {$/;"	f	file:
 white2gray	lsh/lua/lgc.c	37;"	d	file:
+who_am_i	src/net/core/dev.c	/^struct net_device * who_am_i(u8 *mac){$/;"	f
 width	src/disp.c	/^static int width=-1;$/;"	v	file:
 win_result	src/drivers/ide/ide.c	/^static int win_result(struct ide_hwif *hwif){$/;"	f	file:
+wnd_adopt_one	src/net/ipv4/tcp.cc	/^static int wnd_adopt_one(struct connect *connect, struct sk_buff *one){$/;"	f	file:
 wndsize	src/include/net/tcp.h	/^	u16 wndsize;$/;"	m	struct:tcphdr
+word	src/include/net/tcp.h	/^		u16 word[0];$/;"	m	union:tcp_opt::__anon29
 write_asciis_buffer	src/disp.c	/^void write_asciis_buffer(unsigned x,unsigned val_type){$/;"	f
 write_bar	src/lib/printf.c	/^void write_bar(int x, int y, char *title, char *content){$/;"	f
 write_chars	src/lib/vsprintf.c	/^static int write_chars(char *dest, char *src,  char *endflags, int width){$/;"	f	file:
@@ -5792,7 +5884,7 @@ write_screen	src/lib/printf.c	/^static int write_screen(struct cell *start, char
 write_variable	src/lib/vsprintf.c	/^static int write_variable(char *buf, u32 value, char flag, int width){$/;"	f	file:
 writeb	src/arch/x86/include/asm/io.h	/^static inline void writeb(unsigned addr, u8 value){$/;"	f
 writel	src/arch/x86/include/asm/io.h	/^static inline void writel(unsigned addr, unsigned value){$/;"	f
-writer	lsh/lua/ldump.c	/^ lua_Writer writer;$/;"	m	struct:__anon70	file:
+writer	lsh/lua/ldump.c	/^ lua_Writer writer;$/;"	m	struct:__anon75	file:
 writer	lsh/lua/lstrlib.c	/^static int writer (lua_State *L, const void* b, size_t size, void* B) {$/;"	f	file:
 writer	lsh/lua/luac.c	/^static int writer(lua_State* L, const void* p, size_t size, void* u)$/;"	f	file:
 writew	src/arch/x86/include/asm/io.h	/^static inline void writew(unsigned addr, u16 value){$/;"	f
@@ -5805,11 +5897,12 @@ x	debug/kernel/utils1.h	/^	int x;$/;"	m	struct:utils1_stru
 x_udelay	src/utils.c	/^static int x_udelay;$/;"	v	file:
 y	debug/kernel/t.h	/^	int y:8;$/;"	m	struct:bfield
 yindex	lsh/lua/lparser.c	/^static void yindex (LexState *ls, expdesc *v) {$/;"	f	file:
-yingdazhe_dengdaiqueren	cmd/tcp.cc	/^	 yingdazhe_dengdaiqueren,$/;"	e	enum:__anon30	file:
-yingdazhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 yingdazhe_dengdaiqueren,$/;"	e	enum:__anon29	file:
+yingdazhe_dengdaiqueren	cmd/tcp.cc	/^	 yingdazhe_dengdaiqueren,$/;"	e	enum:__anon35	file:
+yingdazhe_dengdaiqueren	src/net/ipv4/tcp.cc	/^	 yingdazhe_dengdaiqueren,$/;"	e	enum:__anon34	file:
 ylines	lsh/vi.h	/^	char **ylines;$/;"	m	struct:vi
 ylines_fix	lsh/vi.h	/^	char **ylines_fix;$/;"	m	struct:vi
 ylmax	lsh/vi.h	/^	int ylmax;$/;"	m	struct:vi_clipinfo
+yourip	src/include/linux/skbuff.h	/^	u32 yourip;$/;"	m	struct:pseudo_hdr
 yourip	src/include/net/arp.h	/^	u32 yourip;$/;"	m	struct:arphdr
 yourip	src/include/net/ip.h	/^	u32 yourip;$/;"	m	struct:iphdr
 yourmac	src/include/linux/if_ether.h	/^	char yourmac[6];$/;"	m	struct:ethhdr
@@ -5820,7 +5913,10 @@ yy	lsh/vi.h	/^	char yy;$/;"	m	struct:vi_clipinfo
 z	debug/kernel/t.h	/^	int z:17;$/;"	m	struct:bfield
 z	lsh/lua/ldo.c	/^  ZIO *z;$/;"	m	struct:SParser	file:
 z	lsh/lua/llex.h	/^  ZIO *z;  \/* input stream *\/$/;"	m	struct:LexState
+zero	src/include/linux/skbuff.h	/^	u8 zero;$/;"	m	struct:pseudo_hdr
 zgetc	lsh/lua/lzio.h	22;"	d
+zhizhenjianju	src/net/ipv4/tcp.cc	/^static inline int zhizhenjianju(void *ptr1, void *ptr2){$/;"	f	file:
+zhizhentuiyi	src/net/ipv4/tcp.cc	17;"	d	file:
 zone_dma	include/mmzone.h	/^zone_t zone_dma;$/;"	v
 zone_highmem	include/mmzone.h	/^zone_t zone_highmem;$/;"	v
 zone_mem_map	include/mmzone.h	/^	struct page *zone_mem_map;	\/**first page descriptor of zone*\/$/;"	m	struct:zone_struct	typeref:struct:zone_struct::page

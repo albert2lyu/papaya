@@ -10,7 +10,7 @@ void send_data(char *data){
 		//skb->len = ARP_PACK_SIZE;
 		//waiting_for_transmit(skbarr[i]);
 		u32 yourip = MAKE_IP(192, 168, 0, 22);
-		arp_inquire(yourip, 0, 0);
+		arp_inquire(yourip);
 	}
 	//nic_wake_queue(testnd);	
 }
@@ -19,10 +19,17 @@ void testnet(void){
 	//register_e1000_driver();
 	register_rtl8139_driver();
 	//pci_register_driver(&rtl8139_driver);
-	//spin("before testnd open");
 	//oprintf("testnd:%x", testnd);
-	struct net_device *netdev = pick_nic();
+	list_nic();
+
+	struct net_device *netdev = pick_nic(0, MAKE_IP(192,168,0,9));
+	struct net_device *netdev2 = pick_nic(0, MAKE_IP(192,168,1,9));
 	netdev->open(netdev);
+	netdev2->open(netdev2);
+	//oprintf("=======\n");
+	//info_nic(netdev);
+	//info_nic(netdev2);
+	return;
 	//spin("after testnd open");
 //	__asm__ __volatile__("sti");
 	//info_regs(testnd);

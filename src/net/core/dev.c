@@ -5,18 +5,75 @@
 #include<linux/byteorder/generic.h>
 #define IN_WAKE_QUEUE 1
 
-#define YOUR_NIC_NUM 8
-static struct net_device *__all_your_nic[YOUR_NIC_NUM];
-/* just return a nic for usage, we handle multiple network-adapters in future */
-struct net_device *pick_nic(void){
-	for(int i = 0; i < YOUR_NIC_NUM; i++){
-		if(__all_your_nic[i]) return __all_your_nic[i];
+#define YOUR_NIC_CNT 4
+static struct net_device *__all_your_nic[YOUR_NIC_CNT];
+
+struct net_device * who_am_i(u8 *mac){
+	struct net_device *this;
+	for(int i = 0; i < YOUR_NIC_CNT; i++){
+		if( (this = __all_your_nic[i]) && 
+			 memcmp(this->mac, mac, 6) == 0 )
+		{
+			return this;
+		}
 	}
 	return 0;
 }
 
+void info_nic(struct net_device *netdev){
+	//oprintf("IN DEV, sizeof = %u", sizeof(struct net_device));
+	u8 *mac = netdev->mac;
+	struct eax { u8 al; u8 ah; u8 AL; u8 AH;};
+	struct eax *ip = (void *)&netdev->ip;
+	oprintf("mac: %x%x%x%x%x%x    << *%x >>ip:%u.%u.%u.%u \n",  mac[0], mac[1], mac[2], mac[3], mac[4], mac[5], 
+													  &netdev->ip,
+													  ip->AH, ip->AL, ip->ah, ip->al);	
+	return;
+}
+void list_nic(void){
+	struct net_device *this;
+	for(int i = 0; i < YOUR_NIC_CNT; i++){
+		if( (this = __all_your_nic[i]) ){
+			oprintf("nic[%u]: ", i);
+			info_nic(this);
+		}
+	}
+}
+
+/* 发送一个package之前，通过目标ip和源ip挑选合适的网卡
+ * case 1: dest_ip = 0, src_ip有效。
+ *  	   这是最常见的情况，根据source ip匹配网卡。
+ * case 2: src_ip = 0, dest_ip有效。
+ *		   当你想跟一个局域网里的peer通信时，可以只给出目的ip,内核会认为你想
+ 		   在局域网内通信，并挑选跟他同一网段的网卡。
+ */
+struct net_device *pick_nic(u32 dest_ip, u32 src_ip){
+	assert(dest_ip || src_ip);
+	struct net_device *this;
+	for(int i = 0; i < YOUR_NIC_CNT; i++){
+		if((this = __all_your_nic[i])){
+			if(this->ip == src_ip) return this;	//先通过src_ip挑选网卡
+			//尝试找跟dest_ip同一子网的网卡
+			//这是最简单的实现，有bug
+			if((dest_ip & this->ipmask) == (this->ip & this->ipmask)){
+				return this;
+			}
+		}
+	}
+	//TODO 取消assert， 有一种情况，程序要访问的ip是公网，而且它设置source ip 
+	//     为0 或者伪造ip。那一定找不到对应的网卡。就随便挑一个算了。
+	struct __eax *eax = (void *)&dest_ip;
+	oprintf("want to %u.%u.%u.%u\n", eax->AH, eax->AL, eax->ah, eax->al);	
+	eax = (void *)&src_ip;
+	oprintf("from %u.%u.%u.%u\n", eax->AH, eax->AL, eax->ah, eax->al);	
+
+	//oprintf("wanna dest: %u, source: %u\n", dest_ip, src_ip);
+	assert(0 && "pic nic failed");
+	return 0;
+}
+
 void register_nic(struct net_device *netdev){
-	for(int i = 0; i < YOUR_NIC_NUM; i++){
+	for(int i = 0; i < YOUR_NIC_CNT; i++){
 		if(!__all_your_nic[i]){
 			__all_your_nic[i] = netdev;
 			return;
@@ -98,23 +155,22 @@ void nic_wake_queue(struct net_device *netdev){
 		return sti();
 	}
 	netdev->flags |= IN_WAKE_QUEUE;
-	//nic_start_queue(netdev);
 	sti();
 	
 	struct skb_queue *list = &netdev->tx_queue;
 	struct sk_buff * one;
-	oprintf("[ nic_wake_queue invoked    ");
+	//oprintf("[ nic_wake_queue invoked    ");
 	//oprintf("root:%x, tail:%x\n", list->root, list->tail);
 	int code = 0;
 	while(1){
 		netdev->tx_count++;
-		oprintf(" %u done  ", netdev->tx_count);
+		//oprintf(" %u done  ", netdev->tx_count);
 		one = list->root;
+		//info_skb(one);
 		LL2_POP(list);
 		cli();
 		code = netdev->start_xmit(one, netdev);
 		if(code == -1 || list->root == 0){
-			//nic_stop_queue(netdev);
 			netdev->flags &= ~IN_WAKE_QUEUE;
 			break;
 		}
@@ -122,7 +178,7 @@ void nic_wake_queue(struct net_device *netdev){
 	}
 
 	sti();		
-	oprintf(" nic_wake_queue quit  ]  ");
+	//oprintf(" nic_wake_queue quit  ]  ");
 	//下面这行跟不上代码了，因为从这儿出去，队列必是stooped状态。
 	//无网卡DESC，或者队列为空，都会导致队列stop
 }
@@ -149,8 +205,8 @@ void process_rx_queue( struct net_device *netdev){
 			case 0x86dd:
 				spin("ipv6 message");
 			default:
-				oprintf("protocol id:%x ", ntohs(one->ethhdr->protocol) );
-				spin("unknown protocol");
+				oprintf("protocol id:%x , IGNORE It\n", ntohs(one->ethhdr->protocol) );
+				//spin("unknown protocol");
 		}
 		cli();
 	}

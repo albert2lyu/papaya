@@ -6,6 +6,14 @@
 #define PROTOCOL_ARP  0x0806
 #define PROTOCOL_IP 0x0800
 
+struct pseudo_hdr{
+	u32 myip;
+	u32 yourip;
+	u8 zero;
+	u8 protocol;
+	u16 payload_len;
+};
+
 struct ethhdr;
 struct arphdr;
 struct iphdr;
@@ -43,6 +51,9 @@ struct sk_buff{
 		void *third_hdr;
 	};
 	struct list_head node;
+	union{
+		struct pseudo_hdr *pseudo_hdr;
+	};
 	struct {
 		struct sk_buff *frag_begin, *frag_end;
 	}debug;

@@ -63,6 +63,9 @@ struct icmphdr{
 			u16 sequence;
 		};
 	};
+	union {
+		u32 dword[0];
+	}data;
 };
 
 struct icmpmsg_un{

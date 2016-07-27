@@ -75,6 +75,9 @@ int main(int argc, char *argv[]){
 	assert( cc_path[ strlen(cc_path) - 1] == 'n');
 	cc_path[strlen(cc_path) - 1] = 'c';
 
+	//remove cc file if exists
+	remove(cc_path);
+
 	//printf("cc path:%s\n", cc_path);
 	assert( filesize(cnfile) > 0 );
 	assert( vim_open(cnfile) );
@@ -111,5 +114,6 @@ int main(int argc, char *argv[]){
 //vim->len_of_line[vim->currl],
 	}
 	assert( vim_write(cc_path) );
+	assert( chmod(cc_path, 0555) == 0);
 	return 0;
 }

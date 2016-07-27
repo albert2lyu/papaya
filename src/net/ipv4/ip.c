@@ -90,13 +90,18 @@ void ip_layer_receive(struct sk_buff *skb){
 
 /* identifier, protocol, checksum, flip 
  * 这时IP层向下的出口，我们在此把IP头转换成网络字节序。
+ * 2, source ip字段必须在这里添上，因为要计算校验和。 这意味着pick_nic要在
+ *    这里调用。
  */
 static int __ip_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){
-	assert(skb->dev);
-
+	//assert(skb->dev);
 	struct iphdr *iphdr = skb->iphdr;
+	struct net_device *nic = pick_nic(iphdr->yourip, iphdr->myip); 
+	skb->dev = nic;
+	iphdr->myip = nic->ip;
+
 	iphdr->protocol = me_protocol;
-	iphdr->msgid = skb->dev->ip_identifier++;
+	//iphdr->msgid = skb->dev->ip_identifier++;
 	iphdr->ttl = ttl;
 	
 	if(iphdr->tot_len < 1486){
@@ -105,7 +110,7 @@ static int __ip_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){
 		arp_down(skb);
 		return 0;
 	}
-
+	assert(" > MTU ");
 	/* we need slice this ip datagram */
 	struct sk_buff *group_head = ip_fragment(skb);
 	/* hand over all fragments to arp layer */
@@ -113,6 +118,8 @@ static int __ip_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){
 	void *begin = curr;
 	do{
 		struct sk_buff *frag = MB2STRU(struct sk_buff, curr, node);
+		struct net_device *nic = pick_nic(frag->iphdr->yourip, frag->iphdr->myip); 
+		frag->iphdr->myip = nic->ip;
 		arp_down(frag);
 		curr = curr->next;
 	}while(curr != begin);
@@ -134,11 +141,14 @@ int ip_down(struct sk_buff *skb, u8 me_protocol,
 	iphdr->version = 4;
 	iphdr->len = 5;
 	iphdr->ignore = 0;
+	iphdr->flag_off = 0;
 	iphdr->tot_len = skb->pkgsize - ETHHDR_LEN;
+	iphdr->myip = src_ip;
+	iphdr->yourip = dest_ip;
 	return __ip_down(skb, me_protocol, ttl);
 }
 
-int ip_echo(struct sk_buff *skb, u8 me_protocol, u8 ttl){
+int ip_echo_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){
 	struct iphdr *iphdr = skb->iphdr;
 	EXCHG_U32(iphdr->myip, iphdr->yourip);
 	return __ip_down(skb, me_protocol, ttl);
@@ -147,8 +157,10 @@ int ip_echo(struct sk_buff *skb, u8 me_protocol, u8 ttl){
 /* 产生的IP分片都是网络字节序的，因为分片时肯定要写入CRC，写入CRC就需要先
  * 做字节翻转
  */
-static struct sk_buff *ip_fragment(struct sk_buff *orgin){
-	assert(0);
+static struct sk_buff *ip_fragment(struct sk_buff *origin){
+	struct __eax *eax = (void *)&origin->iphdr->yourip;
+	oprintf("want to %u.%u.%u.%u\n", eax->AH, eax->AL, eax->ah, eax->al);	
+	assert(0 && "ip fragment spin");
 	return 0;
 }
 /* two jobs: merge data, release skbuffs.
@@ -194,13 +206,6 @@ static struct sk_buff * ip_reassemble(struct sk_buff *group_head){
 
 static void ip_up(struct sk_buff *skb){
 	struct iphdr *iphdr  = skb->iphdr;
-	struct pseudo_hdr pseudo_hdr = {
-		myip: htonl(iphdr->myip),
-		yourip: htonl(iphdr->yourip),
-		zero: 0,
-		protocol: iphdr->protocol,
-		payload_len: htons(IP_PAYLOAD_LEN(iphdr))
-	};
 	switch(iphdr->protocol){
 		case 1:
 			icmp_receive(skb);
@@ -208,9 +213,18 @@ static void ip_up(struct sk_buff *skb){
 		case 2:
 			oprintf("@IGMP\n");
 			break;
-		case 6:
-			tcp_layer_recv(skb, &pseudo_hdr);
+		case PROTOCOL_TCP:{
+			struct pseudo_hdr *
+			pseudo_hdr = kmalloc2(sizeof(struct pseudo_hdr), 0);
+			pseudo_hdr->myip = htonl(iphdr->myip);
+			pseudo_hdr->yourip = htonl(iphdr->yourip);
+			pseudo_hdr->zero = 0;
+			pseudo_hdr->protocol = iphdr->protocol;
+			pseudo_hdr->payload_len = htons(IP_PAYLOAD_LEN(iphdr));
+			skb->pseudo_hdr = pseudo_hdr;
+			tcp_layer_recv(skb);
 			break;
+		}
 		case 17:
 			udp_layer_receive(skb);
 			break;

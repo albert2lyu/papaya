@@ -13,7 +13,7 @@ all:
 	gcc -c -o lsh.o lsh.c $(options) $(lshopt) 
 	gcc -c -o han2pinyin.o han2pinyin.c $(options)
 	gcc -c -o file.o file.c $(options)
-	gcc -o lsh lsh.o vi.o utils.o $(LIB_O) $(CORE_O) $(options) $(lshopt) -Wl,-export-dynamic
+	gcc -o lsh lsh.o vi.o utils.o file.o $(LIB_O) $(CORE_O) $(options) $(lshopt) -Wl,-export-dynamic
 	gcc -o han2pinyin han2pinyin.o vi.o utils.o file.o $(LIB_O) $(CORE_O) $(options) $(lshopt) -Wl,-export-dynamic
 #gcc -o lsh lsh.o vi.o utils.o $(LIB_O) $(CORE_O) $(options) $(lshopt) 
 	touch ../.lsh.history
