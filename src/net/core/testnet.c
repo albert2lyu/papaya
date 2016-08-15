@@ -15,6 +15,7 @@ void send_data(char *data){
 	//nic_wake_queue(testnd);	
 }
 
+extern void register_rtl8139_driver(void);
 void testnet(void){
 	//register_e1000_driver();
 	register_rtl8139_driver();

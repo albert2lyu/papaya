@@ -98,4 +98,5 @@ struct request_queue * blk_get_queue(u16 dev_id);
 
 int ll_rw_block2(u16 dev_id, int rw, unsigned start, int count, char *buf);
 int ll_rw_block(u16 dev_id, int rw, unsigned start, int count, char *buf);
+void register_queue_getter(int major, get_queue_fn *get_queue, void *data);
 #endif

@@ -7,7 +7,7 @@
 * note, the status is marked IRQ_DISABLED, so you should clear this bit manually
 * after you do 'request_irq',(see time.c init_time()) otherwise...
 */
-int request_irq(int irq, void (*handler)(int, void*), unsigned flags, void *dev){
+int request_irq(int irq, void (*handler)(int, void*, struct stack_frame *), unsigned flags, void *dev){
 	if(irq < 0 || irq >=NR_IRQS || !handler) return -EINVAL;
 
 	struct irqaction *action = kmalloc(sizeof(struct irqaction));
@@ -124,7 +124,7 @@ int handle_IRQ_event(int irq){
 			spin("sti now");
 			 __asm__ __volatile__ ("sti");
 		}
-		action->func(irq, action->dev);		
+		action->func(irq, action->dev, 0);		
 		__asm__ __volatile__ ("cli");
 
 		action = action->next;

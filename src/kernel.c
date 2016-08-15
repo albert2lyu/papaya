@@ -16,7 +16,7 @@
 #include<linux/timer.h>
 char *testbuf;
 char *bigbuf;
-int avoid_compiler_warning;
+int avoid_gcc_complain;
 extern int p1,p2,sec_data;
 extern void tty(void);
 extern void tty1(void);
@@ -86,11 +86,11 @@ void kernel_c(){
 	//struct pcb *f2 = create_process((u32)func2,9,5,"func2",1);
 	struct pcb *f_init = create_process((u32)func_init,4,0xffffffff,"func_init",0);
 	//struct pcb *u_f = create_process(0x8048000,9,100,"init",3);
-	//avoid_compiler_warning = (int)f1;
-	avoid_compiler_warning = (int)f0;
-	//avoid_compiler_warning = (int)f2;
-	avoid_compiler_warning = (int)f_init;
-	//avoid_compiler_warning = (int)u_f;
+	//avoid_gcc_complain = (int)f1;
+	avoid_gcc_complain = (int)f0;
+	//avoid_gcc_complain = (int)f2;
+	avoid_gcc_complain = (int)f_init;
+	//avoid_gcc_complain = (int)u_f;
 	//tty 调用的getchar时会sleep,等醒来,再被调度时,已经到了ring1堆栈.
 	//暂时把tty放在ring1,但它是按照一个用户进程编写的.它不会调用内核其它模块的函数.暂时不能放在ring3,是因为跳到ring3后,是因为tty的代码是在ring0.
 /*	create_process((u32)tty,9,5,"tty",1);*/
@@ -150,7 +150,7 @@ void func0(void){
 		//ll_rw_block2(0x300, READ, 0, 2, bigbuf);
 		oprintf("@fun0: read block finished");
 
-		testnet();
+		//testnet();
 		while(1){
 			mdelay(1000 * 2);
 			oprintf("+");
@@ -173,17 +173,23 @@ void func2(void){
 	}
 }
 void func_init(void){
+	#if 0
 	while(1){
 		oprintf("func_init sleep");
 		kp_sleep(0, 0);
 		oprintf("func_init waked up");
 	}
+	#endif
+
 	oprintf("func init run..\n");
 	ide_read_partation(0x3, 0);
-
+	while(1);
+	oprintf("-1\n");
 	init_vfs();
 	register_filesystem("cell", cell_read_super);	
+	oprintf("0\n");
 	struct vfsmount *mnt_stru = do_mount(0x301, "/", "cell");	
+	oprintf("1\n");
 	if(!mnt_stru) spin("root device mount failed");
 	struct fs_struct *fs_stru = current->fs;
 	fs_stru->root = fs_stru->pwd = mnt_stru->small_root;
@@ -191,13 +197,15 @@ void func_init(void){
 	//current->fs = fs_stru;
 
 	struct in_dir indir;
-	//int err = pathwalk("/home/mnt/", &indir, 0);	avoid_compiler_warning = err;
+	//int err = pathwalk("/home/mnt/", &indir, 0);	avoid_gcc_complain = err;
 	mnt_stru = do_mount(0x305, "/home/mnt/", "cell");	
+	oprintf("2\n");
 	//int err = pathwalk("/home/mnt/5", &indir, 0);
 	testbuf = kmalloc(512 * 200);
 	int fd = sys_open("/home/mnt/5/dimg.c", 2, 0);
+	oprintf("3\n");
 	int rbytes = sys_read(fd, testbuf, sizeof(testbuf));
-	avoid_compiler_warning = rbytes = (unsigned)&indir;
+	avoid_gcc_complain = rbytes = (unsigned)&indir;
 
 	assert("func init keep running" && 0);
 }
@@ -285,6 +293,7 @@ static void probe(void){
 
 }
 
+#if 0
 static int scan_dirty_machine_words(unsigned start, unsigned end){
 	int count = 0;
 	for(int i = start; i < end; i += 4){
@@ -296,3 +305,4 @@ static int scan_dirty_machine_words(unsigned start, unsigned end){
 	}
 	return count;
 }
+#endif

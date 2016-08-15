@@ -63,4 +63,6 @@ int ip_echo_down(struct sk_buff *skb, u8 me_protocol, u8 ttl);
 int ip_down(struct sk_buff *skb, u8 me_protocol, 
 			u32 dest_ip, 	u32 src_ip,
 			u8 ttl);
+void ip_layer_init(void);
+void ip_layer_receive(struct sk_buff *skb);
 #endif

@@ -278,4 +278,6 @@ void __less(void *buf, int len);
 int memcmp(void *s1, void *s2, int len);
 struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};
 char * mk_ipstr(u32 ip);
+
+int __bs0s(unsigned *);		
 #endif

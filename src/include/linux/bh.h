@@ -1,7 +1,7 @@
 #ifndef BH_H
 #define BH_H
 
-typedef void(*bh_fn)(void *data) ;
+typedef int(*bh_fn)(void *data) ;
 #define BH_FLAG_DISABLE 1
 unsigned bh_flags;
 static inline void bh_enable(void){

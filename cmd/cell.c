@@ -259,7 +259,7 @@ int main(int argc, char *argv[]){
 	_pwd_block = malloc(0x100000);
 	_entpwd = malloc(64);
 	mainfd = open(argv[1], O_RDWR);
-	if(!mainfd) fail_say("open failed: %s", argv[1]); 
+	if(mainfd == -1) fail_say("open failed: %s", argv[1]); 
 	read(mainfd, mbrbuf, 1024);
 	
 	init_dp();

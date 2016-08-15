@@ -1,5 +1,6 @@
 #ifndef SCHEDULE_H
 #define SCHEDULE_H
+#include<valType.h>
 extern unsigned ticks;
 extern struct pcb *idle;
 /**if a process is prepared for running,we say it's 'active'.all active process
@@ -33,4 +34,7 @@ void wake_up(struct pcb *p);
 	:"=m"(current->pregs)\
 	:\
 	)
+
+void kp_sleep(u32 msg_type,u32 msg_bind);
+void wake_up(struct pcb *p);
 #endif

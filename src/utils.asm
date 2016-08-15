@@ -85,7 +85,7 @@ init8259A:
 	mov al,[esp+4];ERR by default,all irq-port was masked
 	out 21h,al
 	iodelay
-	mov al,11110011b;		arg meaing:[AT hard-disk irq open]  
+	mov al,10110011b;		arg meaing:[AT hard-disk irq open]  
 	out 0a1h,al
 	iodelay
 	ret

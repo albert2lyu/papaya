@@ -1,0 +1,6 @@
+1, lsh的正则表达式先按正常的来，以后有机会用
+https://github.com/GuillaumeBadi/Verbal-Exprejon
+  当参考，来设计。
+  用lua实现的话，"generator"估计写的难看一些，但采集更容易，即，能很容易的支持更美观的用户写法。
+  用C实现的话，则是反过来。
+  考虑用lsh的preprocessor以兼得。

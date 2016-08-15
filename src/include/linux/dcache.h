@@ -155,4 +155,6 @@ struct dentry *d_lookup(struct dentry *dir, struct qstr *name);
 
 #include<linux/slab.h>
 struct slab_head *dentry_cache;
+
+int d_rehash(struct dentry *dir, unsigned hash);
 #endif

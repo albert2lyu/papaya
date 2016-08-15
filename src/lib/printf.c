@@ -118,7 +118,7 @@ int oprintf(char *format, ...){
 	open_window(POS_L(cursor) - PAGE_H + 1 + 4);
 	if(IF) sti();
 	if(mm_available){
-		kfree_pg(buf, BUF_PG_ORDER);
+		kfree_pg((unsigned)buf, BUF_PG_ORDER);
 	}
 	return length;
 }

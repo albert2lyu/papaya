@@ -5,6 +5,7 @@
 #include"file.h"
 #include<stdlib.h>
 #include<limits.h>
+#include<fcntl.h>
 
 #define bool int
 typedef unsigned char u8;

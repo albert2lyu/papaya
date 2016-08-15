@@ -97,6 +97,12 @@ static char *get_lshfile(char *filename){
 static char *get_homefile(){
 	return 0;
 }
+int open_editor(int a, int b){
+	printf("hello world\n\n");
+	system("vim");
+	printf("vim return !!");
+	return 0;
+}
 int main(int argc, char *argv[]){
 	char input[1024]={0};
 	char purelua[1024] = {0};
@@ -106,6 +112,7 @@ int main(int argc, char *argv[]){
 	get_dirfile(lshdir, (char *)history_file, historyfile);
 	printf("%s\n", homedir);
 	signal(SIGINT, sighandler_ctrl);
+	rl_bind_keyseq("\\C-J", open_editor);
 	tail_pipe.active = false;
 	vi_library_init();
 	L = luaL_newstate(  );	/*opens Lua*/

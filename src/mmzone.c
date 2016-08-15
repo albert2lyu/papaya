@@ -150,7 +150,7 @@ void cleave(free_area_t *free_area, int order){
 
 //TODO here we have bug...	zone_t *__zones[3];
 void __free_pages(page_t *page, int order){
-	zone_t *zone = __zones + page->PG_zid;
+	zone_t *zone = __zones[page->PG_zid];
 	page->_count--;
 	if(page->_count != -1) return;
 	__free_pages_bulk(page, zone, order);

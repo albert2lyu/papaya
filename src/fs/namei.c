@@ -3,6 +3,7 @@
 #include<linux/fs.h>
 #include<proc.h>
 #include<linux/errno.h>
+#include<list.h>
 
 #define IS_MNT_PT(dentry) ( !list_empty( &(dentry)->vfsmount) )
 #define LOOKUP_DIR 1

@@ -1,5 +1,6 @@
 #ifndef UDP_H
 #define UDP_H
+#include<linux/skbuff.h>
 #include<valType.h>
 
 #pragma pack(push)
@@ -14,4 +15,7 @@ struct udphdr{
 };
 
 #pragma pack(pop)
+
+
+void udp_layer_receive(struct sk_buff *comer);
 #endif

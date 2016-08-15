@@ -7,6 +7,18 @@
 #include<string.h>
 #include"utils.h"
 
+#define EOL '\n'
+enum{
+	ASCII_CR = 1,
+	ASCII_ESC = 2
+};
+
+static char STR_CR[] = {ASCII_CR, 0};
+//static char STR_ESC[] = {ASCII_ESC, 0};
+static char STR_ESC_CR[] = {ASCII_ESC, ASCII_CR, '\n', 0};
+
+#define VI_CURRL_TAIL(vi) (vi->lines[vi->currl] + vi->len_of_line[vi->currl] -1)
+#define VI_CURRL_END(vi) (vi->lines[vi->currl] + vi->len_of_line[vi->currl])
 #define VI_CURRL_LEN(vi) (vi->len_of_line[vi->currl])
 #define VI_CURRL_LIMIT(vi) (vi->len_of_line[vi->currl] - 1)	//BUG empty line ?
 #define VI_CURR_OFFSET(vi) (vi->curr - vi->lines[vi->currl])
@@ -121,6 +133,8 @@ struct vi{
 	int *len_of_yline_fix;
 	int *size_of_yline_fix;
 	struct vi_clipinfo *clipinfo_fix;
+	#define VI_REGEX_LEN 128
+	char last_search[VI_REGEX_LEN];
 };
 void VI_LINE_MK(struct vi *vi, int l, char *src, int srclen);
 /*i use staic inline in two situation: that function is light enough;  that function is mainly called by library itself, and only in a few occasion*/
@@ -136,6 +150,8 @@ static void VI_A_LINES(struct vi *vi, int l, int lnum){
 }
 static inline void vi_o(struct vi*vi){
 	VI_A_LINES(vi, vi->currl, 1);
+	vi->currl++;
+	vi->curr = vi->lines[vi->currl];
 }
 void vi_$(struct vi * vi);
 void vi_0(struct vi *vi);
@@ -256,16 +272,23 @@ void vi_v(struct vi * vi);
  /*Take Care!
   * Here a whole line may be moved to anohter place by realloc, you should know
   * what you are doing :)
+  *> @return how many bytes inserted 
   */
-static inline void vi_i(struct vi*vi, char *content){
-	vi_insert_safe(vi, content, strlen(content));
+static inline int vi_i(struct vi*vi, char *content){
+	int len = strlen_ex(content, STR_ESC_CR);
+	vi_insert_safe(vi, content, len);
+	return len;
 }
-static inline void vi_a(struct vi *vi, char *content){
-	vi_append_safe(vi, content, strlen(content));
+
+static inline int vi_a(struct vi *vi, char *content){
+	int len = strlen_ex(content, STR_ESC_CR);
+	vi_append_safe(vi, content, len);
+	return len;
 }
 static inline void vi_$0(struct vi *vi){
 	vi->curr = vi->lines[vi->currl] + VI_CURRL_LEN(vi);
 }
+
 int vi_yW(struct vi *vi);
 bool vi_W(struct vi *vi);
 
@@ -305,10 +328,23 @@ static inline char* __vi_next(struct vi *vi, int currl, char *curr){
 	else return 0;
 	return (void *)__DO_NOT_COMPLAIN;
 }
+
+//vi_hg还没实现。
+//@desc 移到行尾，自动进入下一行。像是全局的右箭头
 static inline bool vi_lg(struct vi *vi){
-	assert(0);
-	return 0;
+	if(vi->curr >= VI_CURRL_TAIL(vi)){	//可能大于。当落在空行上。
+		if(vi->currl == vi->lmax) return false;
+		else{
+			vi->currl++;
+			vi->curr = vi->lines[vi->currl];
+		}
+	}
+	else{
+		vi->curr++;
+	}
+	return true;
 }
+
 static inline bool vi_H_(struct vi *vi){
 	if(vi->curr > vi->lines[vi->currl]){
 		vi->curr--;
@@ -420,5 +456,8 @@ bool vi_e_(struct vi *vi);
 bool vi_e(struct vi *vi);
 bool vi_meet_emptyline(struct vi *vi);
 bool vi_meet_spaceline(struct vi *vi);
-
+bool vi_search_foward(struct vi *vi, char *pattern);
+bool vi_search_backward(struct vi *vi, char *pattern);
+bool vi_N(struct vi *vi);
+bool vi_n(struct vi *vi);
 #endif

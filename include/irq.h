@@ -1,5 +1,7 @@
 #ifndef IRQ_H
 #define IRQ_H
+struct stack_frame;
+
 /**与中断控制器打交道的一套函数*/
 #define NR_IRQS 16
 
@@ -26,7 +28,7 @@ struct irqaction{
 	/*linux 把这个函数写成void (*handler)(int irq, void *dev_id, pt_regs *pregs)
 	 * 在papaya内核里，current->pregs是全局accessable的。至于dev_id，是为了支持
 	 * 多中断源共用中断通道，遇到的不多，先不支持它*/
-	void (*func) (int irq, void *dev);
+	void (*func) (int irq, void *dev, struct stack_frame *regs);
 	unsigned flags;
 	void *dev;
 	
@@ -37,4 +39,5 @@ irq_desc_t irq_desc[NR_IRQS];
 
 
 
+int request_irq(int irq, void (*handler)(int, void*, struct stack_frame *), unsigned flags, void *dev);
 #endif

@@ -80,4 +80,6 @@ static inline u32 tcphash(u32 hisip, u16 hisport, u32 myport){
 							 +  (myport & 0xff) + (myport >> 8);
 	return hash;
 }
+void init_tcp(void);
+void tcp_layer_recv(struct sk_buff *comer);
 #endif

@@ -140,15 +140,18 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 struct page *alloc_pages(u32 gfp_mask, int order){
 	/**discard gfp_mask for temporary*/
 	struct page *page;
+	extern int avoid_gcc_complain;
 	if(gfp_mask & __GFP_DMA){
 		page = (void *)__rmquene(&zone_dma, order);
 	}
 	else if(gfp_mask & __GFP_HIGHMEM){	/*BUG 高端内存区不能是全映射的，而且根本没页表*/
+		avoid_gcc_complain = 
 		( page = (void *)__rmquene(&zone_highmem, order) ) ||
 		( page = (void *)__rmquene(&zone_normal, order) ) ||
 		( page = (void *)__rmquene(&zone_dma, order) ) 	;
 	}
 	else
+		avoid_gcc_complain = 
 		( page = (void *)__rmquene(&zone_normal, order) ) ||
 		( page = (void *)__rmquene(&zone_dma, order) )	;
 		

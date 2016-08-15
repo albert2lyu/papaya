@@ -3,6 +3,9 @@
 #include<utils.h>
 #include<linux/if_ether.h>
 #include<linux/byteorder/generic.h>
+#include<net/arp.h>
+#include<net/ip.h>
+#include<net/tcp.h>
 #define IN_WAKE_QUEUE 1
 
 #define YOUR_NIC_CNT 4

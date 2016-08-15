@@ -45,6 +45,7 @@ void init_zone(void);
 #define free_page(frame_addr)  free_pages(frame_addr, 0)
 
 
+void free_pages(unsigned frame_addr, int order);
 
 
 

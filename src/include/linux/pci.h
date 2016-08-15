@@ -173,4 +173,6 @@ static inline void pci_fix_config_dword(struct pci_dev *pcidev, int offset, unsi
 
 void pci_init(void);
 int pci_register_driver(struct pci_driver *driver);
+int pci_enable_device(struct pci_dev *pcidev);
+int pci_set_master(struct pci_dev *pcidev);
 #endif

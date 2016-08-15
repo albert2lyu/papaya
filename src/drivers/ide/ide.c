@@ -1,6 +1,7 @@
 /*TODO we need do more argument check */
 #include<linux/ide.h>
 #include<irq.h>
+#include<schedule.h>
 
 static struct request * ide_get_next_rq(struct ide_hwif *hwif);
 static void ide_do_request(u16 dev_id);
@@ -86,7 +87,7 @@ static void write_intr(struct ide_hwif *hwif){
 	ide_do_request(cur_rq->dev_id);
 }
 
-static void ide_intr(int irq, void *_hwif, void *reg){
+static void ide_intr(int irq, void *_hwif, struct stack_frame *reg){
 	assert(((struct ide_hwif *)_hwif)->handler);
 	((struct ide_hwif*)_hwif)->handler(_hwif);
 }
@@ -257,9 +258,9 @@ void ide_init(void){
 
 	ide_hwifs[0].drive[0].present = 1;
 	ide_hwifs[0].drive[1].present = 1;
-	request_irq(0xf,  ide_intr, SA_INTERRUPT, ide_hwifs);
-	irq_desc[0xf].status &= ~IRQ_DISABLED;
-	request_irq(0x10,  ide_intr, SA_INTERRUPT, ide_hwifs + 1);
+	request_irq(0xe,  ide_intr, SA_INTERRUPT, ide_hwifs);
+	irq_desc[0xe].status &= ~IRQ_DISABLED;
+	//request_irq(0x10,  ide_intr, SA_INTERRUPT, ide_hwifs + 1);
 	blk_devs[3].do_request = ide_do_request;
 	blk_devs[3].add_request = add_request;
 //	blk_devs[3].end_request = ide_end_request;

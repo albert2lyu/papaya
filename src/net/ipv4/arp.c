@@ -8,6 +8,9 @@
 #include<utils.h>
 #include<linux/skbuff.h>
 #include<linux/ip.h>
+
+extern void waiting_for_transmit(struct sk_buff *skb);
+
 /* For those sk_buffs who are waiting the ARP layer to resolve their target 
  * MAC address. The Arp layer will try updating the 'IP-MAC' table by sending 
  * an ARP package to net-cable. And then, will re-process these strayed children

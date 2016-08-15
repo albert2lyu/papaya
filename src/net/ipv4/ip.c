@@ -5,6 +5,11 @@
 #include<utils.h>
 #include<linux/mylist.h>
 #include<linux/byteorder/generic.h>
+#include<net/arp.h>
+#include<net/icmp.h>
+#include<net/tcp.h>
+#include<net/udp.h>
+
 #define FRAG_BEGIN 1
 #define FRAG_MID 2
 #define FRAG_END 3

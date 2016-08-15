@@ -5,6 +5,7 @@
 #include<unistd.h>
 #include<assert.h>
 #include<errno.h>
+#include<string.h>
 int fdsize(int fd){
 	int pos = lseek(fd, 0, SEEK_CUR);	
 	int size = lseek(fd, 0, SEEK_END);

@@ -2,7 +2,7 @@
 #include<time.h>
 #include<irq.h>
 static int time_bh;
-static void timer_interrupt(int irq){
+static void timer_interrupt(int irq, void *dev, struct stack_frame *regs){
 	//oprintf("timer_interrupt:%u\n",irq);	
 	do_timer();
 	mark_bh(time_bh);

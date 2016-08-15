@@ -56,11 +56,13 @@
 #include<sys/types.h>
 #include<sys/stat.h>
 #include<fcntl.h>
-int __silent=1;
+#include<string.h>
+int __silent=0;
 char *vi_ops1_9 = "123456789";
 char*  vi_move_ops = "hjkl0$^W%";
 char*  vi_pair_str = "()[]{}<>";
 char*  vi_pair_str2 = ")(][}{><";
+
 
 static inline void __expand_line(int l, int size, char **lines, int *size_of_line){
 	lines[l] = realloc(lines[l], size);
@@ -103,6 +105,8 @@ static void vi_append_at(struct vi *vi, int l, char *at, char *src, int srclen){
  * 3, don't call this function directly
 */
 static void vi_insert(struct vi*vi, char *src, int srclen){
+	if(srclen == 0) return;
+
 	vi_insert_at(vi, vi->currl, vi->curr, src, srclen);
 	//danger! you must ensure this line isn't re-allocated
 	vi->curr += srclen - 1;
@@ -187,6 +191,46 @@ Def_vi_op(B)
 Def_vi_op(b)
 Def_vi_op(e)
 
+/* preprocess实现起来很简单，因为不用考虑缓冲区溢出。只会随着处理长度减小
+ * TODO 需要str_del，这样不够简洁。
+ * ><CR>和<ESC>被预处理成1和2，而不是13和27，因为它们可能是匹配模式中的text内容
+ *  ，而不是用户的按键。用1和2也只是暂时的决定，以后找更安全的ascii码。
+ */
+void preprocess(char *ops){
+	int len = strlen(ops);
+	char *curr  = ops;
+	char *tail = ops + len - 1;
+	while(*curr){
+		int rightlen = tail - curr + 1 + 1;	//把最后一个\0也算进去
+		switch(*curr){
+			/*  \<  \>  ... */
+			case '\\':{
+				if(curr[1] == '<') curr[0] = '<';
+				else if(curr[1] == '>') curr[0] = '>';
+				else assert(0 && "unimplemented yet");
+				char_arr_del(curr, rightlen, 1, 1);
+				break;
+			}
+
+			/* <CR>  <ESC>  */
+			case '<':{
+				if( strncasecmp(curr, "<CR>", 4) == 0){
+					char_arr_del(curr, rightlen,  1, 3);
+					curr[0] = ASCII_CR;
+				}
+				else if( strncasecmp(curr, "<ESC>", 5) == 0){
+					char_arr_del(curr, rightlen, 1, 4);
+					curr[0] = ASCII_ESC;
+				}
+				else assert(0 && "unknown key");
+				break;
+			}
+			default:
+				break;
+		}
+		curr++;
+	}
+}
 /*1, 一部分序列要立刻解析成函数，因为ｃ库反正需要实现相应的api，一部分序列交给通用处理,像f, $, 费组合字符要立刻失败,一部分操作只用来兼容vim就没有意义了把，像比y0，dh,是很不常用的,不如放在以后收集意见后再实现，不要迷信，可能它当初设计的就不好，你怕分裂给用户困扰，那就不实现总可以吧
  *2, 先把位移的y,d操作做成通用的，如何．剔除一些常用组合，像比yw,dw*/
 /*每次最好把必要的flag信息返回给lua，ｌｕａ主动获取的话，效率低，但ｌｕａ的bitwise
@@ -195,10 +239,15 @@ Def_vi_op(e)
 //use f|, l|, w_, e_
 bool vi_normal(struct vi *vi, char *op){
 /*	vi->flags = 0;*/
+	preprocess(op);		/*直接处理可以吗，这可是从lua stack传过来的，const?*/
+	printf("preprocess done: %s\n", op);
 	vi->ops = op;
 	vi->op_id = 0;
 
 	int state = VI_FLAG(SUCCESS);	/*result state of last command*/
+	int (*i_or_a)(struct vi *vi, char *piece);
+	bool (*do_search)(struct vi *vi, char *pattern);
+	int len;
 	while(vi->ops[vi->op_id] && __TEST_STATE(SUCCESS)){
 		char *currop = vi->ops + vi->op_id;
 		switch(*currop){
@@ -234,17 +283,58 @@ bool vi_normal(struct vi *vi, char *op){
 			case 'l':		state = vi_l(vi);	goto mv1;
 			case '^':		state = vi_xor(vi);	goto mv1;
 			case '%':		state = vi_percent(vi);	goto mv1;
+
+			case 'n':		state = vi_n(vi);	goto mv1;
+			case 'N':		state = vi_N(vi);	goto mv1;
+			case ASCII_ESC: goto mv1;
 			mv1:
 							vi->op_id++;
 							break;
 
 			case 'o':		vi_o(vi);
-							vi_i(vi, currop + 1);	goto mv_$;
-			case 'i':		vi_i(vi, currop + 1);	goto mv_$;
-			case 'a':		vi_a(vi, currop + 1);	goto mv_$;
-			mv_$:			vi->op_id += strlen(currop);
+			case 'i':		i_or_a = vi_i;
+							goto insert;
+
+			case 'a':		i_or_a = vi_a;
+							goto insert;
+			insert:{
+							char *blink = vi->curr;		//关键句,插入长度为0时
+							len = i_or_a(vi, currop + 1);
+							vi->op_id += 1 + len;
+								
+							if(op[vi->op_id] == ASCII_CR)	//暂不支持'\n'
+							{
+								blink += len;
+								char *break_at = blink + len;		// Bb
+								int rlen = VI_CURRL_END(vi) - break_at;
+								vi_o(vi);
+								vi_i(vi, break_at);	
+								vi_0(vi);
+								op[vi->op_id] = 'i';
+
+								*break_at = EOL;
+								vi->len_of_line[vi->currl - 1] -= rlen;
+							}
 							break;
-					
+					}
+
+			case '/':
+							do_search = vi_search_foward;
+							goto lable_search;
+			case '?':
+							do_search = vi_search_backward;
+							goto lable_search;
+			lable_search:{
+							char *pattern = currop + 1;
+							int len = strlen_ex(pattern, STR_CR);
+							do_search(vi, pattern);
+
+							vi->op_id += 1 + len;
+							if(op[vi->op_id] == ASCII_CR) vi->op_id++;
+							break;
+			}
+							
+									
 			case 0:			
 			case '\n':
 							assert(0);
@@ -640,6 +730,117 @@ bool vi_drop(struct vi *v){
 	return 1;
 }
 
+#include<regex.h>
+// vi里的/xxx<CR>如果遇到当下即是 matched，那它的行为跟n一样。
+// lsh不这样。 
+// lsh搜索到底部了也不会回到顶部
+// 暂时不支持?,它在编辑器里有用，但在编程里就不那么必要
+// 反向搜索，如果正好匹配到脚下的，也会停在这儿 ---算了，还是不这样。主要是编程
+// 的话，后者更自然
+bool vi_search_backward(struct vi *vi, char *pattern){
+	assert( strlen(pattern) < VI_REGEX_LEN);
+	if(pattern != vi->last_search) strcpy( vi->last_search, pattern);
+
+	int err;
+	regex_t reg;
+	int nm = 256;		//一个就够了?
+	regmatch_t matchs[nm];	
+	char errmsg[128] = "error buf";
+
+	if( (err = regcomp(&reg, pattern, REG_EXTENDED)) != 0){
+		regerror(err, &reg, errmsg, sizeof(errmsg));
+		fprintf(stderr, "%s:pattern '%s'\n", errmsg, pattern);
+		return false;
+	}
+
+	for(int l = vi->currl; l >= 0; l--){
+		char *bematch = vi->lines[l];
+		char *end = l == vi->currl ? vi->curr : 
+										  &vi->lines[l][vi->len_of_line[l]];
+		char backup = *end;
+		*end = 0;
+   		err = regexec(&reg, bematch, nm, matchs, 0);
+		*end = backup;
+		if(err) continue;
+		
+		//find one, stand on it
+		int i;
+		for(i = 0; i < nm; i++){
+			if(matchs[i].rm_so == -1) 	break;
+			if(l == vi->currl && matchs[i].rm_so > VI_CURR_OFFSET(vi)){
+				break;
+			}
+		}
+		i--;	//就是它了
+		vi->curr = bematch + matchs[i].rm_so;
+		vi->currl = l;
+		return true;
+	}
+	return false;
+}
+
+//暂时不支持search结果缓存
+bool vi_search_foward(struct vi *vi, char *pattern){
+	assert( strlen(pattern) < VI_REGEX_LEN);
+	if(pattern != vi->last_search) strcpy( vi->last_search, pattern);
+
+	int err;
+	regex_t reg;
+	int nm = 256;		//一个就够了?
+	regmatch_t matchs[nm];	
+	char errmsg[128] = "error buf";
+
+	if( (err = regcomp(&reg, pattern, REG_EXTENDED)) != 0){
+		regerror(err, &reg, errmsg, sizeof(errmsg));
+		fprintf(stderr, "%s:pattern '%s'\n", errmsg, pattern);
+		return false;
+	}
+
+	for(int l = vi->currl; l <= vi->lmax; l++){
+		char *bematch = l == vi->currl ? vi->curr : vi->lines[l];
+
+		vi->lines[l][ vi->len_of_line[l] ] = 0;
+   		err = regexec(&reg, bematch, nm, matchs, 0);
+		vi->lines[l][ vi->len_of_line[l] ] = EOL;
+		if(err) continue;
+		
+		//find one, stand on it
+		vi->curr = bematch + matchs[0].rm_so;
+		vi->currl = l;
+		return true;
+	}
+	return false;
+}
+
+/* BREAK
+   暂时不考虑方向随?, /改变。 到时候想实现，考虑在vim_normal里做，或者做成
+ * vi_search和vi_?这样的函数
+ * TODO 如果last_search为空，用户就调用了n/N。
+ */
+bool vi_n(struct vi *vi){
+	if(vi->last_search[0] == 0) return false;
+
+	int originl = vi->currl;
+	char *origin = vi->curr;
+	bool ok = vi_search_foward(vi, vi->last_search);
+
+	if(!ok) return false;	//压根搜不到
+	if(origin == vi->curr){	//搜到了，但很可惜，正在脚下，要再找下一个
+		if( vi_lg(vi) == false) return false;	//已经是文末
+		ok = vi_search_foward(vi, vi->last_search);
+		if(!ok) {		//接下来搜不到了
+			vi->currl = originl;
+			vi->curr = origin;
+			return false;
+		}
+	}
+
+	return true;	
+}
+
+bool vi_N(struct vi *vi){
+	return vi_search_backward(vi, vi->last_search);	
+}
 /*copy selection
  *1,copy it first, but we can not paste always correctly this version
  *@vi->v_begin, vi->v_beginl must be set before invoke it

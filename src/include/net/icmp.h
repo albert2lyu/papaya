@@ -108,6 +108,7 @@ struct icmpmsg_tstamp{
 
 
 
+void icmp_receive(struct sk_buff *comer);
 
 
 #endif

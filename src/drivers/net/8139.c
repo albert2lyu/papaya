@@ -13,6 +13,7 @@
 #include<linux/slab.h>
 #include<mm.h>
 #include<linux/skbuff.h>
+#include<linux/bh.h>
 #define PRIV(netdev) ((struct rtl8139_private*)(netdev->private))
 #define __priv(netdev) ((struct rtl8139_private *)netdev->private)
 #define ETH_MIN_LEN 60
@@ -359,6 +360,7 @@ static void on_tx(struct net_device *netdev){
 }
 
 
+extern void process_rx_queue( struct net_device *netdev);
 static int rx_bottomhalf( void *_netdev){
 	process_rx_queue(_netdev);
 	return 0;
@@ -394,7 +396,7 @@ static void on_rx(struct net_device *netdev){
  * 之后就返回。 如果ISR里还有置位，它自然还会触发新的中断。 FIXME  对吗？
  * 不，不该这样做，应该尽最快把ISR空闲出来，这样新的网卡中断能表征出来。
  */
-static void on_intr(int irq, void *dev, void *regs){
+static void on_intr(int irq, void *dev, struct stack_frame *regs){
 	struct net_device *netdev = dev;
 	/* the interupt Status Register reflects all current pending interrupts, regardless of
 	 * the state of the corresponding mask bit in the IMR.

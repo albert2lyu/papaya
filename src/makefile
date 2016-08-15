@@ -9,8 +9,9 @@
 ROOT=/home/wws/lab/yanqi
 cheader_path=-I$(ROOT)/src/include/ -I$(ROOT)/include/ -I$(ROOT)/src/arch/x86/include/ 
 
-cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -Wno-implicit-function-declaration -g -fno-stack-protector -nostdinc
+cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -g -fno-stack-protector -nostdinc
 
+#-Wno-implicit-function-declaration 
 export cflags
 all:
 	make -C drivers/block/
@@ -27,6 +28,8 @@ all:
 	make -f makefile2
 
 clean:
+	rm ../bin/*.bin
+	rm ../bin/*.elf
 	rm *.d -f
 	rm *.o -f
 	rm ../lib/* -f
@@ -49,7 +52,7 @@ git:
 	cp ~/.vimrc ../cmd/
 	cp ~/.gdbinit ../cmd/
 	mv ../cmd/*.img ~/Documents/tmp_for_git/
-	mv ../cmd/dimg ~/Documents/tmp_for_git/
+	mv ../cmd/_dimg ~/Documents/tmp_for_git/
 	mv ../cmd/init ~/Documents/tmp_for_git/
 	mv ../cmd/cell ~/Documents/tmp_for_git/
 	mv ../cmd/bochsout.txt ~/Documents/tmp_for_git/
