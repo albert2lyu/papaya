@@ -39,6 +39,7 @@ clean_others:
 	rm ../bin/*.bin -f
 	rm ../bin/*.elf -f
 	rm lib/*.o -f
+	rm lib/*.asmo -f
 	
 
 #只clean src目录
