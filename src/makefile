@@ -26,13 +26,25 @@ all:
 	make -C net/ipv4
 	make -C lib/
 	make -f makefile2
+	make -C ../cmd/
 
+#整个项目总的clean
+#但是不清除lsh目录，它跟papaya内核保持一定的独立性。make时也没有它
 clean:
-	rm ../bin/*.bin
-	rm ../bin/*.elf
+	make clean_others
+	make clean_src
+	make clean -C ../cmd/
+
+clean_others:
+	rm ../bin/*.bin -f
+	rm ../bin/*.elf -f
+	rm lib/*.o -f
+	
+
+#只clean src目录
+clean_src:
 	rm *.d -f
 	rm *.o -f
-	rm ../lib/* -f
 	rm  drivers/block/*.o -f
 	rm drivers/ide/*.o -f
 	rm drivers/pci/*.o -f
@@ -41,24 +53,31 @@ clean:
 	rm fs/cell/*.o -f
 	rm mm/*.o -f
 	rm arch/x86/mm/*.o -f
-	rm ../cmd/*.o -f
 	rm net/core/*.o -f
 	rm net/ipv4/*.o -f
 	rm kernel/*.o -f
-	rm lib/*.o -f
+	rm *~ -f
 
+#暂时只搬一个tmp文件
+_git:
+	make clean_src
+	-mv tmp ~/Documents/tmpsrc_for_git/
+
+_tig:
+	-mv ~/Documents/tmpsrc_for_git/* ./
+
+
+#每个目录的make _git都会做make clean，所以这儿不宜再调用总的make clean。
+#所以用clean_others清除剩余的就行了。
 git:
-	cp ~/.bashrc ../cmd/
-	cp ~/.vimrc ../cmd/
-	cp ~/.gdbinit ../cmd/
-	mv ../cmd/*.img ~/Documents/tmp_for_git/
-	mv ../cmd/_dimg ~/Documents/tmp_for_git/
-	mv ../cmd/init ~/Documents/tmp_for_git/
-	mv ../cmd/cell ~/Documents/tmp_for_git/
-	mv ../cmd/bochsout.txt ~/Documents/tmp_for_git/
-	rm ../cmd/*.o
-	rm ../cmd/*~
+	make clean_others
+	make _git
+	make _git -C ../cmd/
+	make _git -C ../lsh/
 
 tig:
-	mv ~/Documents/tmp_for_git/* ../cmd/
+	make _tig 
+	make _tig -C ../cmd/
+	make _tig -C ../lsh/
+
 

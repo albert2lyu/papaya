@@ -1,4 +1,4 @@
-all:prepare_folder boot.bin kernel.elf ../cmd/_dimg
+all:prepare_folder boot.bin kernel.elf 
 #'make' will search target-file and rely-file according through VPATH,if she
 #failed under current directory.
 VPATH=../lib/ ../bin/
@@ -27,9 +27,7 @@ kernel.elf:$(kernelrelyo)
 	cd ../lib/;\
 	ld -m elf_i386 -s -Ttext 0xc0030400 -o ../bin/kernel.elf $(kernelrelyo);\
 	ld -m elf_i386 -Ttext 0xc0030400 -o ../bin/g_kernel.elf $(kernelrelyo) 
-../cmd/_dimg:../cmd/_dimg.c bootinfo.asmo
-	gcc -c ../cmd/_dimg.c -o ../cmd/_dimg.o -std=c99 -Wno-implicit-function-declaration -g
-	gcc -o  ../cmd/_dimg  ../cmd/_dimg.o ../lib/bootinfo.asmo
+
 %.d:%.c
 	set -e;rm -f $@;\
 	gcc -M $< $(cheader_path) > this_is_a_tmp_file;\
@@ -44,8 +42,6 @@ kernel.elf:$(kernelrelyo)
 
 clean:
 	rm  -rf ../lib/;\
-	rm  ../cmd/*.o;\
-	rm ../cmd/_dimg;\
 	rm -f *.d;
 #replace your 400m.img to after using make git
 

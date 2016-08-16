@@ -1,3 +1,4 @@
+23, cmd来一个makefile怎么样。觉得不错。
 22, makefile2里面的cflags还有no-implicit-function
 21, 目前传给irqaction->handler()的stack_frame是0.
 20, oprintf("%"),这样，只打印一个百分号，是会出bug的。

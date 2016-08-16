@@ -20,10 +20,18 @@ all:
 	touch ../.lsh.history
 
 
+#注意lua目录是不被clena的
 clean:
-	make -C ./lua clean
-	-rm *.o
-	-rm lsh
-	-rm han2pinyin
-#gcc -c -o main.o main.c $(options)
-#gcc -o t main.o vi.o utils.o $(options)
+	rm *.o -f
+	rm lsh -f
+	rm han2pinyin -f
+	rm *~ -f
+
+_git:
+	make clean
+	-mv lua/*.o ~/Documents/tmplua_for_git/
+	-mv lua/*.a ~/Documents/tmplua_for_git/
+	-mv lua/*.so ~/Documents/tmplua_for_git/
+
+_tig:
+	-mv ~/Documents/tmplua_for_git/* lua/	

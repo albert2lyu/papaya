@@ -241,7 +241,7 @@ void preprocess(char *ops){
 bool vi_normal(struct vi *vi, char *op){
 /*	vi->flags = 0;*/
 	preprocess(op);		/*直接处理可以吗，这可是从lua stack传过来的，const?*/
-	printf("preprocess done: %s\n", op);
+	//printf("preprocess done: %s\n", op);
 	vi->ops = op;
 	vi->op_id = 0;
 
