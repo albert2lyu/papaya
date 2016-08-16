@@ -1,3 +1,4 @@
+#define _DEFAULT_SOURCE
 //能不能让最后一个换行符合法，它之后才是文件尾，而它又不同于别的换行符，别的换行符意味着下面有新的一行开始，它却不是。
 /*TODO
  * 1, Vi should handle '\0' as normal character, he should even reduce the
@@ -57,7 +58,7 @@
 #include<sys/stat.h>
 #include<fcntl.h>
 #include<string.h>
-int __silent=0;
+int __silent=1;
 char *vi_ops1_9 = "123456789";
 char*  vi_move_ops = "hjkl0$^W%";
 char*  vi_pair_str = "()[]{}<>";

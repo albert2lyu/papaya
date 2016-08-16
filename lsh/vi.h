@@ -13,9 +13,11 @@ enum{
 	ASCII_ESC = 2
 };
 
-static char STR_CR[] = {ASCII_CR, 0};
+#define STR_CR ((char[]){ASCII_CR, 0})
+#define STR_ESC_CR ((char[]){ASCII_ESC, ASCII_CR, '\n', 0})
+//static char STR_CR[] = {ASCII_CR, 0};
 //static char STR_ESC[] = {ASCII_ESC, 0};
-static char STR_ESC_CR[] = {ASCII_ESC, ASCII_CR, '\n', 0};
+//static char STR_ESC_CR[] = {ASCII_ESC, ASCII_CR, '\n', 0};
 
 #define VI_CURRL_TAIL(vi) (vi->lines[vi->currl] + vi->len_of_line[vi->currl] -1)
 #define VI_CURRL_END(vi) (vi->lines[vi->currl] + vi->len_of_line[vi->currl])

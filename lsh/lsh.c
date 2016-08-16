@@ -1,3 +1,6 @@
+/* 在ubuntu15.04 上，孤儿进程被交给upstart进程，不再是init进程了。
+ * 这是lighgdm的一个子进程。杀了它会导致桌面重启。
+ */
 /* TASK:
  * TODO  
  * 1, wildcard character: *
@@ -6,17 +9,22 @@
  * 1, solid script syntax parsing, 
  * 2, vim library
  */
+
+#define _BSD_SOURCE
 #include<errno.h>
-#include<sys/wait.h>
 #include"lsh.h"
 #include"vi.h"
 #include"vim.h"
 #include"file.h"
 #include<stdio.h>
+//#define _POSIX_C_SOURCE 200112L
+//#define _XOPEN_SOURCE 600
 #include<stdlib.h>
 #include<assert.h>
 #include<string.h>
 #include<unistd.h>
+#include<sys/wait.h>
+#include<sys/types.h>
 #include<sys/time.h>
 #include<sys/resource.h>
 #include<sys/wait.h>
@@ -48,7 +56,11 @@ char input_head[64];
 struct vi __luavi;
 struct vi *luavi = &__luavi;
 lua_State *L;
+/* linux对signal的处理比较奇怪。
+ * 一个signal响应之后，它会清除原先注册的handler。所以要再注册一次。
+ */
 void  sighandler_ctrl(int x){
+	//if(lsh_blocked) return;
 	signal(SIGINT, sighandler_ctrl);
 	printf("\nto quit lsh, type 'exit'\n");
 }
@@ -803,7 +815,11 @@ int run_cmdline(char *input){
 		tail_pipe.text[bytes] = 0;
 	}
 //	printf("death");
-	wait4(-1, 0, 0, 0);		/*receive child-process's exit code as SHELL_RET_CODE*/
+	signal(SIGINT, SIG_IGN);
+	int pid = wait4(-1, 0, 0, 0);		/*receive child-process's exit code as SHELL_RET_CODE*/
+	signal(SIGINT, sighandler_ctrl);
+	assert( pid != -1);
+	//fprintf(stderr, "wait4 return %d\n", err);
 	return 0;	/*TODO*/
 }
 

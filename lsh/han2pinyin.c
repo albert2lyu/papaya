@@ -1,11 +1,15 @@
+//#define _GNU_SOURCE
+#define _BSD_SOURCE
+#include<stdlib.h>
+
 #include<assert.h>
 #include"vi.h"
 #include"vim.h"
 #include"word.h"
 #include"file.h"
-#include<stdlib.h>
 #include<limits.h>
 #include<fcntl.h>
+#include<sys/stat.h>
 
 #define bool int
 typedef unsigned char u8;
@@ -27,7 +31,7 @@ static void convert_seg(void){
 		u32 unicode = (low & 0b00111111) + 
 					  ((mid & 0b00111111) << 6) +
 					  ((high & 0b00001111) << 12);
-		char *pinyin = pinyin_of[unicode];
+		char *pinyin = (char *)pinyin_of[unicode];
 		assert(pinyin && "can not find a word in dictionary");
 
 		/* 删除一个汉字，并插入相应的拼音 */

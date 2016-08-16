@@ -1,5 +1,6 @@
-options=-std=c99 -g -Wall -Wno-char-subscripts -Wno-unused-function  -funsigned-char
-lshopt=-I./lua  -lm -ldl -lreadline 
+options=-std=c99 -g -Wall -Wno-char-subscripts -Wno-unused-function  -funsigned-char -I/usr/include/i386-linux-gnu/ -I/usr/include/
+
+lshopt=-I./lua -lm -ldl -lreadline 
 
 CORE_O=	./lua/lapi.o ./lua/lcode.o ./lua/ldebug.o ./lua/ldo.o ./lua/ldump.o ./lua/lfunc.o ./lua/lgc.o ./lua/llex.o ./lua/lmem.o \
 	./lua/lobject.o ./lua/lopcodes.o ./lua/lparser.o ./lua/lstate.o ./lua/lstring.o ./lua/ltable.o ./lua/ltm.o  \

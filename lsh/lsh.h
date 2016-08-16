@@ -11,7 +11,11 @@ enum{
 	LSH_MOD_VI
 };
 
+#ifdef PATH_MAX
+#undef PATH_MAX
 #define PATH_MAX 255
+#endif
+
 #define PATH_ITEM_MAX 64
 char gpath[PATH_ITEM_MAX][PATH_MAX];
 
