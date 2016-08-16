@@ -1,4 +1,6 @@
 `git add .
-`date|
-`git commit -m last_ret
+`date +%T|
+local command = [[git commit -m "]] .. last_ret .. [["]]
+print(command)
+`$(command)
 `git push -u origin master

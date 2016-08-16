@@ -441,7 +441,9 @@ static int __call_run_cmdline(lua_State *L){
 	if(tail_pipe.active){
 		if(ret != 0) lua_pushnil(L);
 		else{
-			lua_pushlstring(L, tail_pipe.text, tail_pipe.textlen);	
+			lua_pushlstring(L, tail_pipe.text, tail_pipe.textlen-1);	
+			//TODO i want to trip off the final '\n', so change [textlen ]
+			// to [textlen -1 ] for temporary.
 		}
 
 		tail_pipe.active = false;
