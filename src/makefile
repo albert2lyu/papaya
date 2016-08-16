@@ -75,10 +75,11 @@ git:
 	make _git
 	make _git -C ../cmd/
 	make _git -C ../lsh/
-
+	-mv ../tags ~/Documents/
 tig:
 	make _tig 
 	make _tig -C ../cmd/
 	make _tig -C ../lsh/
+	-mv ~/Documents/tags ../
 
 
