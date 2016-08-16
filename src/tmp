@@ -1,0 +1,62 @@
+
+MS08-061 : The case of the kernel mode double-fetch
+
+MS08-061 addresses several vulnerabilities in win32k.sys where you can execute arbitrary code in kernel mode. These bugs can only be exploited locally and there is no remote vector based on our investigation of the vulnerability.
+
+One of these vulnerabilities involves multiple kernel mode accesses of user mode data leading to an interesting race condition.  When accessing user mode data, kernel mode code needs to “capture” a copy of the user mode data locally and avoid accessing the user mode original multiple times.  Failing to do so results in a type of problem known as a “double fetch”.
+
+When the kernel captures the user mode data, it works with the local copy (located in kernel address space) and is not affected by any changes that happen to the user mode copy. This capture avoids race conditions involving different values of the data being returned from subsequent user mode fetches.
+
+A double fetch from user mode could lead to several security vulnerabilities.  In the case of MS08-061, we are addressing an inadequate pool allocation and a later memory pool overflow.  Let’s look at a piece of the vulnerable source code:
+
+// Attacker controls lParam
+
+void win32k_entry_point(…) {
+
+   […]
+      // lParam has already passed successfully the ProbeForRead
+      my_struct = (PMY_STRUCT)lParam;
+      if (my_struct ->lpData) {
+           cbCapture = sizeof(MY_STRUCT) + my_struct->cbData;  // [1] first fetch
+    […]
+                 // my_struct ->lpData has already passed successfully the ProbeForRead
+    […]
+            if ( my_allocation = UserAllocPoolWithQuota(cbCapture, TAG_SMS_CAPTURE)) != NULL) {
+                 RtlCopyMemory(my_allocation, my_struct->lpData, my_struct->cbData);   // [2] second fetch
+
+            }
+      }
+   […]
+}
+
+As you can see in the above vulnerable code, there are two fetches of the same user mode data ([1] and [2]). Since the kernel cannot guarantee that both fetches will have the same value, a small allocation can occur in [1] but later in [2] the kernel copies the data with a bigger length causing a memory pool overflow. This can easily be performed with a parallel, and high priority, thread changing the supplied address range (pointed by lParam) in a loop.
+
+A kernel developer should keep these issues in mind and should capture whatever data the code is using from user mode avoiding double fetches.
+
+// Attacker controls lParam
+
+void win32k_entry_point(…) {
+  […]
+     // lParam has already passed successfully the ProbeForRead
+
+
+     my_struct = (PMY_STRUCT)lParam;
+     cbData_captured= my_struct->cbData;
+     lpData_captured = my_struct->lpData;
+     if (lpData_captured) {
+         cbCapture = sizeof(MY_STRUCT) + cbData_captured;  
+    […]
+         // lpData_captured has already passed successfully the ProbeForRead
+    […]
+         if ( my_allocation = UserAllocPoolWithQuota(cbCapture, TAG_SMS_CAPTURE)) != NULL) {
+             RtlCopyMemory(my_allocation, lpData_captured, cbData_captured);
+         }
+      }
+    […]
+}
+
+
+– Fermin J. Serna, SVRD Blogger
+
+
+
