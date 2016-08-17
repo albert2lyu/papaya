@@ -954,9 +954,19 @@ int run_cmdline(char *input){
 		tail_pipe.text[bytes] = 0;
 	}
 	signal(SIGINT, SIG_IGN);
-	while(wait4(-1, 0, 0, 0) != -1);
+	int status;
+	int errcode = 0;
+	while( wait4(-1, &status, 0, 0) != -1){
+		int exit_code;
+		if(WIFEXITED(status)){	//exit normally
+			exit_code = WEXITSTATUS(status);
+		}
+		else exit_code = -1;
+
+		errcode |= exit_code;		//只要有一个进程失败，就返回非0状态码
+	}
 	signal(SIGINT, sighandler_ctrl);
-	return 0;	/*TODO 要返回命令的状态码*/
+	return errcode;	/*TODO 要返回命令的状态码*/
 }
 
 /*@fullpath  if success, store result in fullpath*/
