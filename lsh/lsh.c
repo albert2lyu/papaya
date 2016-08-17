@@ -504,24 +504,27 @@ static int __call_vi_print(lua_State *L){
 static int __call_run_cmdline(lua_State *L){
 	char *cmdline = (char *)lua_tostring(L, -1);
 	int ret = run_cmdline(cmdline);
-
+	int nr_ret = 0;
 	if(tail_pipe.active){
-		if(ret != 0) lua_pushnil(L);
-		else{
-			lua_pushlstring(L, tail_pipe.text, tail_pipe.textlen-1);	
+		nr_ret++;
+		lua_pushlstring(L, tail_pipe.text, tail_pipe.textlen-1);	
+		//if(ret != 0) lua_pushnil(L);
+		//else{
+			//lua_pushlstring(L, tail_pipe.text, tail_pipe.textlen-1);	
 			//TODO i want to trip off the final '\n', so change [textlen ]
 			// to [textlen -1 ] for temporary.
-		}
+		//}
 
 		tail_pipe.active = false;
 		close(tail_pipe.fds[0]);
 		free(tail_pipe.text);
 	} 
-	else lua_pushinteger(L, ret);
+
+	lua_pushinteger(L, ret);
+	lua_setglobal(L, "errno");
 	
-	lua_pushvalue(L, -1);
-	lua_setglobal(L, "last_ret");
-	return 1;
+	//lua_pushvalue(L, -1);
+	return nr_ret;
 }
 /*break:__onindex做好了，接下来往getter里注册__onindex_xx，并把getter表注册到ｍｔ里*/
 void register_vi(lua_State *L){
@@ -755,9 +758,20 @@ int mix2lua(char *mixbuf, char *luabuf){
 	}
 
 	do{
-		vim_xor();				if(vim->curr[0] != '`') continue;
+		vim_xor();				
+		if(vim->curr[0] != '`'){
+			vim_orx();
+			if(vim->curr[0] != '`') continue;
+			else{
+				vim_r('|');
+				vim_0();
+				bool ok = vim_f('=');	assert(ok);
+				vim_l();	vim_jmpspace();
+				assert(vim->curr[0] = '`');
+			}
+		}
 		/*we stand on '`' now */
-		//vim_r('"');
+		vim_i("run_cmdline(");	vim_l();
 		vim_x();	vim_i("[[");
 		while(vim_f('$') & VI_FLAG(SUCCESS)){
 			process$();
@@ -765,8 +779,6 @@ int mix2lua(char *mixbuf, char *luabuf){
 		vim_$();
 		vim_a("]]");
 		/*core operation finished */
-		vim_xor();
-		vim_i("run_cmdline(");
 		vim_normal("$a)");
 	}while(vim_j());
 	vim_gg();

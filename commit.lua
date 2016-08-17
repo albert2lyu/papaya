@@ -6,15 +6,15 @@ end
 
 	
 `git add "$(argv[1])"
-if last_ret ~= 0 then 
+if errno ~= 0 then 
 	print("git add failed , stop ")
 	return
 end
 
-`date|
-`git commit -m "$(last_ret)"
+local date = `date`
+`git commit -m "$(date)"
 
-if last_ret ~= 0 then 
+if errno ~= 0 then 
 	print("git commit -m failed , stop ")
 	return
 end

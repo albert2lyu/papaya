@@ -1457,7 +1457,7 @@ int vi_taste_digit(struct vi*vi){
 	return taste_digit(vi->curr);
 }
 bool vi_F(struct vi *vi, char c){
-	char *curr = vi->curr - 1;
+	char *curr = vi->curr - 1;		//TODO '-1' bug here
 	while(curr >= vi->lines[vi->currl]){
 		if(*curr == c){
 			vi->curr = curr;
