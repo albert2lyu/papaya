@@ -1,3 +1,6 @@
+3, 使用lua5.2。
+   5.2的语法稍微强一些。 暂时不考虑再做混合语法了。就用纯lua。
+
 1, lsh的正则表达式先按正常的来，以后有机会用
 https://github.com/GuillaumeBadi/Verbal-Exprejon
   当参考，来设计。
