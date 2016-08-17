@@ -1,8 +1,6 @@
-#include<sys/types.h>
+#include"file.h"
 #include<sys/stat.h>
-#include<fcntl.h>
 #include<stdio.h>
-#include<unistd.h>
 #include<assert.h>
 #include<errno.h>
 #include<string.h>
@@ -31,3 +29,4 @@ char *get_dirfile(char *dir, char *filename, char *fullpath){
 	strcat(fullpath, filename);
 	return fullpath;
 }
+

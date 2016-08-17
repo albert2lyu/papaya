@@ -115,6 +115,38 @@ int open_editor(int a, int b){
 	printf("vim return !!");
 	return 0;
 }
+static bool you_throw_me_a_script(int argc, char **argv){
+	if(argc >= 2){
+		char *filepath = argv[1];	
+		if( file_exists(filepath) ) return true;
+	}
+	return false;
+}
+
+//暂时假设lsh有两个命令行选项，-s 和 -d。
+static bool is_lsh_option(char *name){
+	if(strcmp(name, "-s") == 0	||
+	   strcmp(name, "-d") == 0 ) 
+		return true;
+	
+	return false;
+
+}
+
+//argv of lsh: /bin/lsh  ./test.lua arg1 arg2
+//pass to script as: ./test.lua arg1 arg2
+static void prepare_lua_args(struct lua_State *L, int argc, char *argv[]){
+	lua_pushinteger(L, argc - 1);
+	lua_setglobal(L, "argc");
+	lua_newtable(L);
+	for(int i = 1; i < argc; i++){
+		lua_pushinteger(L, i - 1);
+		lua_pushstring(L, argv[i]);
+		lua_rawset(L, -3);
+	}
+	lua_setglobal(L, "argv");
+}
+
 int main(int argc, char *argv[]){
 	char input[1024]={0};
 	char purelua[1024] = {0};
@@ -122,7 +154,7 @@ int main(int argc, char *argv[]){
 	get_dirfile(homedir, "lsh/", lshdir);
 	char historyfile[128];
 	get_dirfile(lshdir, (char *)history_file, historyfile);
-	printf("%s\n", homedir);
+	//printf("%s\n", homedir);
 	signal(SIGINT, sighandler_ctrl);
 	rl_bind_keyseq("\\C-J", open_editor);
 	tail_pipe.active = false;
@@ -135,7 +167,7 @@ int main(int argc, char *argv[]){
 	/*load config file to prepare usr enviroment and lsh state itself*/
 	char initfile[128];
 	get_dirfile(lshdir, "init.lua", initfile);
-	fprintf(stderr, "%s\n", initfile);
+	//fprintf(stderr, "%s\n", initfile);
 	int err = luaL_loadfile(L, initfile); assert(!err);
 	err = lua_pcall(L, 0, LUA_MULTRET, 0);
 	if(err){
@@ -149,21 +181,49 @@ int main(int argc, char *argv[]){
 	/* config end */
 
 	read_history(historyfile);
+	//如果是以bash xxx运行的，xxx如果不是一个命令行参数，那就认为它是脚本名字
+	//脚本名字必须写在第一个参数
+	bool script_mode = false;
+	if(argc >= 2){
+		if(is_lsh_option( argv[1] )) ;
+		else if( file_exists( argv[1] ) == false ){
+			fprintf(stderr, "lsh: %s: no such file or directory\n", argv[1] );
+			return 3;
+		}
+		else script_mode = true;
+	}
+
 	char *readline_buf = 0;/*write to key-buffer of 'readline ' is dangerous*/
+	if(script_mode ){
+		readline_buf = malloc(PATH_MAX + strlen("source ") );	//必须用malloc
+		strcpy(readline_buf, "source ");
+		strcat(readline_buf, argv[1]);
+	}
+
 	while( 1 ){
-		char *curr_input = input;
-		if( readline_buf )		free( readline_buf );
 		char prompt[64];
-		readline_buf = readline(strcat(getcwd(prompt, 64), __lshprefixArr[__lshmod]) );
+		char *curr_input = input;
+		
+		//if(readline_buf)
+			//if(!script_mode) free( readline_buf );
+
+		if(!readline_buf){
+			readline_buf = readline(
+							strcat(getcwd(prompt, 64), 
+							__lshprefixArr[__lshmod]) 
+						   );
+		}
+
 		if( readline_buf && *readline_buf ){
-			strcpy(input, readline_buf);	/*write valid input to mainbuf*/
-			add_history( readline_buf );
+			strcpy(input, readline_buf);
+			add_history( readline_buf );	//TODO 脚本不该污染历史命令
 			write_history(historyfile);
+
+			free(readline_buf);
+			readline_buf = 0;
 		}
-		if(!*input){
-			printf("no previous command exist\n");
-			continue;
-		}
+		else continue;		//用户没输入命令就按了Enter
+
 		if (strncmp(input, "source ", strlen("source ")) == 0){
 			vim_open(input+strlen("source "));
 			curr_input=0;
@@ -209,14 +269,21 @@ int main(int argc, char *argv[]){
 
 		if( !mix2lua(curr_input, purelua) ){
 			printf("\npreprocess failed\n");
-			continue;	
+			if(script_mode) return -1;
+			else	continue;	
 		}
 		if(!__silent) printf("purelua: >>>%s<<<", purelua);
+
+		if(script_mode) prepare_lua_args(L, argc, argv);
+
 		int error = luaL_loadstring( L, purelua ) || lua_pcall( L, 0, 0, 0 );
 		if( error ){
 			fprintf( stderr, "%s\n", lua_tostring( L, -1 ) );
 			lua_pop( L, 1 ); 
+
+			if(script_mode) return -1;
 		}
+		if(script_mode) return 0;
 	}
 }
 /*break:userdata的问题已经解决了，挺绕的，进ｃ时，ｌｕａ压栈的不是userdata,而是userdata的地址，二userdata存储的又是struct vi的地址．虽然解决了，但realloc还是除错．估计跟lua层无关，应该是malloc　init vi引发的．
@@ -553,11 +620,13 @@ void export_vi(lua_State *L){
 
 void process$(void){
 	assert(vim->curr[0] == '$');
-	vim_r('"');		/*make right side double-quotation */
+	vim_x();		/*make right side double-quotation */
+	vim_i("]]");
+
 	vim_a("..");
 	vim_f('(');
 	vim_percent();
-	vim_a("..\"");
+	vim_a("..[[");
 	return;
 }
 /*关键是怎么执行script文件，./test.lsh，是交给操作系统，还是lsh自己处理.
@@ -661,6 +730,16 @@ static int process_colon(){
 	}
 	return 1;
 }
+
+#if 0
+static void do_escape(void){
+	while( vim_f_ex(STR_QUOT"\\", 0) ){
+		vim_i("\\");
+		vim_l();
+		vim_l();
+	}
+}
+#endif
 /* The core preprocess: convert mixed-lua-cmd code to pure luacode 
  * @mixbuf	0: pass 0 if vim already adopt mix-code
 * TODO 1, $ in a string
@@ -670,15 +749,21 @@ int mix2lua(char *mixbuf, char *luabuf){
 	if(mixbuf){
 		vim_set(mixbuf);
 	}
+	if(vim->curr[0] == '#' && vim->curr[1] == '!'){
+		vim->curr[0] = vim->curr[1] = '-' ;
+		vim_j();
+	}
+
 	do{
 		vim_xor();				if(vim->curr[0] != '`') continue;
 		/*we stand on '`' now */
-		vim_r('"');
+		//vim_r('"');
+		vim_x();	vim_i("[[");
 		while(vim_f('$') & VI_FLAG(SUCCESS)){
 			process$();
 		}
 		vim_$();
-		vim_a("\"");
+		vim_a("]]");
 		/*core operation finished */
 		vim_xor();
 		vim_i("run_cmdline(");
@@ -697,35 +782,72 @@ int mix2lua(char *mixbuf, char *luabuf){
  * ignore this comment line:@vi vi->curr is a pointer to the first character of command string:
  * eg. cp test.txt test.txt.cp | ..  then,tail flag is '|'
  * eg. cp test.txt test.txt.cp 		then,tail flag is '\0'
- * @return 0:failed;	1:success	2:success but meet line END
- * @after process a command 'line', this function set vi->curr at the tail of
+ *
+ * @return 0:failed;	>=0		成功解析一段命令。返回命令结束标志
+ 						-2		解析失败（命令格式语法错误)
+						-1		解析失败（遇到行尾了且都是空白字符)
+ 						
+ * @OLD after process a command 'line', this function set vi->curr at the tail of
  * this command 'line', namely a '|' or '\n', and convert it to '\0';  he does
  * not tell the parent whether exist another command 'line' behind.
  * */
-//这个函数该增强一些，遇到裸|之类的语法错误该标识出来，提示语法错误
-//BREAK vim不能正常运行．　可以．　看来是argc, argv传递的异常．没那么麻烦
-void build_lsh_cmd(//struct vi *vi,
+// TODO 这个函数该增强一些，遇到裸|之类的语法错误该标识出来，提示语法错误
+// @退出状态
+// 成功解析一个命令。  退出时一定落在“命令行结束标志”: 管道符| 或者 EOL。
+// 这对调用它的build_lsh_commands很重要。
+// !! 放低对错误语法的检测。 先写最清晰的流程，只考虑正常的语法。对错误的语法
+// !! 能基本定位，并避免异常就行了。
+#define EMPTY_UNTIL_EOL -1
+#define CMD_SYNTAX_BAD  -2
+int  build_lsh_cmd(//struct vi *vi,
 					struct lsh_cmd *command){
 	command->argc = 0;
+	bool ok;
+	int state;
+	state = vim_jmpspace();
+	if(__TEST_STATE(meetn))	return EMPTY_UNTIL_EOL;
+	// 现在可以确定跳过命令行最前面的空白了。而且是落在一个实在的命令上。
+	// 当然，如果用户最开始输入一个"|"，此处是检查不出来的。
+
 	while(1){
-		int state;
-		state = vim_jmpspace();			vim_m('a');
-		/*ensure we are standing on a word*/
-		if(__TEST_STATE(meetn))	break;
-		if(*vim->curr == '|') break;		/* messy, should rebuild here*/
-		//if(__TEST_STATE(meetn))	return command->argc;	/*smart true/false*/ 
-		command->argv[command->argc++] = vi_mcurr(vim, 'a');
-		state = vim_f_ex("\t |", VI_FLAG(curr));	
-		if(__TEST_STATE(SUCCESS) == 0)
-					vim->curr = vim->lines[0] + vim->len_of_line[0];
+		//每一个loop开始，都是停留在有效命令的起始非空字符上
+		char *seghead;
+		char *segtail;
+		if( strchar(STR_QUOT, vim->curr[0]) ){	//若有引号，一定在seg首
+			seghead = vim->curr+1;
+			ok = vim_f( vim->curr[0] );
+			//一定有匹配的右引号； 右引号右面一定是空白或结束字符(单词边界)
+			assert(ok);	assert( strchar(" \t|"STR_EOL, vim->curr[1]) );
+			segtail = vim->curr;
+
+			vim->curr++;	//推进到右引号右侧，一变接下来统一跳过空白
+		}
+		else{
+			seghead = vim->curr;
+			vim_f_ex("\t |"STR_EOL, 0);		//1,一定会成功；2，需要curr标志吗
+			segtail = vim->curr;
+		}
+		command->argv[command->argc++] = seghead;
+
+		//如果停在空白字符上，看看是不是紧邻着管道符| 或者EOL了。
+		//如果是，推进到上面去，及早的结束，别等到下一个loop了。
+		while(*vim->curr == ' ' || *vim->curr == '\t')	vim->curr++;		
+		//现在停在非空白字符上了
 		char standon = *vim->curr;
-		vim->curr[0] = 0;
-		if(standon == '\n' || standon == '|') break;
-		//如果最后一个是空格，它停在空格上l走不了,其实是停在0上
-		vim_l();
+		*segtail = 0;		//这一句可能改写vim->curr，所以备份*curr到standon
+
+		if(standon == '|' || standon == EOL){
+			command->argv[command->argc] = 0;	
+			return standon;
+		}
+
+		//现在停在空白字符上，但该命令行可能已经读完了。
+		//几种情形: (.表示现在的落脚点)
+		//  ps. -e  \n					常规情形
+		//	ls.     \n					一段空格之后，是EOL
+		//	ps -e.   | grep xxx  \n 	一段空格之后，是管道|
 	}
-	command->argv[command->argc] = 0;	/*execv need a null-terminated argv[]*/
-	return;
+	return 12345;
 }
 /*@return (command count): build how many lsh-cmd structure*/
 /* eg.  cat * -R | grep 'debug'|wc -l	*/
@@ -746,16 +868,21 @@ int build_lsh_cmds(char *input, struct lsh_cmd *lsh_cmds){
 
 	int i = 0;
 	while(1){
-		build_lsh_cmd(lsh_cmds + i);
-		bool success = lsh_cmds[i].argc;
-		if(success) i++;
-		if(!success || VI_CURR_LEN(vim) == VI_CURRL_LEN(vim) + 1) break;
-		if(i == LSH_CMD_MAX) return 0;	/*mark built-num as 0, that's failed*/
+		bool ret = build_lsh_cmd(lsh_cmds + i);
+		if(ret == '|') i++;			//管道右方还有一个
+		else if(ret == EOL) {		//最后一个命令段
+			i++;
+			break;
+		}
+		else if(ret == EMPTY_UNTIL_EOL) break;	
+		else assert(0 && "what ? ");
+		assert(i != LSH_CMD_MAX);
 		vim_l();
 	}
 	return i;
 }
 
+//不一定要反向创建，只要有晚些关闭父进程的read端就行了 .
 int run_cmdline(char *input){
 	int fork_ret;
 	int ret;
@@ -766,23 +893,28 @@ int run_cmdline(char *input){
 	if(cmdnr < 1) return 1;	//here should removed outside this function
 
 	int cmd_id_max = cmdnr - 1;
-	for (int cmd_id = 0; cmd_id <= cmd_id_max; cmd_id++){
+
+	for (int cmd_id = cmd_id_max; cmd_id >= 0; cmd_id--){
 		struct lsh_cmd *cmd  = lshcmds + cmd_id;
 		/*如果只有一个进程(或者现在就是最右边的进程)，就不要dup2 rpipefd到
 			  １了,所以检查一下右侧害有没有进程*/
-		if(cmd_id != cmd_id_max){
+		if(cmd_id != 0){
 			int *pipefds = free_pipefd + cmd_id * 2;/*alloc pipe fd[2]*/
 			pipe(pipefds);	/*syscall pipe() create a file in memory, and let
 							  two fd point it, one read, one write([0],[1])*/
-			r_pipefds = pipefds;
+			l_pipefds = pipefds;
 		}
 		if((fork_ret = fork()) == 0){	/*child process 1*/
 			/*try link to left pipe*/
 			if(l_pipefds){		/*read from left pipe*/
+				close(l_pipefds[1]);
 				dup2(l_pipefds[0], 0);	/*fd 0 automatically closed by dup2*/
+				close(l_pipefds[0]);
 			}
 			if(r_pipefds){	/*write to right pipe*/
+				close(r_pipefds[0]);
 				dup2(r_pipefds[1], 1);
+				close(r_pipefds[1]);
 			}
 			else{
 				if(tail_pipe.active){
@@ -791,9 +923,11 @@ int run_cmdline(char *input){
 			}
 			/*good bye... new life*/
 			//if(!__silent) fprintf(stderr, "%d> run:%s ", getpid(), fullpath);
+			#if 0
 			for(int i = 0; i < cmd->argc; i++){
 				if(!__silent) fprintf(stderr, "%d:<%s>  ",i, cmd->argv[i]);
 			}
+			#endif
 			if(!__silent) fprintf(stderr, "\n");
 			/* execvp
 			 * we save much effort, this interface can search command using current
@@ -805,8 +939,11 @@ int run_cmdline(char *input){
 			fprintf(stderr, "%s\n", strerror(errno));
 			exit(ret);	/*shouldn't flow to here*/
 		}
-		l_pipefds = r_pipefds;
-		r_pipefds = 0;
+		if(l_pipefds) close(l_pipefds[0]);
+		if(r_pipefds) close(r_pipefds[1]);
+
+		r_pipefds = l_pipefds;
+		l_pipefds = 0;
 	}
 	if(tail_pipe.active){
 		int bytes = read(tail_pipe.fds[0], tail_pipe.text, 0x100000*10);
@@ -816,13 +953,10 @@ int run_cmdline(char *input){
 		tail_pipe.textlen = bytes;
 		tail_pipe.text[bytes] = 0;
 	}
-//	printf("death");
 	signal(SIGINT, SIG_IGN);
-	int pid = wait4(-1, 0, 0, 0);		/*receive child-process's exit code as SHELL_RET_CODE*/
+	while(wait4(-1, 0, 0, 0) != -1);
 	signal(SIGINT, sighandler_ctrl);
-	assert( pid != -1);
-	//fprintf(stderr, "wait4 return %d\n", err);
-	return 0;	/*TODO*/
+	return 0;	/*TODO 要返回命令的状态码*/
 }
 
 /*@fullpath  if success, store result in fullpath*/
@@ -876,3 +1010,47 @@ int lsh_run_cmd( lua_State *L ){
 */
 
 
+#if 0
+	for (int cmd_id = 0; cmd_id <= cmd_id_max; cmd_id++){
+		struct lsh_cmd *cmd  = lshcmds + cmd_id;
+		/*如果只有一个进程(或者现在就是最右边的进程)，就不要dup2 rpipefd到
+			  １了,所以检查一下右侧害有没有进程*/
+		if(cmd_id != cmd_id_max){
+			int *pipefds = free_pipefd + cmd_id * 2;/*alloc pipe fd[2]*/
+			pipe(pipefds);	/*syscall pipe() create a file in memory, and let
+							  two fd point it, one read, one write([0],[1])*/
+			r_pipefds = pipefds;
+		}
+		if((fork_ret = fork()) == 0){	/*child process 1*/
+			/*try link to left pipe*/
+			if(l_pipefds){		/*read from left pipe*/
+				dup2(l_pipefds[0], 0);	/*fd 0 automatically closed by dup2*/
+			}
+			if(r_pipefds){	/*write to right pipe*/
+				dup2(r_pipefds[1], 1);
+			}
+			else{
+				if(tail_pipe.active){
+					dup2(tail_pipe.fds[1], 1);
+				}
+			}
+			/*good bye... new life*/
+			//if(!__silent) fprintf(stderr, "%d> run:%s ", getpid(), fullpath);
+			for(int i = 0; i < cmd->argc; i++){
+				if(!__silent) fprintf(stderr, "%d:<%s>  ",i, cmd->argv[i]);
+			}
+			if(!__silent) fprintf(stderr, "\n");
+			/* execvp
+			 * we save much effort, this interface can search command using current
+			 * enviroment's PATH, and let the new process inherit current environ-
+			 * ment.  But we need keep 'environ' sychronized with lua firstly.
+			*/
+			lsh_sync_env();
+			ret = execvp(cmd->argv[0], cmd->argv);
+			fprintf(stderr, "%s\n", strerror(errno));
+			exit(ret);	/*shouldn't flow to here*/
+		}
+		l_pipefds = r_pipefds;
+		r_pipefds = 0;
+	}
+#endif

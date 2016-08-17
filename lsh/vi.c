@@ -527,32 +527,31 @@ int vi_E(struct vi *vi){
  * 	
  * Note! 'ML 'not supported, we offer another API 'search'
  * 虽然有＇\n'选项',但仍不支持多行
+ * Wed Aug 17 15:12:25 CST 2016 修改>
+ * 以前是group里有'\n'，则认为是super f（自动进入下一行的），现在把这个功能
+ * 改成到flags的标志位里，提供一个FLAG_MULTI bit。以后做。
+ * 从今天其，group里的'\n'标志，表示这个f可以推进到EOL上。虽然这是危险的。
+ * !! TODO 不是想的那么简单。如果将来EOL换成0,0怎么通过group传递进来。
+ * 
+ * 当因为EOL失败返回时，不会在返回值里标记meetn。因为，还有第二个失败的原因吗？
  */
-int vi_f_ex(struct vi *vi, char *group, unsigned flags){
+bool vi_f_ex(struct vi *vi, char *group, unsigned flags){
 	assert((flags & VI_FLAG(ML)) == 0);
-	int state = 0;
+	//int state = 0;
 	char *curr = (VI_FLAG(curr) & flags) ? vi->curr : vi->curr + 1;
-	bool exist_flag_n = (bool)strchar(group, '\n');
 	while( 1 ){
-		if( *curr == '\n'){
-			if(exist_flag_n && vi->currl < vi->lmax){
-				vi->currl++;	/*现在是停在行末，一定要小心，不要乱改*/
-				vi->curr = vi->lines[vi->currl];
-				goto success;
-			}
-			return 0;	/*we don't return flag-meetn. Becasue, Is there another 
-						  failure reason*/
-		}
-		if ( strchar( group, *curr ) == 0 )	curr++;
-		else{	/*current character matched*/
+		if(strchar(group, *curr)){
 			vi->curr = curr;
-			goto success;
+			return true;
+		}
+		else if(*curr == EOL){
+			return false;
+		}
+		else{	//we are safe
+			curr++;
 		}
 	}
-success:
-		state += (((int)*vi->curr)<<8);		/*not so necessary, just a shorthand*/
-		__SET_STATE(SUCCESS);
-		return state;
+	return 12345;
 }
 
 struct vi* vi_new( char *str){

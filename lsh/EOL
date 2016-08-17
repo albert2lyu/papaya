@@ -1,0 +1,2 @@
+1, see <vi.c> vi_f_ex()  TODO
+   这一点被build_lsh_cmd依赖到了。

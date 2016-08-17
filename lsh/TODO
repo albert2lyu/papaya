@@ -33,3 +33,9 @@ repeat    "I am hungry"    now
 luashell目前还没做到。
 单引号不仅起着聚集带字符串的作用。
 它发挥了聚集作用后，本身被shell trip掉了。并不会传入argv。这是lua shell实现上又要注意的一点。
+
+
+3, Lua Shell要赶紧支持以script文件做参数。 
+   即，用户运行./commit cmd。 内核会自动调用commit里标志的lsh解释器，并且把cmd当参数传给lsh解释器，lsh要负责把命令悉数传递给脚本。
+
+4, 直接运行一个bash文件abc。和手动执行/bin/bash abc的效果是一样的。

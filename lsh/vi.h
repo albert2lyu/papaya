@@ -7,7 +7,9 @@
 #include<string.h>
 #include"utils.h"
 
+#define STR_EOL "\n" 
 #define EOL '\n'
+#define STR_QUOT "'\""
 enum{
 	ASCII_CR = 1,
 	ASCII_ESC = 2
