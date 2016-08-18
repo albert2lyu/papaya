@@ -31,6 +31,7 @@
 //#include"preprocess.h"
 #include<readline/readline.h>
 #include<readline/history.h>
+#include<setjmp.h>
 static struct{
 	bool active;
 	int fds[2];
@@ -56,13 +57,15 @@ char input_head[64];
 struct vi __luavi;
 struct vi *luavi = &__luavi;
 lua_State *L;
+char *readline_buf = 0;/*write to key-buffer of 'readline ' is dangerous*/
 /* linux对signal的处理比较奇怪。
  * 一个signal响应之后，它会清除原先注册的handler。所以要再注册一次。
  */
+sigjmp_buf new_prompt;
 void  sighandler_ctrl(int x){
-	//if(lsh_blocked) return;
-	signal(SIGINT, sighandler_ctrl);
 	printf("\nto quit lsh, type 'exit'\n");
+	signal(SIGINT, sighandler_ctrl);
+	siglongjmp(new_prompt, 1);
 }
 /*1, will keep lua's main stack balanced, no footprint leaved
  */
@@ -193,7 +196,6 @@ int main(int argc, char *argv[]){
 		else script_mode = true;
 	}
 
-	char *readline_buf = 0;/*write to key-buffer of 'readline ' is dangerous*/
 	if(script_mode ){
 		readline_buf = malloc(PATH_MAX + strlen("source ") );	//必须用malloc
 		strcpy(readline_buf, "source ");
@@ -204,9 +206,10 @@ int main(int argc, char *argv[]){
 		char prompt[64];
 		char *curr_input = input;
 		
-		//if(readline_buf)
-			//if(!script_mode) free( readline_buf );
-
+		//if, and only if..
+		//只有当svaesigs flag不为0时，行为才是正常的。
+		//否则响应一次ctrl-c之后，就再不响应了。再看。
+		sigsetjmp(new_prompt, 1);
 		if(!readline_buf){
 			readline_buf = readline(
 							strcat(getcwd(prompt, 64), 
