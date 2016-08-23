@@ -2,7 +2,7 @@
 # see /usr/share/doc/bash/examples/startup-files (in the package bash-doc)
 # for examples
 #PATH=~/Downloads/mips/bin/:./:$PATH
-PATH=~/Downloads/mips/bin/:./:/home/wws/software/:$PATH
+PATH=~/Downloads/mips/bin/:$PATH
 alias lvim='/opt/bin/vim'
 alias shot='scrot -s'
 cd ~/lab/yanqi/cmd

@@ -7,18 +7,27 @@
 #include<string.h>
 #include"utils.h"
 
+enum{
+	E_meetn = 1,
+	E_curr,
+};
 #define STR_EOL "\n" 
 #define EOL '\n'
 #define STR_QUOT "'\""
+//TODO　考虑就用27作为ASCII_ESC的值，ASCII_CR是没办法，本来该是'\n'的值的。
+//再看看，说不定后者也有可能就用'\n'表示
+// 还是不能，像比/\n<CR>用来搜索换行符。此处\n和<CR>就要区分开来
+//　但是，在inseart和append的时候，是否把\n也当做<CR>处理？按理该。　再看。
 enum{
 	ASCII_CR = 1,
-	ASCII_ESC = 2
+	ASCII_ESC = 2,
+	ASCII_DEL = 127,
 };
 
 #define STR_CR ((char[]){ASCII_CR, 0})
 #define STR_ESC_CR ((char[]){ASCII_ESC, ASCII_CR, '\n', 0})
 //static char STR_CR[] = {ASCII_CR, 0};
-//static char STR_ESC[] = {ASCII_ESC, 0};
+#define STR_ESC  ((char[]){ASCII_ESC, 0})
 //static char STR_ESC_CR[] = {ASCII_ESC, ASCII_CR, '\n', 0};
 
 #define VI_CURRL_TAIL(vi) (vi->lines[vi->currl] + vi->len_of_line[vi->currl] -1)
@@ -41,15 +50,17 @@ enum{
 #define EXCHG_PTR(a, b) do{void *tmp = a; a = (void*)b; b = tmp;} while(0)
 #define EXCHG_INT(a, b) do{int tmp = a; a = b; b = tmp;} while(0)
 
+#if 0
 #define Def_vi_op(x)\
 	static inline bool vi_op_##x (struct vi*vi){\
 		vi->op_id++;\
-		if(vi->ops[vi->op_id] == '_'){\
+		if(vi->ops[vi->op_id] == '|'){\
 			vi->op_id++;\
 			return vi_##x##_(vi);\
 		}\
 		return vi_##x(vi);\
 	}
+#endif
 /*
  * here is a balance:
  * 1, I want to write brief code: i hate writing code like "vi_f(vi, ' ')"
@@ -198,7 +209,6 @@ char*  vi_move_ops;
 char*  vi_pair_str;
 char*  vi_pair_str2 ;
 void vi_insert_safe(struct vi*vi, char *src, int srclen);
-void vi_append_safe(struct vi*vi, char *src, int srclen);
 int vi_jmpspace_ex(struct vi *vi, int control);
 int vi_f_ex(struct vi*vi,   char *group, unsigned flags);
 void vi_print(struct vi*vi, int);
@@ -273,21 +283,40 @@ int vi_d(struct vi *vi);
 int vi_op_d(struct vi *vi);
 int vi_op_y(struct vi *vi);
 void vi_v(struct vi * vi);
- /*Take Care!
-  * Here a whole line may be moved to anohter place by realloc, you should know
-  * what you are doing :)
+
+ /*> Take Care!
+  *> Here a whole line may be moved to anohter place due to realloc, be aware of
+  *  what you are doing :)
   *> @return how many bytes inserted 
+  *> 对<CR>的支持是在这里实现的，来分担一部分的复杂度。
+  *> 顺便支持'\n'
+  *> 对<ESC>的支持不是在这里实现的。用０结尾就够了。
   */
 static inline int vi_i(struct vi*vi, char *content){
 	int len = strlen_ex(content, STR_ESC_CR);
 	vi_insert_safe(vi, content, len);
+
+	if(content[len] == ASCII_CR || content[len] == '\n'){
+		char *break_at = vi->curr + 1;
+		int rlen = VI_CURRL_END(vi) - break_at;	//右半部长度
+		vi_o(vi);
+		if(rlen) vi_i(vi, break_at);
+		vi_0(vi);
+
+		*break_at = EOL;
+		vi->len_of_line[vi->currl - 1] -= rlen;
+
+		len += vi_i(vi, content + len + 1) + 1;		//换行符也算到长度里去
+	}
 	return len;
 }
 
+//唯一要提防的是，在空行插入的时候
+//TODO 往行尾追加呢?
 static inline int vi_a(struct vi *vi, char *content){
-	int len = strlen_ex(content, STR_ESC_CR);
-	vi_append_safe(vi, content, len);
-	return len;
+	assert(VI_CURR_LEN(vi) <= VI_CURRL_LEN(vi));
+	if( VI_CURRL_LEN(vi) != 0 )	vi->curr++;	
+	return vi_i(vi, content);
 }
 static inline void vi_$0(struct vi *vi){
 	vi->curr = vi->lines[vi->currl] + VI_CURRL_LEN(vi);
@@ -401,8 +430,8 @@ int vi_taste_digit(struct vi*vi);
 char *vi_clipboard(struct vi *vi, char *buf);
 static inline bool vi_xor(struct vi*vi){
 	vi_0(vi);
-	int state = vi_jmpspace(vi);
-	return !__TEST_STATE(meetn);
+	int ok = vi_jmpspace(vi);
+	return (ok || vi->_errno == E_curr);
 }
 static inline bool vi_orx(struct vi*vi){
 	vi_$(vi);
@@ -464,4 +493,12 @@ bool vi_search_foward(struct vi *vi, char *pattern);
 bool vi_search_backward(struct vi *vi, char *pattern);
 bool vi_N(struct vi *vi);
 bool vi_n(struct vi *vi);
+
+bool vi_df(struct vi *vi, char target);
+bool vi_dW(struct vi *vi);		
+
+bool vi_yf(struct vi *vi, char target);
+void vi_y0(struct vi *vi);
+void vi_y$(struct vi *vi);
+
 #endif

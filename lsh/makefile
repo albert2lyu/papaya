@@ -1,4 +1,4 @@
-options=-std=c99 -g -Wall -Wno-char-subscripts -Wno-unused-function  -funsigned-char -I/usr/include/i386-linux-gnu/ -I/usr/include/
+options=-std=c99 -g -Wall -Wno-char-subscripts -Wno-unused-function  -funsigned-char -I/usr/include/i386-linux-gnu/ -I/usr/include/　-g3 -gdwarf-2
 
 lshopt=-I./lua -lm -ldl -lreadline 
 
@@ -18,7 +18,7 @@ all:
 	gcc -o han2pinyin han2pinyin.o vi.o utils.o file.o $(LIB_O) $(CORE_O) $(options) $(lshopt) -Wl,-export-dynamic
 #gcc -o lsh lsh.o vi.o utils.o $(LIB_O) $(CORE_O) $(options) $(lshopt) 
 	touch ../.lsh.history
-	mv lsh /home/wws/software/
+	mv lsh /home/wws/lsh/
 
 
 #注意lua目录是不被clena的

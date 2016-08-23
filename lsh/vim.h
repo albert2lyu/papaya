@@ -121,4 +121,17 @@ static inline bool vim_meet_emptyline(){
 static inline bool vim_meet_spaceline(){
 	return vi_meet_spaceline(vim);
 }
+
+static inline bool vim_p(){
+	return vi_p(vim);
+}
+
+static inline bool vim_d(){
+	return vi_d(vim);
+}
+
+static inline bool vim_y(){
+	return vi_y(vim);
+}
+
 #endif

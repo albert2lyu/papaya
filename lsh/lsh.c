@@ -39,6 +39,8 @@ static struct{
 	int textlen;
 }tail_pipe;
 
+static bool __hide_prompt = false;
+
 static int __call_run_cmdline(lua_State *L);
 static int process_if();
 static int process_colon();
@@ -51,7 +53,7 @@ int __lshmod = LSH_MOD_LUA;
 char *__lshprefixArr[]={
 	[LSH_MOD_LUA] = "$ ",
 	[LSH_MOD_CMD] = "$` ",
-	[LSH_MOD_VI] = "$: "
+	[LSH_MOD_VI] = "$@ "
 };
 char input_head[64];
 struct vi __luavi;
@@ -209,23 +211,26 @@ int main(int argc, char *argv[]){
 		//if, and only if..
 		//只有当svaesigs flag不为0时，行为才是正常的。
 		//否则响应一次ctrl-c之后，就再不响应了。再看。
+		//memset(&new_prompt, 0, sizeof(new_prompt));
 		sigsetjmp(new_prompt, 1);
-		if(!readline_buf){
+		while(!readline_buf ){
+			char empty[32] = {0};
 			readline_buf = readline(
-							strcat(getcwd(prompt, 64), 
-							__lshprefixArr[__lshmod]) 
+							strcat(__hide_prompt ? empty : getcwd(prompt, 64), 
+									__lshprefixArr[__lshmod]) 
 						   );
+			if(readline_buf[0] == 0){	//用户没输入内容就按了Enter
+				free(readline_buf);
+				readline_buf = 0;
+			}
 		}
-
-		if( readline_buf && *readline_buf ){
-			strcpy(input, readline_buf);
-			add_history( readline_buf );	//TODO 脚本不该污染历史命令
-			write_history(historyfile);
-
-			free(readline_buf);
-			readline_buf = 0;
-		}
-		else continue;		//用户没输入命令就按了Enter
+		//printf("got realine_buf:%p\n", readline_buf);
+		//printf("and it contains data\n");
+		strcpy(input, readline_buf);
+		add_history( readline_buf );	//TODO 脚本不该污染历史命令
+		write_history(historyfile);
+		free(readline_buf);
+		readline_buf = 0;
 
 		if (strncmp(input, "source ", strlen("source ")) == 0){
 			vim_open(input+strlen("source "));
@@ -245,6 +250,10 @@ int main(int argc, char *argv[]){
 		}
 		else if(strcmp(input, "mod cmd") == 0){
 			__lshmod = LSH_MOD_CMD;
+			continue;
+		}
+		else if(strcmp(input, "hide prompt") == 0){
+			__hide_prompt = !__hide_prompt;
 			continue;
 		}
 		else if(strcmp(input, "exit") == 0)
@@ -448,7 +457,7 @@ int __call_vi_normal(lua_State *L){
 	char *str = (char *)lua_tostring(L, 2);
 	
 	int ret = vi_normal(vi, str);
-	lua_pushinteger(L, ret);
+	lua_pushboolean(L, ret);
 	return 1;
 }
 
@@ -619,20 +628,30 @@ void register_vi(lua_State *L){
 	lua_pushcfunction(L, __call_vi_share_clipboard);
 	lua_setfield(L, -2, "share_clipboard");
 }
+
 void export_vi(lua_State *L){
 	/*export vim later*/
 /*	vi_init(luavi);*/
 }
 
-void process$(void){
+void process$(char lineflag){
 	assert(vim->curr[0] == '$');
 	vim_x();		/*make right side double-quotation */
-	vim_i("]]");
+	vim_i("]]..");
 
-	vim_a("..");
-	vim_f('(');
-	vim_percent();
+	//vim_a("..tostring");		//boolean无法隐式的被..连接。但number可以。
+								//所以暂时就不用tostring了
+	vim_f('(');		vim_m('l');
+	vim_percent();  vim_m('r');
 	vim_a("..[[");
+	
+	if(lineflag == '@'){
+		//TODO 既然支持表达式变量，就帮用户加个()。以免and or的时候语法歧义
+		//vim_normal("F)hvl%lyh%");
+		vim_normal("`llv`rhy");		//拷贝变量表达式到剪贴板
+		vim_a(" == 0 and '\\127' or ");	//TODO　若i是字符串０呢？
+		vim_p();
+	}
 	return;
 }
 /*关键是怎么执行script文件，./test.lsh，是交给操作系统，还是lsh自己处理.
@@ -709,6 +728,7 @@ static int process_if(){
 	return 1;
 }
 
+#if 0
 /*@argument none. Here use default global variable 'vim'
  * 1, TODO ":" appeared in [[]] will be wrong parsed
  */
@@ -717,7 +737,7 @@ static int process_colon(){
 	for(int i = 0; i <= vim->lmax; i++){
 		vim_Gn(i);
 		vim_xor();
-		if(vim->curr[0] != ':') continue;
+		if(vim->curr[0] != '@') continue;
 		//suppose this line appear like this: "< hjkl> --here is commentary"
 
 		vim_x();				// hjkl> --here is commentary
@@ -736,6 +756,7 @@ static int process_colon(){
 	}
 	return 1;
 }
+#endif
 
 #if 0
 static void do_escape(void){
@@ -748,8 +769,9 @@ static void do_escape(void){
 #endif
 /* The core preprocess: convert mixed-lua-cmd code to pure luacode 
  * @mixbuf	0: pass 0 if vim already adopt mix-code
-* TODO 1, $ in a string
-* 2,BUG mix末尾如果有空格，会崩溃 source ssdfX, X不能是空个
+ * TODO 1, $ in a string
+ * 2,BUG mix末尾如果有空格，会崩溃 source ssdfX, X不能是空个
+ *> TODO 现在不支持`和@行的行尾注释。以后做。　这很有用。
  */
 int mix2lua(char *mixbuf, char *luabuf){
 	if(mixbuf){
@@ -759,25 +781,35 @@ int mix2lua(char *mixbuf, char *luabuf){
 		vim->curr[0] = vim->curr[1] = '-' ;
 		vim_j();
 	}
-
+	
+	char lineflag = 0;
 	do{
-		vim_xor();				
-		if(vim->curr[0] != '`'){
+		vim_xor();
+		if( (lineflag = vim->curr[0]) != '`' && lineflag != '@')
+		{
 			vim_orx();
-			if(vim->curr[0] != '`') continue;
+			if( (lineflag = vim->curr[0])!= '`' && lineflag != '@') continue;
 			else{
-				vim_r('|');
+				if(lineflag == '`')		vim_r('|');
+				else if(lineflag == '@') vi_d$(vim);
+				else assert(0);
+
 				vim_0();
 				bool ok = vim_f('=');	assert(ok);
 				vim_l();	vim_jmpspace();
-				assert(vim->curr[0] = '`');
+				assert(vim->curr[0] = lineflag);
 			}
 		}
-		/*we stand on '`' now */
-		vim_i("run_cmdline(");	vim_l();
+		/*we stand on ` or @ now */
+		if(lineflag == '`')  vim_i("run_cmdline(");	
+		else if(lineflag == '@') vim_i("vim:normal(");
+		else assert(0);		//TODO 太胆小了?
+
+		vim_l();
 		vim_x();	vim_i("[[");
-		while(vim_f('$') & VI_FLAG(SUCCESS)){
-			process$();
+		while(vim_f('$')){
+			if(vim->curr[1] != '(') continue;
+			process$(lineflag);
 		}
 		vim_$();
 		vim_a("]]");
@@ -786,7 +818,7 @@ int mix2lua(char *mixbuf, char *luabuf){
 	}while(vim_j());
 	vim_gg();
 	if( !process_if() ) return false;
-	process_colon();
+	//process_colon();
 	vim_out(luabuf);
 	char tmpbuf[128];
 	get_dirfile(lshdir, "volatile.lua", tmpbuf);
@@ -818,9 +850,8 @@ int  build_lsh_cmd(//struct vi *vi,
 					struct lsh_cmd *command){
 	command->argc = 0;
 	bool ok;
-	int state;
-	state = vim_jmpspace();
-	if(__TEST_STATE(meetn))	return EMPTY_UNTIL_EOL;
+	ok = vim_jmpspace();
+	if(!ok && vim->_errno == E_meetn)	return EMPTY_UNTIL_EOL;
 	// 现在可以确定跳过命令行最前面的空白了。而且是落在一个实在的命令上。
 	// 当然，如果用户最开始输入一个"|"，此处是检查不出来的。
 

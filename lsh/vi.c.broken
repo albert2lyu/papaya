@@ -51,7 +51,6 @@
  * operation.
  *
  */
-#include"tochar.h"
 #include<ctype.h>
 #include"vi.h"
 #include<unistd.h>
@@ -65,7 +64,6 @@ char*  vi_move_ops = "hjkl0$^W%";
 char*  vi_pair_str = "()[]{}<>";
 char*  vi_pair_str2 = ")(][}{><";
 
-void vi_append_safe(struct vi*vi, char *src, int srclen);
 
 static inline void __expand_line(int l, int size, char **lines, int *size_of_line){
 	lines[l] = realloc(lines[l], size);
@@ -187,14 +185,12 @@ bool vi_w_(struct vi *vi){
 	}
 	return ret;
 }
-#if 0
 Def_vi_op(w)
 Def_vi_op(W)
 Def_vi_op(E)
 Def_vi_op(B)
 Def_vi_op(b)
 Def_vi_op(e)
-#endif
 
 /* preprocess实现起来很简单，因为不用考虑缓冲区溢出。只会随着处理长度减小
  * TODO 需要str_del，这样不够简洁。
@@ -238,8 +234,6 @@ void preprocess(char *ops){
 }
 
 /* operation sequence, like "w", "dd", "df"
- * opseq表示一个操作基元，一段opstr被分成多个opseq来逐个处理。
- * 它叫做opunit似乎更好，opstr才改叫做opseq。就是vi_normal接收的那个ops。再说。
  */
 struct opseq{
 	union{
@@ -252,24 +246,17 @@ struct opseq{
 /*@return 
  * opseq.totlen = -1		illegal op sequence
  * opseq.totlen = 0			遇到终点了。　最好不要让它这样返回，在上层就检测结尾
- * opseq.byte[], 能容纳的操作码序列最长为４。这已经很够了。我见到的最长也就２
- 				 像i123，只有i是操作码。　像/123<CR>，只有/是操作码。
-				 像df1,只有df是操作码。
  */
 static struct opseq taste_opseq(struct vi *vi){
 	char *currop = vi->ops + vi->op_id;
-	struct opseq opseq;
+	char *backup = currop;
+	union opseq opseq;
 
 	opseq.value = *currop;	//第一次初始化，不要用opseq.byte[0] = *currop;
 	switch(*currop){
 		case 'd':
 		case 'y':
 				{
-					if(vi->v_begin){		//这个vi出于选择模式
-						opseq.totlen = 1;
-						break;
-					}
-
 					opseq.byte[1] = currop[1];
 					if(currop[1] == currop[0]){
 						opseq.totlen = 2;
@@ -278,8 +265,8 @@ static struct opseq taste_opseq(struct vi *vi){
 					switch(currop[1]){
 						case 'f':
 							opseq.totlen = 3;	break;
-						case 'w':	assert(0);
 						case 'W':
+						case 'w':
 						case '0':
 						case '$':
 							opseq.totlen = 2;	break;
@@ -294,22 +281,14 @@ static struct opseq taste_opseq(struct vi *vi){
 		case 'F':	
 		case 'm':	
 		case '`':	
-						opseq.totlen = 2;	break;
+						opseq.len = 2;	break;
 					
 		case 'W':	
 		case 'w':	
 		case 'B':	
 		case 'E':	
 		case 'e':	
-		case 'b':
-				{
-						if(currop[1] == '|'){
-							opseq.byte[1] = '|';	
-							opseq.totlen = 2;
-						}
-						else opseq.totlen = 1;
-						break;
-				}
+		case 'b':	
 					
 		case 'v':	
 		case 'G':	
@@ -328,7 +307,7 @@ static struct opseq taste_opseq(struct vi *vi){
 		case 'n':	
 		case 'N':	
 		case ASCII_ESC:
-					opseq.totlen = 1;		break;
+					opseq.len = 1;		break;
 					
 		case 'o':	
 		case 'i':	
@@ -336,47 +315,25 @@ static struct opseq taste_opseq(struct vi *vi){
 				{
 					char *content = currop + 1;
 					int len = strlen_ex(content, STR_ESC);
-					opseq.totlen = 1 + len;
-					if(content[len] == ASCII_ESC) opseq.totlen += 1;
+					opseq.len = 1 + len;
+					if(content[len] == STR_ESC) opseq.len += 1;
 					else;	//遇到结尾的\0了。
 
 					break;
 				}
 								
-		case '/':
-		case '?':
-				{
-					char *pattern = currop + 1;
-					int len = strlen_ex(pattern, STR_CR);	//此处CR和'\n'不同
-															//的意义就出来了
-					opseq.totlen = 1 + len + 1;	// the last '1' for <CR>
-					break;
-				}
 
 		case 0:
-					opseq.totlen = 0;		break;
+					opseq.len = 0;		break;
 		default:
-					opseq.totlen = -1;		break;
+					opseq.len = -1;		break;
 	}
 	return opseq;
 }
 
-/*
- * 没有count，则返回默认的1。　
- * 这样有潜在的风险，即，上层需要知道，这个１到底是缺省生成的，还是用户指定的。
- */
-static int taste_count(char *opseq, char **endptr){
-	if(opseq[0] == '0') return 1;		//0是opcode,不能做count prefix
-	if(opseq[0] == '-') return 1;		//不接受负数的count prefix
-	if(opseq[0] == ASCII_DEL) return 0;	//DEL键的ascii码才表示重复前缀是0	
+bool vi_normal(struct vi *vi, char *opstr){
 
-	int count = strtol(opseq, endptr, 10);
-	if(count == 0) return 1;	//用户没有输入命令前缀，
-	return count;
 }
-
-//暂时只考虑两个
-#define SEQ(a, b) ( tochar(a) + ( tochar(b) << 8 ))
 /*1, 一部分序列要立刻解析成函数，因为ｃ库反正需要实现相应的api，一部分序列交给通用处理,像f, $, 费组合字符要立刻失败,一部分操作只用来兼容vim就没有意义了把，像比y0，dh,是很不常用的,不如放在以后收集意见后再实现，不要迷信，可能它当初设计的就不好，你怕分裂给用户困扰，那就不实现总可以吧
  *2, 先把位移的y,d操作做成通用的，如何．剔除一些常用组合，像比yw,dw*/
 /*每次最好把必要的flag信息返回给lua，ｌｕａ主动获取的话，效率低，但ｌｕａ的bitwise
@@ -391,148 +348,121 @@ static int taste_count(char *opseq, char **endptr){
  *   5, 为了支持N=0，需要子层识别N=0，做dry run。即，解析掉一个命令字段，但不
  *      产生实际的效果。
  * > op必须以０结尾，而不是\n
- * > 暂时不提供vi->N。只用局部变量。
  */
-bool vi_normal(struct vi *vi, char *ops){
-	int len;
-	bool ok;
-
-	preprocess(ops);		//直接处理可以吗，这可是从lua stack传过来的，const ?
+bool vi_normal(struct vi *vi, char *opseq){
+/*	vi->flags = 0;*/
+	preprocess(op);		/*直接处理可以吗，这可是从lua stack传过来的，const?*/
 	//printf("preprocess done: %s\n", op);
-	vi->ops = ops;
+	vi->ops = op;
 	vi->op_id = 0;
 
-	//bool (*do_search)(struct vi *vi, char *pattern);	//TODO
-	//暂时不做过多的错误反馈
-	while(vi->ops[vi->op_id]){
+	int state = VI_FLAG(SUCCESS);	/*result state of last command*/
+	int (*i_or_a)(struct vi *vi, char *piece);
+	bool (*do_search)(struct vi *vi, char *pattern);
+	int len;
+	while(vi->ops[vi->op_id] && __TEST_STATE(SUCCESS)){
 		char *currop = vi->ops + vi->op_id;
-		int N = taste_count(currop, &currop);
-		vi->op_id = currop - vi->ops;
-
-		//这是命令的解析阶段，会检测格式错误
-		struct opseq opseq= taste_opseq(vi);	
-		if(opseq.totlen == -1){
-			ok = false;
-			goto out;;	//刚才这个命令解析失败了
-		}
-
-		if(N < 1 ) goto take_effect_done;	//在此处支持N=0
-
-		take_effect:							//开始opseq的运行阶段
-		ok = 1;
-		switch(opseq.value){
+		switch(*currop){
 			case 'd':
-							ok = vi_d(vi);				break;
-			case SEQ(d, f):
-							ok = vi_df(vi, currop[2]);				break;
-			case SEQ(d, d):
-							vi_dd(vi);					break;
-			case SEQ(d, W):
-							ok = vi_dW(vi);				break;
-			case SEQ(d, 0):
-							vi_d0(vi);						break;
-			case SEQ(d, $):
-							vi_d$(vi);						break;
-			
-			case 'y':		ok = vi_y(vi);				break;
-			case SEQ(y, f):
-							ok = vi_yf(vi, currop[2]);				break;	
-			case SEQ(y, y):
-							vi_yy(vi);					break;
-			case SEQ(y, W):
-							ok = vi_yW(vi);				break;
-			case SEQ(y, w):	assert(0);
-			case SEQ(y, 0):
-							vi_y0(vi);					break;
-			case SEQ(y, $):
-							vi_y$(vi);					break;
+				state = vi_op_d(vi);	break;
+			case 'y':
+				state = vi_op_y(vi);	break;
+			case 'W':		state = vi_op_W(vi);	break;
+			case 'w':		state = vi_op_w(vi);	break;
+			case 'B':		state = vi_op_B(vi);	break;
+			case 'E':		state = vi_op_E(vi);	break;
+			case 'e':		state = vi_op_e(vi);	break;
+			case 'b':		state = vi_op_b(vi); 	break;
 
-		
-			case 'W' + ('|' << 8):
-							ok = vi_W_(vi);		break;
-			case 'w' + ('|' << 8):
-							ok = vi_w_(vi);		break;
-			case 'B' + ('|' << 8):
-							ok = vi_B_(vi);		break;
-			case 'b' + ('|' << 8):
-							ok = vi_b_(vi);		break;
-			case 'E' + ('|' << 8):
-							ok = vi_E_(vi);		break;
-			case 'e' + ('|' << 8):
-							ok = vi_e_(vi);		break;
+			case 'f':		state = vi_f(vi, currop[1]);	goto mv2;
+			case 'F':		state = vi_F(vi, currop[1]);	goto mv2;
+			case 'm':		state = vi_m(vi, currop[1]);	goto mv2;
+			case '`':		state = vi_tom(vi, currop[1]); 	goto mv2;
+			mv2:
+							vi->op_id += 2;	
+							break;
 
-			case 'W':		ok = vi_W(vi);		break;
-			case 'w':		ok = vi_w(vi);		break;
-			case 'B':		ok = vi_B(vi);		break;
-			case 'E':		ok = vi_E(vi);		break;
-			case 'e':		ok = vi_e(vi);		break;
-			case 'b':		ok = vi_b(vi); 		break;
+			case 'v':		vi_v(vi);		goto mv1;
+			case 'G':		vi_G(vi);		goto mv1;
+			case 'p':		state = vi_p(vi);	goto mv1;
+			case 'x':		vi_x(vi);	goto mv1;
 
-			case 'f':		ok = vi_f(vi, currop[1]);	break;
-			case 'F':		ok = vi_F(vi, currop[1]);	break;
-			case 'm':		ok = vi_m(vi, currop[1]);	break;
-			case '`':		ok = vi_tom(vi, currop[1]); break;
+			case '0':		vi_0(vi);			goto mv1;
+			case '$':		vi_$(vi);			goto mv1;
+			case 'h':		state = vi_h(vi);	goto mv1;
+			case 'j': 		state = vi_j(vi);	goto mv1;
+			case 'k':		state = vi_k(vi);	goto mv1;
+			case 'l':		state = vi_l(vi);	goto mv1;
+			case '^':		state = vi_xor(vi);	goto mv1;
+			case '%':		state = vi_percent(vi);	goto mv1;
 
-			case 'v':		vi_v(vi);		break;	
-			case 'G':		vi_G(vi);		break;
-			case 'p':		ok = vi_p(vi);	break;
-			case 'x':		vi_x(vi);		break;
-
-			case '0':		vi_0(vi);			break;
-			case '$':		vi_$(vi);			break;
-			case 'h':		ok = vi_h(vi);	break;
-			case 'j': 		ok = vi_j(vi);	break;
-			case 'k':		ok = vi_k(vi);	break;
-			case 'l':		ok = vi_l(vi);	break;
-			case '^':		ok = vi_xor(vi);	break;
-			case '%':		ok = vi_percent(vi);	break;
-
-			case 'n':		ok = vi_n(vi);	break;
-			case 'N':		ok = vi_N(vi);	break;
-			case ASCII_ESC: 				break;
+			case 'n':		state = vi_n(vi);	goto mv1;
+			case 'N':		state = vi_N(vi);	goto mv1;
+			case ASCII_ESC: goto mv1;
+			mv1:
+							vi->op_id++;
+							break;
 
 			case 'o':		vi_o(vi);
-			case 'i':		len = vi_i(vi, currop + 1);		goto insert_done;
-			case 'a':		len = vi_a(vi, currop + 1);		goto insert_done;
-			insert_done:
-							if(len < 0) ok = false;
+			case 'i':		i_or_a = vi_i;
+							goto insert;
+
+			case 'a':		i_or_a = vi_a;
+							goto insert;
+			insert:{
+							char *blink = vi->curr;		//关键句,插入长度为0时
+							len = i_or_a(vi, currop + 1);
+							vi->op_id += 1 + len;
+								
+							if(op[vi->op_id] == ASCII_CR)	//暂不支持'\n'
+							{
+								blink += len;
+								char *break_at = blink + len;		// Bb
+								int rlen = VI_CURRL_END(vi) - break_at;
+								vi_o(vi);
+								vi_i(vi, break_at);	
+								vi_0(vi);
+								op[vi->op_id] = 'i';
+
+								*break_at = EOL;
+								vi->len_of_line[vi->currl - 1] -= rlen;
+							}
 							break;
-			//去细看这两个search函数，它们怎么就直接把pattern当做字符串了。
-			//最后一个<CR>不考虑吗。即使这样，也还要支持<CR>的后续操作。
+					}
+
 			case '/':
-							ok = vi_search_foward(vi, currop + 1);
-							break;
+							do_search = vi_search_foward;
+							goto lable_search;
 			case '?':
-							ok = vi_search_backward(vi, currop + 1);
+							do_search = vi_search_backward;
+							goto lable_search;
+			lable_search:{
+							char *pattern = currop + 1;
+							int len = strlen_ex(pattern, STR_CR);
+							do_search(vi, pattern);
+
+							vi->op_id += 1 + len;
+							if(op[vi->op_id] == ASCII_CR) vi->op_id++;
 							break;
+			}
+							
 									
 			case 0:			
 			case '\n':
 							assert(0);
-			default:		ok = false;
+			default:		state = 0;
 		}
-		
-		take_effect_done:
-		if(!ok)	goto out;	//刚才这个命令运行失败了
-		N --;
-		if(N >= 1) goto take_effect;	//重复刚才的操作直到N次
-
-		vi->op_id += opseq.totlen;			//进入下一段指令序列
 	}
-
-	out:
-	if(!__silent) vi_print(vi, ok);
-	return ok;
+	if(!__silent) vi_print(vi, state);
+	vi->_errno = state;
+	return state;
 }
 
 /*register index:'a', 'b'...*/
-//下面的assert都是必要的，因为是严重错误，用户肯定写错了代码
-//或者抛出红色的不可屏蔽警告也可以。
 bool vi_tom(struct vi *vi, char rid){
 	if(vi_mvalid(vi, rid)){
 		struct mark_register *r = &vi->m_regs[rid];
-		assert(r->currl >= 0 && r->currl <= vi->lmax);
-		assert(r->curroff >= 0 && r->curroff <= VI_CURRL_LEN(vi));
+		assert(r->currl >= 0 && r->curroff >= 0);
 		vi->currl = r->currl;
 		vi->curr = vi->lines[vi->currl] + r->curroff;
 		return true;
@@ -547,7 +477,6 @@ bool vi_tom(struct vi *vi, char rid){
  * char *backup = vi->curr;
  * because realloc(caused by vi_a(), vi_i() eg.) may move the whole line to a
  * new place, leaving your backup a bad pointer.
- * 目前版本的标记记录的是行号和列号(行内偏移)，他不会跟着内容变动。
  */
 bool vi_m(struct vi *vi, char rid){
 	if(rid >= 'a' && rid <= 'z'){
@@ -555,6 +484,7 @@ bool vi_m(struct vi *vi, char rid){
 		vi->m_regs[rid].curroff = VI_CURR_OFFSET(vi);
 		return true;
 	}
+	assert(false);
 	return false;
 }
 
@@ -794,9 +724,9 @@ int vi_f( struct vi *vi, char to, ... ){
 	char *at = strnchar(vi->curr+1, to);
 	if(at){
 		vi->curr = at;
-		return 1;
+		return VI_FLAG(SUCCESS);
 	}
-	return false;
+	return 0;
 }
 
 /*@control  control information:
@@ -845,16 +775,14 @@ int vi_jmpspace_ex(struct vi *vi, int control){
 int vi_jmpspace(struct vi *vi){
 	char *curr = jmp_space(vi->curr);
 	if(*curr == '\n'){
-		vi->_errno = E_meetn;
-		return false;
+		return VI_FLAG(meetn);
 	}
 	else if(curr == vi->curr){	/*current is a non-space character*/
-		vi->_errno = E_curr;
-		return false;
+		return 0;
 	}
 	else {		/* moves */
 		vi->curr = curr;
-		return true;
+		return VI_FLAG(SUCCESS);
 	}
 	return __DO_NOT_COMPLAIN;
 }
@@ -1158,9 +1086,9 @@ void vi_del_lines(struct vi * vi){
  * nested 'copy'.
  * TODO you fogot to perform a clipboard copy
  */
-bool vi_d(struct vi *vi){
-	bool ok = vi_y(vi);
-	if(!ok) return false;
+int vi_d(struct vi *vi){
+	int state = vi_y(vi);
+	if(__TEST_STATE(SUCCESS) == 0) return state;
 
 	if(vi->v_m == vi->v_n){
 		vi_del_within(vi);
@@ -1168,7 +1096,7 @@ bool vi_d(struct vi *vi){
 	else{
 		vi_del_across(vi);
 	}
-	return true;
+	return VI_FLAG(SUCCESS);
 }
 
 /*not the only interface to copy, the other is vi_yy
@@ -1190,7 +1118,7 @@ int vi_y(struct vi *vi){
 	}
 
 	vi_v(vi);
-	return 1;
+	return VI_FLAG(SUCCESS);
 }
 
 /* expired comment
@@ -1209,7 +1137,7 @@ int vi_p(struct vi *vi){
 
 	if(vi->clipinfo->yy){
 		vi_paste_yy(vi);
-		return true;
+		return VI_FLAG(SUCCESS);	
 	}
 	if(vi->clipinfo->ylmax == 0){
 		vi_paste_line(vi);
@@ -1220,7 +1148,7 @@ int vi_p(struct vi *vi){
 	//vi->currl = currl;	lines may be realloc
 	//vi->curr = curr;
 /*	vi->ylmax = -1;*/	//we can paste many times
-	return true;
+	return VI_FLAG(SUCCESS);
 }
 
 
@@ -1247,7 +1175,7 @@ void vi_insert_safe(struct vi*vi, char *src, int srclen){
 
 /*append after '\n' undefined behavior, may crack
  */
-#if 1
+#if 0
 void vi_append_safe(struct vi*vi, char *src, int srclen){
 	assert(VI_CURR_LEN(vi) <= VI_CURRL_LEN(vi));
 	vi->curr++;	/*TODO not so simple*/
@@ -1342,14 +1270,12 @@ void vi_print2(struct vi*vi){
 	}
 }
 void vi_print(struct vi*vi, int normal_ret){
-#if 0
 	/*			l   line 	curr 	normal*/
 	int w[16] = {7, 13, 	13, 	8};
 	printf("\n%-*s%-*s%-*s%-*s%-*s\n", w[0], "currl", w[1], "line", w[2], "curr",w[3], "normal", w[4], "op_id");
 	printf("%-*d%-*p%-*p%-*d%-*d\n", w[0], vi->currl,w[1], vi->lines[vi->currl], w[2], vi->curr, w[3], normal_ret,w[4], vi->op_id);
 	printf("%-*d%-*p%-*d%-*d%-*s\n", w[0], VI_CURRL_LEN(vi),w[1], vi->lines[vi->currl], w[2], vi->curr[0], w[3], normal_ret, w[4], vi->ops+vi->op_id);
 	printf("%-*d%-*p%-*.*s%-*d|%-*s\n", w[0], VI_CURRL_LEN(vi),w[1], vi->lines[vi->currl], w[2], strlen_ex(vi->curr, "\n"), vi->curr, w[3], normal_ret, w[4], vi->ops);
-	#endif
 	putchar('\n');
 	for(int i = 0; i <= vi->lmax; i++){
 		char *prefix = i == vi->currl ? "@" : ">";
@@ -1369,7 +1295,7 @@ void vi_v(struct vi * vi){
 		vi->v_beginl = vi->currl;
 		return;
 	}
-	vi->v_begin = 0;		//这儿的０被别的函数所依赖
+	vi->v_begin = 0;
 	vi->v_beginl = -1;
 }
 void vi_endv(struct vi *vi){
@@ -1396,17 +1322,14 @@ void vi_dd(struct vi *vi){
 	if(vi->currl > vi->lmax) vi->currl = vi->lmax;
 	vi->curr = vi->lines[vi->currl];
 }
-
-//TODO vi的dW是删除到下一个单词前，包括空格。
-//de才是删除一个单词。
-bool vi_dW(struct vi *vi){		
+int vi_dW(struct vi *vi){		
 	vi_v(vi);
-	int ok = vi_E(vi);
-	if(ok){
+	int state = vi_E(vi);
+	if(__TEST_STATE(SUCCESS)){
 		vi_d(vi);
-		return ok;
+		return VI_FLAG(SUCCESS);
 	}
-	return false;
+	return 0;
 }
 int vi_yW(struct vi *vi){
 	assert(0);
@@ -1466,35 +1389,34 @@ void vi_y$(struct vi *vi){
 	vi_$(vi);
 	vi_y(vi);
 }
-bool vi_df(struct vi *vi, char target){
+int vi_df(struct vi *vi, char target){
 	vi_v(vi);
-	bool ok = vi_f(vi, target);
-	if(ok){
+	int state = vi_f(vi, target);
+	if(__TEST_STATE(SUCCESS)){
 		vi_d(vi);
-		return 1;
+		return VI_FLAG(SUCCESS);
 	}
 	else{
 		vi_v(vi);
-		return false;
+		return 0;
 	} 
 
 	return __DO_NOT_COMPLAIN;
 }
-bool vi_yf(struct vi *vi, char target){
+int vi_yf(struct vi *vi, char target){
 	vi_v(vi);
-	bool ok = vi_f(vi, target);
-	if(ok){
+	int state = vi_f(vi, target);
+	if(__TEST_STATE(SUCCESS)){
 		vi_y(vi);
-		return 1;
+		return VI_FLAG(SUCCESS);
 	}
 	else{
 		vi_v(vi);
-		return false;
+		return 0;
 	}
 	return __DO_NOT_COMPLAIN;
 }
 
-#if 0
 int vi_op_d(struct vi *vi){
 	if(vi->v_begin){
 		vi->op_id++;
@@ -1547,7 +1469,6 @@ int vi_op_y(struct vi *vi){
 	}
 	return state;
 }
-#endif
 
 int vi_filesize(struct vi* vi){
 	int filesize = 0;

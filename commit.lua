@@ -1,4 +1,4 @@
-#!/home/wws/software/lsh
+#!/bin/lsh
 if argc < 2 then
 	print("commit which ?");
 	return
