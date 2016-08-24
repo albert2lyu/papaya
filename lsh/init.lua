@@ -1,11 +1,21 @@
+local homedir = os.getenv("HOME")
+package.cpath= homedir .. '/lsh/?.so;'
 require "lfs"
+
 vim = Vi:new()
-vim:set("")
-__Env={
-	PATH = "/usr/bin:/bin",
-}
+vim:set("initialized in init.lua")
+
+--环境变量就命名为Env
+--TODO 考虑用户修改它时，触发ｃ语言调用setenv，而不是每次在execve之前暴力setenv
+--TODO 可不可以直接在lua里就解决呢？不去ｃ里。因为有os.getenv，考虑os.setenv
 Env={}		--for temporary usage
+--TODO 把lshmod放在Env里，合适吗?
 Env.lshmod={lua=0;cmd=1;vi=2}
+--TODO 1,大小写?  2,允许分开?
+--我不太想这样，因为用户需要知道此处的大小写，以及不能分开，是系统API级别的。
+--就是说，顺便让他们了解setenv,getenv。有什么不好。
+Env.PATH = "/usr/bin:/bin:/usr/local/bin/"
+Env.PATH = Env.PATH .. ":/home/wws/software/"
 local lshmod = Env.lshmod
 lshmod.default = lshmod.cmd
 
@@ -14,8 +24,8 @@ function lfs.collect(path)
 	for filename in lfs.dir(path) do
 		if filename ~= "." and filename ~= ".." then
 			local _fullpath = path .. "/" .. filename
-			local attr = lfs.attributes(_fullpath)
-			local file = {name = filename; mode = attr.mode, fullpath = _fullpath}	
+			local attribute = lfs.attributes(_fullpath)
+			local file = {name = filename; attr = attribute, path = _fullpath}	
 			dir[#dir + 1] = file
 		end
 	end

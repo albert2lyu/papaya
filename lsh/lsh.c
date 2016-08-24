@@ -73,11 +73,13 @@ void  sighandler_ctrl(int x){
  */
 static bool lsh_sync_env(){
 	int esp_backup = lua_gettop(L);
-	lua_getglobal(L, "__Env");	/*stack: Env*/
+	lua_getglobal(L, "Env");	/*stack: Env*/
 	lua_pushnil(L);		/*stack: Env  nil */
 	while(lua_next(L, -2)){	//stack: Env key value
 		const char *name = lua_tostring(L, -2);
 		const char *value = lua_tostring(L, -1);
+		if(!value) goto next;
+			
 		/* don't use putenv here,for  we need make a memory copy  of 'name', 'value'
 		 * , we can't store a pointer returned by lua_tostring() outside a function 
 		 */
@@ -85,6 +87,7 @@ static bool lsh_sync_env(){
 			lua_settop(L, esp_backup);
 			return false;
 		}
+		next:
 		lua_pop(L, 1);	/*stack: Env key */
 	}
 
@@ -1015,6 +1018,10 @@ int run_cmdline(char *input){
 	return errcode;	/*TODO 要返回命令的状态码*/
 }
 
+//lua端的Env被修改之后，马上通过C语言让它生效。应该有setenv的函数。
+//TODO 所以这个函数就不需要了? execve是搜索哪些环境变量？只有标准的几个目录?
+//这一块儿还没有做。但决定lua里的环境变量就用Env，所有用户界面的shell级别变量
+//都是大写。　
 /*@fullpath  if success, store result in fullpath*/
 bool get_cmd_fullpath(char *fullpath, char *cmd){
 	if(cmd[0] == '/'){
@@ -1028,10 +1035,11 @@ bool get_cmd_fullpath(char *fullpath, char *cmd){
 	/*get Env from lua*/
 	int esp_backup = lua_gettop(L);
 	lua_getglobal(L, "Env");	/*stack: Env*/
-	lua_getfield(L, -1, "path");	/*stack: Env path*/
+	lua_getfield(L, -1, "Path");	/*stack: Env path*/
 	lua_pushnil(L);		/*stack: Env PATH nil */
 	while(lua_next(L, -2) != 0){	/*stack: Env PATH key value*/
 		const char *path = lua_tostring(L, -1);
+		if(!path) continue;		//XXX
 		strcpy(fullpath, path);
 		int len = strlen(fullpath);
 		if(fullpath[len - 1] != '/'){

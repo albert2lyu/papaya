@@ -13,7 +13,7 @@ all:
 	gcc -o lsh lsh.o vi.o utils.o file.o $(luasrc)/liblua.a $(options) $(lshopt) -Wl,-export-dynamic
 	gcc -o han2pinyin han2pinyin.o vi.o utils.o file.o $(luasrc)/liblua.a $(options) $(lshopt) -Wl,-export-dynamic
 	touch ../.lsh.history
-	mv lsh /home/wws/lsh/
+	mv lsh ~/lsh
 
 
 #注意lua目录是不被clena的
@@ -29,6 +29,7 @@ _git:
 	-mv $(luasrc)/*.o ~/Documents/tmplua_for_git/
 	-mv $(luasrc)/*.a ~/Documents/tmplua_for_git/
 	-mv $(luasrc)/*.so ~/Documents/tmplua_for_git/
+	cp ~/lsh/init.lua .
 
 _tig:
 	-mv ~/Documents/tmplua_for_git/* $(luasrc)

@@ -790,9 +790,9 @@ struct _stat_members members[] = {
         { "uid",          push_st_uid },
         { "gid",          push_st_gid },
         { "rdev",         push_st_rdev },
-        { "access",       push_st_atime },
-        { "modification", push_st_mtime },
-        { "change",       push_st_ctime },
+        { "atime",       push_st_atime },
+        { "mtime", push_st_mtime },
+        { "ctime",       push_st_ctime },
         { "size",         push_st_size },
         { "permissions",  push_st_perm },
 #ifndef _WIN32
