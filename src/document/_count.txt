@@ -1,0 +1,35 @@
+_count count
+
+struct page的_count成员
+
+1, 当处在buddy system里，就是说，free状态下，_count 是１．
+2, 下面一段注释
+/*
+* Methods to modify the page usage count.
+*
+* What counts for a page usage:
+* - cache mapping (page->mapping)
+* - private data (page->private)
+* - page mapped in a task's page tables, each mapping
+* is counted separately
+*
+* Also, many kernel routines increase the page count before a critical
+* routine so they can be sure the page doesn't go away from under them.
+*
+* Since 2.6.6 (approx), a free page has ->_count = -1. This is so that we
+* can use atomic_add_negative(-1, page->_count) to detect when the page
+* becomes free and so that we can also use atomic_inc_and_test to atomically
+* detect when we just tried to grab a ref on a page which some other CPU has
+* already deemed to be freeable.
+*
+* NO code should make assumptions about this internal detail! Use the provided
+* macros which retain the old rules: page_count(page) == 0 is a free page.
+*/
+#define page_count(p) (atomic_read(&(p)->_count) + 1)
+#define set_page_count(p,v) atomic_set(&(p)->_count, v - 1)
+
+其中的
+===================
+* - private data (page->private)
+==================
+这句没法理解。　private存着数据，就也要消耗一个count? 那free状态的页的private存着order怎么说？

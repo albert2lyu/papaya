@@ -138,6 +138,7 @@ void timer_handler(void *data){
 void func0(void){
 	//int counter = 0;
 	oprintf("func0 run..\n");
+	kp_sleep(0,0);
 	#if 0
 	for(int i = 0; i < 10; i++){
 		struct timer *t = create_mytimer(50 * i+1, timer_handler, 0);
@@ -150,12 +151,12 @@ void func0(void){
 		//ll_rw_block2(0x300, READ, 0, 2, bigbuf);
 		oprintf("@fun0: read block finished");
 
+
 		//testnet();
 		while(1){
 			mdelay(1000 * 2);
 			oprintf("+");
 		}
-		//kp_sleep(0,0);
 		//oprintf("func0: %u\n",counter++);
 		//schedule_timeout(2000);
 /*		if(counter-- == 0) kthread_sleep(MSGTYPE_TIMER, 100000000);*/
@@ -183,7 +184,6 @@ void func_init(void){
 
 	oprintf("func init run..\n");
 	ide_read_partation(0x3, 0);
-	while(1);
 	oprintf("-1\n");
 	init_vfs();
 	register_filesystem("cell", cell_read_super);	

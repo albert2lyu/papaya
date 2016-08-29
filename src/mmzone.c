@@ -1,6 +1,7 @@
 #include<mmzone.h>
 #include<utils.h>
 
+static void __free_pages(page_t *page, int order);
 void init_free_area(int zone_id, int start_idx);
 void __free_pages_bulk(struct page *page, zone_t *zone, int order);
 void cleave(free_area_t *free_area, int order);
@@ -43,8 +44,9 @@ void init_free_area(int zone_id, int start_idx){
 	while(linked < zone->spanned_pages){
 		zone_map[linked].PG_zid = zone_id;	
 		zone_map[linked]._count = 1;
-	//	__free_pages_bulk(zone_map + linked, zone, 0);
-		__free_pages_bulk(zone_map + linked, zone, 8);
+		zone_map[linked].private = 8;
+		//__free_pages_bulk(zone_map + linked, zone, 8);
+		__free_pages(zone_map + linked, 8);
 		//linked++;
 		linked += 1 << 8;	/* 按M来初始化 */
 	}
@@ -56,6 +58,11 @@ void init_free_area(int zone_id, int start_idx){
  * @zone	this argument is not needed, it can be referred using page->zid.
  */
 void __free_pages_bulk(struct page *page, zone_t *zone, int order){
+	assert(cli_already());
+	assert(page->_count == 0 && "only allow invoked by free_pages");
+	assert(order == page->private && "just comment this line, but be aware \
+									aware of what happended");
+
 	free_area_t * free_area = zone->free_area;
 	struct page *orphan = page;
 	struct page *assume_head = 0;	/**the assume head of the new double size
@@ -92,22 +99,23 @@ void __free_pages_bulk(struct page *page, zone_t *zone, int order){
 	/**insert orphan to free_list*/
 	INIT_LIST_HEAD(&orphan->lru);
 	list_add(&orphan->lru, &free_area[curr_order].free_list);
-	orphan->PG_private = 1;
+	orphan->PG_private = 1;		//necessary, 因为页分配出去时，这个bit被清除
 	orphan->private = curr_order;
-	orphan->_count = -1;
+	assert(orphan->_count == 0);	//orphan->_count = 0;
 	free_area[curr_order].nr_free++;
 /*	oprintf("free a block");*/
 }
 
 int page_is_buddy(struct page *page, int order){
-	if(page->PG_private == 0 || page->_count != -1 || page->private != order){
+	if(page->PG_private == 0 || page->_count != 0 || page->private != order){
 /*		oprintf("not_buddy:page:%x?%x;,PG_private:%u,_count:%u,private:%u,order:%u ",page, page_idx(page), page->PG_private, page->_count, page->private, order);*/
 		return 0;
 	}
-/*	oprintf("is b ");*/
 	return 1;
 }
 struct page *__rmquene(zone_t *zone , int order){
+	int IF = cli_ex();
+
 	free_area_t *free_area = zone->free_area;
 	int i = order;
 	while(free_area[i].nr_free == 0){
@@ -120,7 +128,12 @@ struct page *__rmquene(zone_t *zone , int order){
 	}
 	struct list_head *lru = free_area[i].free_list.next;
 	list_del_init(lru);		free_area[i].nr_free--;
-	return (page_t *)((unsigned)lru - MEMBER_OFFSET(page_t, lru));
+
+	if(IF) sti();
+	struct page *it =  (page_t *)((unsigned)lru - MEMBER_OFFSET(page_t, lru));
+	it->_count = 1;	
+	it->PG_private = 0;
+	return it;
 }
 
 
@@ -149,11 +162,16 @@ void cleave(free_area_t *free_area, int order){
 
 
 //TODO here we have bug...	zone_t *__zones[3];
-void __free_pages(page_t *page, int order){
+static void __free_pages(page_t *page, int order){
+	int IF = cli_ex();
+
 	zone_t *zone = __zones[page->PG_zid];
 	page->_count--;
-	if(page->_count != -1) return;
-	__free_pages_bulk(page, zone, order);
+	if(page->_count == 0){
+		__free_pages_bulk(page, zone, order);
+	}
+
+	if(IF) sti();
 }
 
 
