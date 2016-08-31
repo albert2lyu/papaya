@@ -47,7 +47,7 @@ base_tss  equ base_text + (tss -_start)
 global _start
 [section .text]
 _start:
-mov esp,0xc0300000
+mov esp,0xc0300000		;使用3M处的地址作为堆栈,不会破坏buddy system吗
 jmp _reallystart
 ;store some data
 tss:

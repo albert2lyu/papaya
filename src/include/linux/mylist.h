@@ -75,10 +75,13 @@ struct ll2{
  * location: the node you want to insert at
  * new: the node you want to inser
  * LL means linked-list
+ * @list 和 @location可以都为0,单不能一个为０，另一个非０ 
+ * 所以 第二个测试,(list && location)是说，不相等可以，但必须都不为０
  */
 #define LL_INSERT(list,location,new)\
 	do{\
-		assert((list) && (location) && (new));\
+		assert( ( (list) == (location) ) || ( (list) && (location) ) );\
+		assert((new));\
 		if(!list && !location) {\
 			list = new;\
 			new->next = new->prev = 0;\

@@ -48,8 +48,8 @@ gequ _kernel_image_start_sector, (_fiximg_start_sector + _fiximg_occupy_sectors)
 
 gequ _gpgdir_base,0x100000
 
-lequ _base_kernel_loaded,0x80000
-base_kernel_reset equ 0x30400
+lequ _base_kernel_loaded,0x60000
+base_kernel_reset equ 0x10400
 lequ _base_entrance_kernel,base_kernel_reset+0xc0000000
 
 gequ RAMDISK_BASE, 0x10000

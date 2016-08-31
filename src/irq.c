@@ -42,7 +42,7 @@ int setup_irq(int irq, struct irqaction *new){
 unsigned do_IRQ(stack_frame regs){
 	int err_code = regs.err_code + 256;
 	int irq = err_code - 0x20;
-	if(irq != 0) oprintf(" !%u ", irq);
+	//if(irq != 0) oprintf(" !%u ", irq);
 	irq_desc_t *desc = irq_desc + irq;
 	unsigned status = desc->status;
 

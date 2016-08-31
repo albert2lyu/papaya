@@ -1,0 +1,22 @@
+color dimg bootinfo
+
+* 为了确认kernel.elf被完整的加载。dimg在刻录kernel.elf到启动盘前，修改了kernel.elf的内容：
+  它把kernel.elf想象成由连续多个扇区组成，然后往每个扇区的首字节写入相应的扇区号。这就是color。标记。
+  首字节本来的value被收集到一个专门的文件fix.img里。因为fix.img固定大小是512字节，所以最多标记511个扇区。
+  fix.img的最后一个byte用来存储total colored sectors.　
+  kernel.elf的最后一个扇区的color不是sector id而是以0xcc。
+  注意一点，因为只有一个byte的空间用于标记，而标记的又是扇区号，所以到256时就会回绕。
+  完整性校验是在boot.asm里进行的，从磁盘读取kernel.elf后立刻进行(当然，fix.img也一同加载到内存了)。
+ char *color = addr_kernel_elf;
+ int sector_id = 0;
+ char fiximg[512];
+ while( *color == sector_id){
+	fix_it(color, fiximg[sector_id]);
+	color += 512;
+	sector_id ++;
+ }
+ if(*color == 0xcc) {
+ 	if(sector_id == fiximg[sector_id + 1]) fix_it(color, sector_id);
+	else spin("error");
+ }
+ else spin("error");

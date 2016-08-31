@@ -25,8 +25,8 @@ boot.bin:boot.asm
 	nasm -o ../bin/boot.bin boot.asm
 kernel.elf:$(kernelrelyo)
 	cd ../lib/;\
-	ld -m elf_i386 -s -Ttext 0xc0030400 -o ../bin/kernel.elf $(kernelrelyo);\
-	ld -m elf_i386 -Ttext 0xc0030400 -o ../bin/g_kernel.elf $(kernelrelyo) 
+	ld -m elf_i386 -s -Ttext 0xc0010400 -o ../bin/kernel.elf $(kernelrelyo);\
+	ld -m elf_i386 -Ttext 0xc0010400 -o ../bin/g_kernel.elf $(kernelrelyo) 
 
 %.d:%.c
 	set -e;rm -f $@;\

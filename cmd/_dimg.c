@@ -65,7 +65,8 @@ void magic_color(void){
 		write(fd_kernel, &magic_x, 1) == 1 );//write magic number
 		assert( write(fd_fix, &byte, 1) == 1 );		//send byte data to fix.img
 	}
-	assert( write(fd_fix, (char *)&i, 1) == 1);
+	assert( write(fd_fix, (char *)&i, 2) == 2);	//结尾的sector nr只用1个byte可
+												//装不下。　得两个.
 	fsync(fd_kernel);
 	fsync(fd_fix);
 	close(fd_kernel);
@@ -78,9 +79,9 @@ int main(int argc, char *argv[]){
 	kernel_img_size = filesize("../bin/kernel.elf");
 	printf("source elf size:%d\n", kernel_img_size);
 	printf("target device :%s\n", filepath);
-	assert(kernel_img_size < 128 * 1024 && 
-			"kernel.elf firstly loaded at 0x80000, take care of 0xA0000, and \
-			boot.asm only read 126 sectors.");
+	assert(kernel_img_size < 250 * 1024 && 
+			"kernel.elf firstly loaded at 0x60000, take care of 0xA0000, and \
+			boot.asm only read ~250 sectors.");
 	/* Note, MUST be executed before @dd */
 	magic_color();
 

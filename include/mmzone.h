@@ -22,6 +22,7 @@
 typedef struct free_area_struct{
 	struct list_head free_list;
 	int nr_free;
+	int frees,allocs;
 }free_area_t;
 
 typedef struct zone_struct{
@@ -30,7 +31,7 @@ typedef struct zone_struct{
 	free_area_t free_area[MAX_ORDER+1];	
 	struct page *zone_mem_map;	/**first page descriptor of zone*/
 	unsigned  spanned_pages;
-
+	int allocs,frees;	//counts for allocate/free operation. For Debug
 }zone_t;
 
 zone_t zone_dma;

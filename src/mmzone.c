@@ -36,7 +36,8 @@ void init_free_area(int zone_id, int start_idx){
 	struct page *zone_map = zone->zone_mem_map;
 	for(int i = 0; i <= MAX_ORDER; i++){
 		INIT_LIST_HEAD(&free_area[i].free_list);
-		free_area[i].nr_free = 0;
+												free_area[i].frees = 0;
+												free_area[i].allocs = 0;
 	}
 
 	int linked = start_idx;		/**how many pages already linked into freelist*/
@@ -50,7 +51,7 @@ void init_free_area(int zone_id, int start_idx){
 		//linked++;
 		linked += 1 << 8;	/* 按M来初始化 */
 	}
-
+	zone->frees = zone->allocs = 0;
 /*	oprintf("linked:%x, span:%x, zone_mem_map:%x\n", linked, zone->spanned_pages, zone->zone_mem_map);*/
 }
 
@@ -69,6 +70,7 @@ void __free_pages_bulk(struct page *page, zone_t *zone, int order){
 									  block*/
 	struct page *phy_neighbor = 0;
 	int curr_order;
+	orphan->PG_private = 0;
 	for(curr_order = order; curr_order < MAX_ORDER; curr_order++){
 		int block_pgs = 1<<curr_order;
 		/*locate the the block-header-page bordered on, which is the suspicious
@@ -92,6 +94,8 @@ void __free_pages_bulk(struct page *page, zone_t *zone, int order){
 
 		/**pick up the buddy page from free_list*/
 		list_del(&phy_neighbor->lru); free_area[curr_order].nr_free--;
+		//不管三七二十一，先把摘下来的PG_private给关闭。后面会有一个
+		//给最终的assume_head加PG_private位的操作
 		phy_neighbor->PG_private = 0;
 		/**the orphan grow up double size, search buddy again*/
 		orphan = assume_head;		
@@ -114,8 +118,10 @@ int page_is_buddy(struct page *page, int order){
 	return 1;
 }
 struct page *__rmquene(zone_t *zone , int order){
-	int IF = cli_ex();
-
+	int IF = cli_ex(); 
+											zone->allocs++;
+											zone->free_area[order].allocs++;
+	
 	free_area_t *free_area = zone->free_area;
 	int i = order;
 	while(free_area[i].nr_free == 0){
@@ -129,10 +135,12 @@ struct page *__rmquene(zone_t *zone , int order){
 	struct list_head *lru = free_area[i].free_list.next;
 	list_del_init(lru);		free_area[i].nr_free--;
 
-	if(IF) sti();
 	struct page *it =  (page_t *)((unsigned)lru - MEMBER_OFFSET(page_t, lru));
 	it->_count = 1;	
 	it->PG_private = 0;
+	it->debug = zone->allocs;		//标记这个bulk是第几次alloc出去的
+
+	if(IF) sti();
 	return it;
 }
 
@@ -166,6 +174,8 @@ static void __free_pages(page_t *page, int order){
 	int IF = cli_ex();
 
 	zone_t *zone = __zones[page->PG_zid];
+											zone->frees++;
+											zone->free_area[order].frees++;
 	page->_count--;
 	if(page->_count == 0){
 		__free_pages_bulk(page, zone, order);

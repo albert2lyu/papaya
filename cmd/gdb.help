@@ -1,0 +1,21 @@
+set disassembly-flavor intel
+
+set arch i386 /  i8086
+
+br *0x7c00 if $ax > 256
+
+x/2i $pc				反汇编接下来两条指令
+
+
+
+watch
+1, watch -l 总是不行
+2, watch (int *)*xxxx 似乎跟 *xxxx 不一样?
+3, set can-use-hw-watchpoints 0
+   对gdb-stub确实有效果
+   不然，一直是
+	Could not insert hardware breakpoints:
+	You may have requested too many hardware breakpoints/watchpoints.
+	但是很慢。
+4,  我想起来bochs的watch是很快的。
+

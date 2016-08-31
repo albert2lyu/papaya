@@ -15,6 +15,11 @@ mbrHead:
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 2,0,1,63,(addr_mbr_loaded + 512 * 63 * 2) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 3,0,1,63,(addr_mbr_loaded + 512 * 63 * 3) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 4,0,1,63,(addr_mbr_loaded + 512 * 63 * 4) >> 4, 0
+	;read_floppy_side_o_sector_total_destsa_destea 0x80, 5,0,1,63,(addr_mbr_loaded + 512 * 63 * 5) >> 4, 0
+	;read_floppy_side_o_sector_total_destsa_destea 0x80, 6,0,1,63,(addr_mbr_loaded + 512 * 63 * 6) >> 4, 0
+	;read_floppy_side_o_sector_total_destsa_destea 0x80, 7,0,1,63,(addr_mbr_loaded + 512 * 63 * 7) >> 4, 0
+	;共度取kernel.elf 63 x 8 / 2 = 252K ，还要减去几个扇区的boot.bin和fix.img
+	;when the size of kernel.elf gets close to  256K, we can't load it completely
     jmp entrance
 
 ;[section .gdt]
@@ -129,15 +134,16 @@ fix_kernel:
 		jne .bad
 		;not the end, let us see how many sectors we fixed
 		mov ecx, 1		;有些早，但没事，因为如果count核对失败，就死循环了。
-		inc al		;assume have fixed this sector
-		cmp byte [esi + 1], al
+		inc ax		;assume have fixed this sector
+		cmp word [esi + 1], ax		;esi此时指向最后一个.　注意，结尾的扇区
+									;数量要两个字节来容纳
 		je .fix_it
 		.bad: jmp $
 	.fix_it: 
-		mov ah, [esi]
-		mov [edi], ah
+		mov bl, [esi]
+		mov [edi], bl 
 		inc esi 
-		inc al
+		inc ax
 		add edi, 512
 	jcxz .check_one	
 

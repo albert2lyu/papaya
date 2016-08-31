@@ -1,0 +1,10 @@
+memory layout
+
+1,进入kernel.asm之前，esp(sp)在默认的位置。接近64K处。
+　kernel.asm的入口处(_start)，首先把esp调整到3G+3M的位置。
+
+2,10400是刚刚64K出头。
+  60000~9ffff是从kernel.elf磁盘到内存的落脚地。256K。
+
+3,注意boot.asm里有一个“清场”的动作。
+  从10400开始，clear　256K的内存。

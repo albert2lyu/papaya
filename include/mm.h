@@ -35,7 +35,8 @@ typedef struct page{
 	int PG_highmem:1;
 	int PG_private:1;
 	unsigned PG_zid:2;
-	int padden:28;
+	unsigned debug:8;
+	int padden:20;
 }page_t;
 
 struct mem_seginfo{

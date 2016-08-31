@@ -184,12 +184,9 @@ void func_init(void){
 
 	oprintf("func init run..\n");
 	ide_read_partation(0x3, 0);
-	oprintf("-1\n");
 	init_vfs();
 	register_filesystem("cell", cell_read_super);	
-	oprintf("0\n");
 	struct vfsmount *mnt_stru = do_mount(0x301, "/", "cell");	
-	oprintf("1\n");
 	if(!mnt_stru) spin("root device mount failed");
 	struct fs_struct *fs_stru = current->fs;
 	fs_stru->root = fs_stru->pwd = mnt_stru->small_root;
@@ -199,15 +196,15 @@ void func_init(void){
 	struct in_dir indir;
 	//int err = pathwalk("/home/mnt/", &indir, 0);	avoid_gcc_complain = err;
 	mnt_stru = do_mount(0x305, "/home/mnt/", "cell");	
-	oprintf("2\n");
 	//int err = pathwalk("/home/mnt/5", &indir, 0);
 	testbuf = kmalloc(512 * 200);
-	int fd = sys_open("/home/mnt/5/dimg.c", 2, 0);
-	oprintf("3\n");
-	int rbytes = sys_read(fd, testbuf, sizeof(testbuf));
+	int fd = sys_open("/home/mnt/5/_dimg.c", 2, 0);
+	//TODO rbytes的返回值是对的，但实际读入的却不止 指定的size这么多
+	int rbytes = sys_read(fd, testbuf, 100);
 	avoid_gcc_complain = rbytes = (unsigned)&indir;
 
-	assert("func init keep running" && 0);
+	//assert("func init keep running" && 0);
+	while(1);
 }
 void usr_func_backup(void){
 	while(1);
