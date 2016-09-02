@@ -217,6 +217,32 @@ stack_error:
 	jmp exception_handler_step1
 len_stack_error equ $ - stack_error
 
+
+; A General Protection Fault may occur for various reasons. The most common are:
+; 
+;     Segment error (privilege, type, limit, read/write rights).
+;     Executing a privileged instruction while CPL != 0.
+;     Writing a 1 in a reserved register field.
+;     Referencing or accessing a null-descriptor. 
+; 
+; Error code: The General Protection Fault sets an error code, which is the segment selector index when the exception is segment related. Otherwise, 0. 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;
+;		 31         16   15         3   2   1   0
+;		+---+--  --+---+---+--  --+---+---+---+---+
+;		|   Reserved   |    Index     |  Tbl  | E |
+;		+---+--  --+---+---+--  --+---+---+---+---+
+;
+; @Tbl
+;	2 bits 	IDT/GDT/LDT table 
+;	0b00 	The Selector Index references a descriptor in the GDT.
+;	0b01 	The Selector Index references a descriptor in the IDT.
+;	0b10 	The Selector Index references a descriptor in the LDT.
+;	0b11 	The Selector Index references a descriptor in the IDT.
+; @E 	
+;	1 bit 	External 	
+;	When set, the exception originated externally to the processor.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 general_protection:
 	push 13
 	jmp exception_handler_step1
@@ -316,10 +342,11 @@ len_page_fault equ  $ - page_fault
 
 ; system call
 i80:
-	push 0	;no err_code
+	push 7	;no err_code
 	SAVE_ALL	;寄存器入栈顺序约定了
-	SET_PREG
+	;SET_PREG
 	call dword [eax*4+func_table]
+	mov [esp + 4 *6], eax
 	jmp ret_from_sys_call
 i81:	;an I-gate for kernel thread to submit their time slice.
 	OPRINTF sec_data.spin

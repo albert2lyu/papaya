@@ -63,6 +63,7 @@ void __free_pages_bulk(struct page *page, zone_t *zone, int order){
 	assert(page->_count == 0 && "only allow invoked by free_pages");
 	assert(order == page->private && "just comment this line, but be aware \
 									aware of what happended");
+	assert(zone->free_area[order].nr_free >= 0);
 
 	free_area_t * free_area = zone->free_area;
 	struct page *orphan = page;
@@ -119,9 +120,9 @@ int page_is_buddy(struct page *page, int order){
 }
 struct page *__rmquene(zone_t *zone , int order){
 	int IF = cli_ex(); 
-											zone->allocs++;
-											zone->free_area[order].allocs++;
-	
+								zone->allocs++;
+								zone->free_area[order].allocs++;
+								assert(zone->free_area[order].nr_free >= 0);
 	free_area_t *free_area = zone->free_area;
 	int i = order;
 	while(free_area[i].nr_free == 0){

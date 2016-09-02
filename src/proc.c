@@ -21,7 +21,7 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name,int 
 	baby->need_resched = 0;
 	baby->sigpending = 0;
 	baby->prio=prio;
-	baby->pid=1;
+	baby->pid=3;
 	baby->time_slice=baby->time_slice_full=time_slice;
 	baby->p_name=p_name;
 	baby->ring=ring;

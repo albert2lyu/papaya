@@ -9,28 +9,44 @@ unsigned ticks;
 static struct pcb *list_sleep;
 struct pcb **pcb_lists[3] = {&list_active, &list_expire, &list_sleep};
 void active_sleep(struct pcb *p,u32 msg_type,u32 msg_bind){
+	int IF = cli_ex();
+
 	p->msg_type=msg_type;
 	p->msg_bind=msg_bind;
 	LL_DEL(list_active,p);
 	LL_I_INCRE(list_sleep,p,prio);
+
+	if(IF) sti();
 }
 
 void active_expire(struct pcb *p){
+	int IF = cli_ex();
+
 	LL_DEL(list_active,p);
 	LL_I_INCRE(list_expire,p,prio);
+
+	if(IF) sti();
 }
 
 void sleep_active(struct pcb *p){
+	int IF = cli_ex();
+
 	LL_DEL(list_sleep,p);
 	LL_I_INCRE(list_active,p,prio);
 /*	oprintf("active p:%s, now list_active=%s\n", p->p_name, list_active->p_name);*/
 	p->msg_type = 0;
+
+	if(IF) sti();
 }
 
 void sleep_expire(struct pcb *p){
+	int IF = cli_ex();
+
 	LL_DEL(list_sleep,p);
 	LL_I_INCRE(list_expire,p,prio);
 	p->msg_type = 0;
+
+	if(IF) sti();
 }
 void do_timer(void){
 	ticks++;
@@ -81,6 +97,8 @@ void do_timer(void){
  * 2, 考虑eflags在切换前后是否需要保持保存，恢复。以及能否保存，恢复。
  */
 void schedule(void){
+	int IF = cli_ex();
+
 /*	oprintf("begin schedule\n");*/
 	current->need_resched = 0;
 	struct pcb *next = 0;
@@ -160,6 +178,8 @@ void schedule(void){
 						:"=m"(current->thread.esp),"=m"(current->thread.eip)
 						:"m"(next->thread.esp), "m"(next->thread.eip),"b"(current)
 						);
+	if(IF) sti();	//TODO 上面的pushf/popf还必要吗 
+					//像这样的sti（)还是减少吧
 	return;
 }
 

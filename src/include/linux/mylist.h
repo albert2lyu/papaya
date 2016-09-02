@@ -160,6 +160,7 @@ struct ll2{
 			if(list->prev) list->prev->next = new;\
 			list->prev=new;\
 			if(root==list) list=new;\
+			else list = root;\
 		}\
 	} while(0)
 

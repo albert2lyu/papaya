@@ -1,0 +1,136 @@
+1,gcc内联汇编直接使用C变量
+  下面这段程序是可以运行的。
+===================
+int abc = 123;
+int bcd;
+int main(void){
+	__asm__ __volatile__(".intel_syntax noprefix\n\t"
+						 "mov eax, abc\n\t"
+						 "mov bcd, eax\n\t");	
+	printf("%d\n", bcd);
+}
+===================
+  但是abc,bcd挪到main里面就不行了。
+  因为gcc内联汇编不支持local variable。
+  只能使用扩展汇编，就是%0,%1那种。
+
+
+２ 内联汇编的两种语法
+
+内联汇编支持两种语法，一种是intel style，一种是 AT&T 格式，具体的语法这里不做介绍。
+特别需要指出的是，在gcc inline asm的编写中支持两个语法格式的切换，使得两种语法的汇编代码都得以正确的编译。
+简单示例：
+asm(
+    //“.globl _charme\n\t"
+    //“_charme:\n\t"
+    “.intel_syntax noprefix\n\t”
+    //“.code64\n\t"
+    "mov eax,0x7\n\t"
+    ".att_syntax\n\t”
+    "mov $5, %eax\n\t”
+    "nop\n\t”
+    "nop\n\t”
+    //“.code32\n\t”
+    //“.globl _charme_end\n\t"
+    //“_charme_end:\n\t”
+    );
+
+
+说明:
+
+  1.   .intel_syntax或者.intel_syntax noprefix表明后续的代码是intel格式的汇编，直到出现.att_syntax时，汇编代码会切换为AT&T格式。 如果使用gcc编译intel格式的汇编，需要在命令行指定-masm=intel。详细说明及其他一些需要注意的细节，可以参考这里。
+
+
+  2.  .globl 允许用户将插入的汇编代码作为单独的一个段出现。
+
+       注释掉.globl 后： 
+
+     1.png
+
+       开启.globl后：
+
+      2.png
+
+       两种写法运行结果一样，选择使用。
+
+
+3.   .code64 .code32 指定其后编译的汇编指令位数，选择使用。
+
+
+
+gcc 内联汇编支持的两种格式
+
+
+两种格式：
+
+基本内联汇编 － __asm__ [__volatile__] ("instruction list"); 
+
+带有c/c++表达式内联汇编 － __asm__ [__volatile__]("instruction list”:Output:Input:Clobber/Modify);
+
+
+说明：
+
+   1.  __asm__ 是asm的宏形式，即#define __asm__ asm。如果要编写符合ANSI C标准的代码(即与ANSI C兼容)使用__asm__。
+
+   2.  __volatile__是volatile的宏形式，使用volatile即表示instruction list中的所有指令要保留，不受优化选项的影响。
+
+   3.  instruction list可以为空。内部书写的指令在一对引号内一行全部书写完毕。也没有在多行中通过多个引号书写。但是任意两条指令之间必须使用;或者\n或者\n\t来分隔。推荐使用\n\t。
+
+   4.  Output，Input，Clobber/Modify都可以为空，如果同时为空则自动转换为第一种格式。
+
+   5.  Output，Input，Clobber/Modify三部分，如果后面的部分不为空，前面部分为空，此时前面的：也不能省略。
+1
+2
+	
+asm(“”::);
+asm("movl %%eax,%%ebx”::"a"(var));
+
+      上述两种书写方式都是正确的。
+
+   6.  对于 AT&T 语法，基本格式中寄存器前面只能有一个%，带c/c++表达式的格式中，必须有两个%。
+
+1
+2
+	
+asm("movl %%eax,%%ebx”);
+asm("movl %eax,%ebx”::);
+
+       上述两种写法都是错误的。
+还有很多的细节，下面会详细的提到。
+
+
+
+三 Constraints
+ 1, 指定输入值和输出值， 输入值和输出值的列表格式为:
+"constraint"(variable), 其中variable是程序中声明的c变量, 在扩展asm格式中， 局部和全局变量都可以使用,
+使用constrant（约束)定义把变量存放到哪(输入)或从哪里传送变量(输出)
+约束使用单一的字符, 如下:
+约束                                   描述
+a                         使用%eax, %ax, %al寄存器
+b                         使用%ebx, %bx, %bl寄存器
+c                         使用%ecx, %cx, %cl寄存器
+d                         使用%edx, %dx, %dl寄存器
+S                         使用%esi, %si寄存器
+D                         使用%edi, %di寄存器
+r                         使用任何可用的通用寄存器
+q                         使用%eax, %ebx, %ecx,%edx之一
+A                         对于64位值使用%eax, %edx寄存器
+f                         使用浮点寄存器
+t                         使用第一个(顶部)的浮点寄存器
+u                         使用第二个浮点寄存器
+m                         使用变量的内存位置
+o                         使用偏移内存位置
+V                         只使用直接内存位置
+i                         使用立即整数值
+n                         使用值已知的立即整数值
+g                         使用任何可用的寄存器和内存位置
+
+
+除了这些约束之外, 输出值还包含一个约束修饰符:
+输出修饰符                             描述
++                         可以读取和写入操作数
+=                         只能写入操作数
+%                         如果有必要操作数可以和下一个操作数切换
+&                         在内联函数完成之前, 可以删除和重新使用操作数 
+
+

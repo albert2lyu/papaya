@@ -19,19 +19,21 @@ void chgpg(u32*dir,int vpg,int rw){
 			"mov %eax, %cr3");
 }
 int sys_fork(stack_frame regs){
+	cli();
 
 	unsigned ppg = page_idx(alloc_pages(__GFP_ZERO, 1));
 	struct pcb * p = (void *)KV(ppg<<12);	/*子进程的pcb*/
 	/*step1 do copy: task_struct, stack_frame, page dir&tbl*/
-	memcp((void *)p, (void *)current, MEMBER_OFFSET( struct pcb, __task_struct_end) );
-	p->regs = current->regs;
+	//memcp((void *)p, (void *)current, MEMBER_OFFSET( struct pcb, __task_struct_end) );	
+	memcpy((void *)p, (void *)current, 0x2000);
+	//p->regs = current->regs;
 
 	ppg = page_idx(alloc_pages(__GFP_ZERO, 0));
 	p->cr3 = (void *)(ppg << 12);
 	unsigned *pdir = (void *)KV(ppg<<12);	/*子进程的page directory*/
 	unsigned *currdir = (void *)KV(current->cr3);
 
-	memcp((void*)(pdir + 256*3), (void *)(currdir + 256*3), 256*4);
+	memcpy((void*)(pdir + 256*3), (void *)(currdir + 256*3), 256*4);
 	for(int i = 0; i < 256*3; i++){
 		if(!currdir[i]) continue;
 	
@@ -81,25 +83,21 @@ int sys_fork(stack_frame regs){
 
 	/*step2: do adjust*/
 	/*设置内核的返回路线*/
-	p->thread.esp = (u32)&p->regs;
-	p->pregs = (void *)p->thread.esp;
-	p->thread.eip = (u32)ret_from_sys_call;
-	p->regs.esp = p->regs.esp;
+	//p->thread.esp = (u32)&p->regs;
 	
-	p->regs.eax = 0;
+	//int regs_offset = ((unsigned)&regs - (u32)current);
+	int pcb2pcb = (unsigned)(p) - (u32)(current);
+    stack_frame *float_regs = (void *)((unsigned) &regs + pcb2pcb);
+	p->thread.esp = (unsigned)float_regs;
+	float_regs->eax = 123;
+	float_regs->ebp += pcb2pcb;
+	p->thread.eip = (u32)ret_from_sys_call;
+	
 	p->p_name = "init2";
+	p->pid = 1;
+	current->pid = 0;
 	LL_I_INCRE(list_active, p, prio);
 
-	current->regs.eax = 0xaa;
+	//current->regs.eax = 0xbb;
 	return 12345;
-
-
-
-
-
-
-
-
-
-
 }
