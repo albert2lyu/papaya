@@ -66,7 +66,9 @@ lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为有
 			部分udp协议			<net/ipv4/udp.c>			
 			部分icmp协议		<net/ipv4/icmp.c>
 			部分tcp协议			<net/ipv4/tcp.cn>
-			I 整个网络模块是在六七月份写完的，到了七月底，进度越来越慢，tcp协议栈没能按计划完成。不过其它部分，像arp, ip重组，udp以及icmp都通过了测试。
+			I 整个网络模块是在六七月份写完的，到了七月底，进度越来越慢，tcp协议
+			  栈没能按计划完成。不过其它部分，像arp, ip重组，udp以及icmp都通过了
+			  测试。
 			II papaya支持多网卡，这是我很骄傲的一点。
 			III 我在tcp.cn里尝试了中文编程。感觉还好。
 		
@@ -75,7 +77,9 @@ lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为有
 			vfs					<fs/*>
 			cell文件系统		<fs/cell/*>
 			I vfs只实现了open, read, lseek, close接口。　另外就是mount。
-			II 	cell文件系统是我自己"发明"出来的，顾名思义，就是“划格子”，很简单的一个文件系统，它好在自己没有inode等概念，但却跟vfs配合的很好。这是我很满意的一次尝试，我通过它学到了很多。
+			II 	cell文件系统是我自己"发明"出来的，顾名思义，就是“划格子”，很简单
+				的一个文件系统，它好在自己没有inode等概念，但却跟vfs配合的很好。
+				这是我很满意的一次尝试，我通过它学到了很多。
 
 	
 	块设备：	
@@ -90,7 +94,8 @@ lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为有
 			bottom half		<kernel/bh.c>
 			printf()		<lib/printf.c>
 			I papaya os的进程调度算法几乎是没有，而且以后很长一段时间都不会考虑。
-			II 基于slab的kmalloc叫做kmalloc2(),　因为papaya还保留着一个早期的堆，是链表实现的。
+			II 基于slab的kmalloc叫做kmalloc2(),　因为papaya还保留着一个早期的
+			   堆，是链表实现的。
 			III papaya的bh.c实现的精简至极，而且跟linux不太一样。
 
 
