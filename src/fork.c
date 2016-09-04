@@ -90,7 +90,9 @@ int sys_fork(stack_frame regs){
     stack_frame *float_regs = (void *)((unsigned) &regs + pcb2pcb);
 	p->thread.esp = (unsigned)float_regs;
 	float_regs->eax = 123;
-	float_regs->ebp += pcb2pcb;
+	if(!(regs.cs & 3)){
+		float_regs->ebp += pcb2pcb;
+	}
 	p->thread.eip = (u32)ret_from_sys_call;
 	
 	p->p_name = "init2";

@@ -25,6 +25,7 @@ all:
 	make -C kernel
 	make -C net/ipv4
 	make -C lib/
+	make -C arch/x86/kernel
 	make -f makefile2
 	make -C ../cmd/
 

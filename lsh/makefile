@@ -16,7 +16,7 @@ all:
 	mv lsh ~/lsh
 
 
-#注意lua目录是不被clena的
+#注意lua目录是不被clean的
 clean:
 	make clean -C lfs
 	rm *.o -f

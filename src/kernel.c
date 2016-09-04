@@ -29,7 +29,7 @@ extern void mm(void);
 char cpu_string[16];
 void idle_func(void);
 void func1(void);
-void func2(void);
+int func2(void *arg);
 void func0(void);
 void func_init(void);
 void usr_func(void);
@@ -137,7 +137,7 @@ void timer_handler(void *data){
 }
 
 void func0(void){
-	//int x = sys_fork();
+	#if 0
 	int x;
 	__asm__ __volatile__(".intel_syntax prefix\n\t"
 						"int 0x80\n\t"
@@ -145,35 +145,21 @@ void func0(void){
 						:"=a"(x)
 						:"a"(1)
 						);
+	#endif
+	kernel_thread(func2, 123, 0);	
 	while(1){
 		//mdelay(30 );
-		oprintf("%u ", x);
+		oprintf("%s ", "func0 ");
 		schedule_timeout(1000);
 	}
-	kp_sleep(0,0);
-	#if 0
-	for(int i = 0; i < 10; i++){
-		struct timer *t = create_mytimer(50 * i+1, timer_handler, 0);
-		start_mytimer(t);
-	}
-	#endif
-	while(1){
 
-		//testnet();
-		//oprintf("func0: %u\n",counter++);
-		//schedule_timeout(2000);
-/*		if(counter-- == 0) kthread_sleep(MSGTYPE_TIMER, 100000000);*/
-	}
 }
 
-void func2(void){
+int func2(void *arg){
 	oprintf("func2 run..\n");
 	while(1){
-		int i = 0;
-		while(i < 1000*1000) i++;
-		oprintf("+");
-		//oprintf(".");
-	//	schedule_timeout(4000);
+		oprintf(">>>>");
+		schedule_timeout(1000);
 	}
 }
 void func_init(void){
