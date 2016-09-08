@@ -74,13 +74,6 @@ struct eflags_stack{
 struct pcb{
 	union{
 		struct{
-			/**'pregs' must be the first member of pcb, otherwise, code in
-			 * kernel.asm will go wrong when investige 'pregs' in assemble mod*/
-		 	stack_frame *pregs;		/**when a ring0 process interrupted by a
-									  certain exception or interruption,the
-									  cpu current(namely eax,ebx...) won't be
-									  saved in member[regs].so we need a pointer
-									  to know the real saved location.*/
 			int need_resched;
 			int sigpending;
 			struct pcb *prev;
@@ -90,7 +83,8 @@ struct pcb{
 			u32 prio;
 			u32 time_slice,time_slice_full;
 			u32 msg_type,msg_bind;
-			u32 *cr3;	/*must be cr3, relied by pointer calculate*/
+			//u32 *cr3;	/*must be cr3, relied by pointer calculate*/
+			struct mm *mm;
 			u32 ring;
 			struct thread thread;
 			struct fs_struct *fs;
@@ -143,7 +137,7 @@ struct tss{
 void fire(struct pcb *p);
 void fire_asm(u32 addr_pcb);
 void proc_init(void);
-struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name,int ring);
+struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name);
 
 void obuffer_init(OBUFFER* pt_obuffer);
 void obuffer_push(OBUFFER* pt_obuffer,char c);

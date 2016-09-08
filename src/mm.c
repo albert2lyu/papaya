@@ -6,10 +6,13 @@
 #include<bootinfo.h>
 #include<elf.h>
 #include<fork.h>
+#include<linux/sched.h>
 static int pgerr_count;
 u32 gmemsize=0;
 char testbuf[1024];
 void init_memory(void){
+	assert(sizeof(union cr3) == 4 && sizeof( union pte) == 4 && 
+		   sizeof(union linear_addr) == 4);
 	heap_init();
 	/**detect pphysical memory: print memory information and init global variable 'gmemsize'*/
 	int mem_segnum = realmod_info->mem_segnum;
@@ -78,8 +81,8 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 	oprintf("sick process:%s,pcb:%x\n",current->p_name,current);
 	if((err_code&B(0001)) == 0){
 	/**page fault:page not exist*/
-
 		/*为init进程加载代码页*/
+		#if 0
 		if(strcmp(current->p_name, "init") == 0 && (err_addr>>12 == 0x8048)){
 			int vpg = err_addr >> 12;
 			map_pg((u32 *)KV(current->cr3), vpg, alloc_page(__GFP_ZERO, 0), PG_USU, PG_RWR);	/*加载代码页.text, .rodata*/
@@ -94,13 +97,14 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 		else{
 			map_pg((u32*)KV(current->cr3),err_addr>>12,alloc_page(__GFP_ZERO,0),PG_USU,PG_RWW);
 		}	
+		#endif
 		if(pgerr_count==2) spin("pgerr_count == 2");
 	}
 
 	/*WP exception*/
 	else if(err_code & B(0010)){
 		int vpg = err_addr >> 12;
-		unsigned *dir = (u32 *)(KV(current->cr3) & ~0xfff);
+		unsigned *dir = (u32 *)(KV(current->mm->cr3.value) & ~0xfff);
 		unsigned *tbl = (u32 *)(KV(dir[PG_H10(vpg)]) & ~0xfff);
 		unsigned pte = tbl[PG_L10(vpg)];
 		unsigned *ppte = tbl + PG_L10(vpg);

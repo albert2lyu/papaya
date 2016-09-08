@@ -1,6 +1,7 @@
 #include<schedule.h>
 #include<proc.h>
 #include<utils.h>
+#include<linux/sched.h>
 /**account clock interrupt. this variable is the base of system soft-clock*/
 unsigned ticks;
 
@@ -136,7 +137,7 @@ void schedule(void){
 	 * 1, 如果调度出来的是内核进程，不用更新cr3,也不用更新esp0
 	 * 2, 现在已经是在向next进程切换了。
 	 */
-	if(next->pregs->cs & 3){
+	if(next->mm){
 		/*如果没有这一句，进程仍然能正常返回到用户空间并运行，只是下次中断
 		 * 陷入内核时，它就找不到自己的内核栈了*/
 		g_tss->esp0 = (unsigned)next + 0x2000;	
@@ -144,7 +145,7 @@ void schedule(void){
 		//这一句好。
 		__asm__ __volatile__("movl %0, %%cr3\n\t"
 							:
-							:"r"(next->cr3));
+							:"r"(next->mm->cr3.value));
 	} 
 	/**
 	 * 1, 内联汇编不能想当然，像下面的，不要一边保护寄存器，一边在输入部随便用

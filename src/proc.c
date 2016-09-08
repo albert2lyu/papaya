@@ -10,23 +10,24 @@ static int selector_plain_d[4]={(int)&selector_plain_d0,(int)&selector_plain_d1,
 static int selector_plain_c[4]={(int)&selector_plain_c0,(int)&selector_plain_c1,0,(int)&selector_plain_c3};
 int __eflags=0x1200;//IOPL=1,STI	__prefix, 避免gdb犯晕:p eflags
 
-void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name,int ring){
-	baby->regs.ss=(selector_plain_d[ring]);
-	baby->regs.esp=(ring==0)?(u32)&(baby->regs):USR_STACK_BASE;/**ring 0 process never touch ss,esp when iretd*/
+/* only create ring 0 process */
+void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name){
+	baby->regs.ss=(selector_plain_d[0]);
+	baby->regs.esp = (u32)&(baby->regs);
+	//baby->regs.esp=(ring==0)?(u32)&(baby->regs):USR_STACK_BASE;
 	baby->regs.eflags=__eflags;//IOPL=1,STI
-	baby->regs.cs=(selector_plain_c[ring]);
+	baby->regs.cs=(selector_plain_c[0]);
 	baby->regs.eip=addr;
-	baby->regs.gs=baby->regs.fs=baby->regs.es=baby->regs.ds=(selector_plain_d[ring]);
-	//fill other members
+	baby->regs.gs=baby->regs.fs=baby->regs.es=baby->regs.ds=(selector_plain_d[0]);
+	//fill in other members
 	baby->need_resched = 0;
 	baby->sigpending = 0;
 	baby->prio=prio;
-	baby->pid=3;
+	baby->pid=0;
 	baby->time_slice=baby->time_slice_full=time_slice;
 	baby->p_name=p_name;
-	baby->ring=ring;
-	//obuffer_init(&baby->obuffer);	/**'->' prior to '&'*/
-	baby->pregs=&baby->regs;
+	baby->ring= 0;
+	//baby->pregs=&baby->regs;
 	baby->thread.esp = (int)&baby->regs;
 	baby->thread.eip = (int)restore_all;
 	baby->fs = kmalloc0( sizeof(struct fs_struct));
@@ -37,38 +38,22 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name,int 
 	baby->rlimits[RLIMIT_NOFILE].max = 1024;
 	baby->fstack.esp = -1;
 	baby->magic = PCB_MAGIC_NUMBER;
+	baby->mm = 0;
+	//第一个内核进程启动时，不需要设置cr3。因为内核此时就用着内核页表。
+	//baby->cr3=(u32*)0x100000;	/**use kernel page directory*/
+	#if 0
 	if(ring){
-		baby->cr3=(u32*)((alloc_pages(__GFP_DEFAULT,1) - mem_map) <<12);	/**note!cr3 use real physical 
-												  		address*/
+		baby->cr3=(u32*)((alloc_pages(__GFP_DEFAULT,1) - mem_map) <<12);	/**note!cr3 use real physical address*/
 		memcpy((char*)(baby->cr3+256*3)+0xc0000000,(char*)0xc0100c00,224*4);
-		/*TODO eliminate such code later */
-		/**
-		u32 *dir = __va(baby->cr3);
-		for(int i = 0; i < PAGE_OFFSET/0x400000; i++){
-			dir[i]  = PG_USU|PG_RWW;
-		}
-		*/
-		/**1,this page must locate in zone_normal, for we will hanlde it
-		 * now
-		 * 2, the following block is expired code.
-		 */
-		/**
-		unsigned ppg = page_idx(alloc_pages(__GFP_NORMAL,1));
-		unsigned vaddr = __va(ppg<<12);
-		struct usr_psp_struct *psp = (struct usr_psp_struct *)\
-									 (vaddr + PAGE_SIZE - USR_PSP_LEN);
-		psp->pid = baby->pid;
-		psp->_errno = 0;
-		map_pg(__va(baby->cr3), (PAGE_OFFSET - PAGE_SIZE)>>12, ppg, PG_USU|PG_P, PG_RWW);
-		*/
 	}
 	else baby->cr3=(u32*)0x100000;	/**use kernel page directory*/
+	#endif
 }
 
-struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name,int ring){
+struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name){
 //	oprintf("@create_process addr=%x\n",addr);
 	struct pcb *baby = (struct pcb*)kmalloc_pg(__GFP_DEFAULT,1);
-	init_pcb(baby,addr,prio,time_slice,p_name,ring);
+	init_pcb(baby,addr,prio,time_slice,p_name);
 	oprintf("new process:baby addr:%x\n",baby);
 	LL_I_INCRE(list_active,baby,prio);	
 /*	oprintf("created a process..\n");*/
@@ -163,23 +148,20 @@ void syscall_soft_ret_to(struct pcb *pcb,int return_val,int return_errno){
 
 
 
-
-
-void fire(struct pcb *p){
+#if 1
+void fire_thread(struct pcb *p){
+	assert(p->mm == 0);		//it should be a kernel thread
 	extern bool task_available;
 	task_available = true;
-/*	assert(p == idle);*/
-	//BUG HERE
-	//设置tss的esp0，不是为了马上的iret，是为了iretd之后的进程再陷入ring0时
-	//正确进入自己的内核栈。
-	if((p->regs.cs&3) != 0){
-		//oprintf("fire process:%s\n", current->p_name);
-	 	g_tss->esp0=(u32)p + 0x2000;
-	} 
-	//恢复cpu现场，先让esp指向现场。现场的位置不是固定的，因为涉及到内核进程。
-	//所以通过之前保存的pcb->pregs来设置esp。
+
 	__asm__ __volatile__(
-		"mov %1,%%cr3\n\t"
+		"movl %0,%%esp\n\t"
+		"jmp restore_all\n\t"
+		:
+		:"r"(&p->regs)
+	);
+	#if 0
+	__asm__ __volatile__(
 		"movl %0,%%esp\n\t"
 		"popl %%ebx\n\t"
 		"popl %%ecx\n\t"
@@ -195,11 +177,12 @@ void fire(struct pcb *p){
 		"addl $4,%%esp\n\t"
 		"iretl\n\t"
 		:
-		:"r"(p->pregs),"r"(p->cr3)
+		:"r"(&p->regs)
 	);
+	#endif
 }
 
-
+#endif
 
 
 

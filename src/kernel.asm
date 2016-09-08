@@ -332,10 +332,6 @@ i30h:
 page_fault:
 	;有出错码的！不要push了
 	push do_page_fault	;这个push位置本该是fs。
-	SAVE_ALL_EXCEPT_FS	
-
-	SET_PREG
-
 	jmp error_code
 
 len_page_fault equ  $ - page_fault
@@ -361,18 +357,19 @@ i81:	;an I-gate for kernel thread to submit their time slice.
 	call schedule
 	;far away
 error_code:
-	;fs还没有保存，要保存它，先把对应位置上的function　address取出来。
-	GET_CURRENT(ebx)
-	mov edi, [esp + REGS_FS_OFFSET]
-	mov eax, fs
-	mov [esp + REGS_FS_OFFSET], eax	;done
+	SAVE_ALL_EXCEPT_FS	
+	
+	mov edi, fs
+	xchg edi, [esp + REGS_FS_OFFSET]
+	mov eax, -1
+	xchg [esp + REGS_ERR_CODE_OFFSET], eax	
 
 	;寄存器都保护好了，现在根据传递过来的函数地址，呼叫对应的服务例程
 	;服务例程都需要两个参数，preg, err_code
-	mov eax, esp		;esp现在就是preg，先存起来
-	push dword [eax + REGS_ERR_CODE_OFFSET]
-	push eax
-	call edi
+	mov ebx, esp		;esp现在就是preg，先存起来
+	push eax	;error code
+	push ebx	;* pt_regs
+	call edi	;call fn
 	;------------已经进入到服务例程里了--------------
 	
 	add esp, 8
@@ -391,9 +388,9 @@ ret_from_exception:
 	;do possible soft irq
 ret_from_intr:
 	GET_CURRENT(ebx)
-	mov ecx, [ebx]	;get pregs
+;	mov ecx, [ebx]	;get pregs
 	;若中断前夕是内核态，直接restore
-	mov eax, [ecx + REGS_CS_OFFSET]
+	mov eax, [esp + REGS_CS_OFFSET]
 	and eax, 0x3
 	cmp eax,0
 	je restore_all	;前夕是内核态。 发生在内核态的中断不会引起调度。

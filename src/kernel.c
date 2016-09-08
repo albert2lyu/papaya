@@ -82,9 +82,9 @@ void kernel_c(){
 	 */
 	bigbuf = (void *)kmalloc_pg(__GFP_DEFAULT, 8+1);//4k * 256 * 2 = 2M
 	//struct pcb *f1 = create_process((u32)func1,9,10,"func1",0);	
-	struct pcb *f0 = create_process((u32)func0,9,0xffffffff,"func0",0);
+	struct pcb *f0 = create_process((u32)func0,9,0xffffffff,"func0");
 	//struct pcb *f2 = create_process((u32)func2,9,5,"func2",1);
-	struct pcb *f_init = create_process((u32)func_init,4,0xffffffff,"func_init",0);
+	struct pcb *f_init = create_process((u32)func_init,4,0xffffffff,"func_init");
 	//struct pcb *u_f = create_process(0x8048000,9,100,"init",3);
 	//avoid_gcc_complain = (int)f1;
 	avoid_gcc_complain = (int)f0;
@@ -117,7 +117,7 @@ void kernel_c(){
 /*	cell_read("t.c", testbuf);*/
 /*	oprintf("%s", testbuf);*/
 /*	spin("ss");*/
-	fire(f_init);
+	fire_thread(f_init);
 	assert(0);
 }
 
@@ -137,7 +137,7 @@ void timer_handler(void *data){
 }
 
 void func0(void){
-	#if 0
+	#if 1
 	int x;
 	__asm__ __volatile__(".intel_syntax prefix\n\t"
 						"int 0x80\n\t"
@@ -146,10 +146,11 @@ void func0(void){
 						:"a"(1)
 						);
 	#endif
-	kernel_thread(func2, 123, 0);	
+	//kernel_thread(func2, 123, 0);	
 	while(1){
 		//mdelay(30 );
-		oprintf("%s ", "func0 ");
+		//oprintf("%s ", "func0 ");
+		oprintf("%u ", x);
 		schedule_timeout(1000);
 	}
 
