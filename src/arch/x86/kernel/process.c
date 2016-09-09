@@ -15,3 +15,17 @@ int kernel_thread(int (*fn)(void *), void *arg, unsigned flags){
 						);
 	return 0;	
 }
+
+
+int sys_execve(struct stack_frame regs){
+	int error;
+	char *filename = (char *)reg.ebx;
+	error = do_execve(filename, (char *[])regs.ecx, (char *[])regs.edx, &regs);
+	return error;
+}
+
+
+
+
+
+

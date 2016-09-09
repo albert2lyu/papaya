@@ -1,8 +1,8 @@
 ; The memory layout diagram is in bootinfo.asm
 ;1 single segment should be smaller than 64KB
 %include "bootinfo.asm"
-%include "../include/pm.inc"
-%include "../include/utils.inc"
+%include "include/old/pm.inc"
+%include "include/old/utils.inc"
 org 0x7c00
 addr_mbr_loaded equ (_base_kernel_loaded - 512 * (_bootbin_occupy_sectors + _fiximg_occupy_sectors))
 [bits 16]

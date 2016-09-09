@@ -14,7 +14,7 @@
 #include<unistd.h>
 #include<assert.h>
 #include<errno.h>
-#include "../include/bootinfo.h"
+#include"../src/include/old/bootinfo.h"
 static int kernel_img_size;
 /* we avoid change R/W cursor of fd*/
 static int fdsize(int fd){

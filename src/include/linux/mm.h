@@ -1,5 +1,6 @@
-#ifndef MM_H
-#define MM_H
+#ifndef LINUX_MM_H
+#define LINUX_MM_H
+
 #include<valType.h>
 #include<utils.h>
 #include<pmm.h>
@@ -49,6 +50,7 @@ void map_pg(u32*dir,int vpg_id,int ppg_id,int us,int rw);
 struct page *alloc_pages(u32 gfp_mask, int order);
 char* kmalloc_pg(u32 gfp_mask, int order);
 void mm_init(void);
+void mm_init2(void);
 extern u32 gmemsize;
 
 /* when @size bytes required, we */
@@ -57,7 +59,23 @@ static inline int size2pages(int size){
 	/* round it to the power of 2 */
 	return ceil2n(least_pages);
 }
+
+struct vm_area;
+struct vm_operations{
+	void (*open)(struct vm_area *area);
+	void (*close)(struct vm_area *area);
+	struct page *(*nopage)(struct vm_area *area, u32 address, int write_access);
+};
+
+struct vm_area{
+	struct mm *mm;
+	u32 start;
+	u32 end;
+	u32 page_prot;	/* access permissions for the page frames */
+	u32 flags;		/* flags of the region */
+
+	struct vm_area *prev, *next;
+	struct vm_operations *ops;
+};
+
 #endif
-
-
-

@@ -7,6 +7,7 @@
 #include<elf.h>
 #include<fork.h>
 #include<linux/sched.h>
+static struct slab_head * mm_cache;
 static int pgerr_count;
 u32 gmemsize=0;
 char testbuf[1024];
@@ -237,4 +238,13 @@ void mm_init(void){
 	extern bool mm_available;
 	mm_available = true;
 }
+
+void mm_init2(void){
+	mm_cache =  kmem_cache_create("mm_cache", sizeof(struct mm), 0,
+										SLAB_HWCACHE_ALIGN, 0, 0);
+}
+
+
+
+
 

@@ -1,4 +1,4 @@
-all: clean dcache.o inode.o super.o namei.o
+all: clean dcache.o inode.o super.o namei.o exec.o
 
 %.o:%.c
 	@gcc -c -o $@ $< $(cflags)

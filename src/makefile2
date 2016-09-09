@@ -5,7 +5,7 @@ VPATH=../lib/ ../bin/
 #header_path will be used when 'gcc -M'.you can not use '$(cflags)' instead of
 #'$(head_path)' under this case,because other unrelated cflags may affect the 
 #operation of 'gcc -M',according to by test.
-cheader_path=-I../include/ 	-I./include/ -I./arch/x86/include/ -I./arch/x86/include/asm/
+cheader_path=-I../include/ 	-I./include/ -I./arch/x86/include/ -I./arch/x86/include/asm/ -I./include/old/
 cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -Wno-implicit-function-declaration -g -fno-stack-protector -nostdinc 
 asmflags=-i../include/ 
 ldpath=-L../lib/
@@ -17,7 +17,7 @@ co= kernel.o   utils.o proc.o  video_drv.o schedule.o\
 ku_utils.o mm.o func_table.o pmm.o mmzone.o irq.o time.o i8259.o\
 ramdisk.o elf.o fork.o 
  
-kernelrelyo=$(asmo)  $(co)	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o ../src/fs_cell.o ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o ../src/net/core/dev.o ../src/net/core/skbuff.o  ../src/kernel/bh.o ../src/net/ipv4/arp.o ../src/net/ipv4/ip.o ../src/net/core/testnet.o  ../src/net/ipv4/icmp.o ../src/net/ipv4/udp.o ../src/lib/vsprintf.o ../src/lib/printf.o ../src/net/ipv4/tcp.o ../src/kernel/timer.o ../src/arch/x86/kernel/process.o
+kernelrelyo=$(asmo)  $(co)	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o ../src/fs_cell.o ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o ../src/net/core/dev.o ../src/net/core/skbuff.o  ../src/kernel/bh.o ../src/net/ipv4/arp.o ../src/net/ipv4/ip.o ../src/net/core/testnet.o  ../src/net/ipv4/icmp.o ../src/net/ipv4/udp.o ../src/lib/vsprintf.o ../src/lib/printf.o ../src/net/ipv4/tcp.o ../src/kernel/timer.o ../src/arch/x86/kernel/process.o ../src/fs/exec.o
 #../src/drivers/net/e1000.o
 include $(co:.o=.d)
 
@@ -37,7 +37,7 @@ kernel.elf:$(kernelrelyo)
 %.o:%.c
 	gcc -c -o ../lib/$@ $< $(cflags)
 
-%.asmo: %.asm ../include/*.inc
+%.asmo: %.asm ./include/old/*.inc
 	nasm -felf -o ../lib/$@ $< $(asmflags)
 
 clean:

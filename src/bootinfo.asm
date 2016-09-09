@@ -13,7 +13,7 @@
 ; C里我们这样用它, #define xxx (unsigned)&(_xxx)
 ; See also bootinfo.h
 
-%include "../include/utils.inc"
+%include "include/old/utils.inc"
 ;                         0x6104    <=====         0x6004  <===    0x6000
 ;+----------------------------------------------------------------+
 ;                          |           256 bytes         | 4bytes |

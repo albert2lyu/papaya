@@ -40,8 +40,8 @@ base_text equ base_kernel_reset+0xc0000000
 base_tss  equ base_text + (tss -_start)
 ;}end symbol
 
-%include "../include/pm.inc"
-%include "../include/utils.inc"
+%include "include/old/pm.inc"
+%include "include/old/utils.inc"
 %include "bootinfo.asm"
 
 global _start

@@ -8,6 +8,9 @@ struct mm{
 };
 
 int kernel_thread(int (*fn)(void *), void *arg, unsigned flags);
+
+int 
+do_execve(char *filepath, char *argv[], char *envp[], struct stack_frame *regs);
 	
 
 #endif

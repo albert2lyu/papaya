@@ -55,7 +55,7 @@ struct thread{
 };
 
 /**the stack frame when cpu traps into kernel for exception or interrupt*/
-typedef struct{
+typedef struct {
 	u32 ebx,ecx,edx,esi;		/**we use four registers to pass syscall args*/
 	u32 edi,ebp,eax;
 	u32 ds,es,gs,fs;

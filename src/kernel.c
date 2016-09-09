@@ -51,7 +51,9 @@ void kernel_c(){
 	probe();
 
 	mm_init();
-	kmem_cache_init();	
+	kmem_cache_init();
+	mm_init2();			/*this partion has to be done after kmem_cache_init() */
+		
 	net_init();
 	pci_init();
 	//kmem_cache_test();
@@ -137,7 +139,7 @@ void timer_handler(void *data){
 }
 
 void func0(void){
-	#if 1
+	#if 0
 	int x;
 	__asm__ __volatile__(".intel_syntax prefix\n\t"
 						"int 0x80\n\t"
@@ -146,11 +148,11 @@ void func0(void){
 						:"a"(1)
 						);
 	#endif
-	//kernel_thread(func2, 123, 0);	
+	kernel_thread(func2, 123, 0);	
 	while(1){
 		//mdelay(30 );
-		//oprintf("%s ", "func0 ");
-		oprintf("%u ", x);
+		oprintf("%s ", "func0 ");
+		//oprintf("%u ", x);
 		schedule_timeout(1000);
 	}
 
