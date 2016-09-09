@@ -14,7 +14,7 @@ papaya内核是我学习linux的一个习作。
 【2】
 papaya os目前的代码量约8000行。只能在x86下运行。为了减少调试的工作量，也没有支持多核。
 目前完成的部分有：
-　　>内存管理:
+	>内存管理:
 			* buddy system		<mmzone.c>
 			* slab allocator		<mm/slab.c>
 			+ slab分配器是不带color的。
