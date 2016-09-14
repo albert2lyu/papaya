@@ -2,14 +2,16 @@
 #ifndef VALTYPE_H
 #define VALTYPE_H
 
+#define bool _Bool
+#define boolean _Bool
+#define true 1
+#define false 0
 #define __DEBUG
 
 #define NULL 0
-#define true 1
-#define false 0
 
-typedef unsigned boolean;
-typedef unsigned  bool;
+typedef unsigned long ulong;
+typedef long long u64;
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -52,6 +54,11 @@ typedef struct{
 
 
 
+#define __4K 0x1000
+#define __8K 0x2000
+#define __1M 0x100000
+#define __1G 0x40000000
+#define __3G 0xc0000000
 
 
 

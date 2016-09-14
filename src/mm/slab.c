@@ -92,7 +92,7 @@ static inline void page_mark_cache(struct page *page, struct slab_head *slabhead
 
 static inline int slab_queue_grow(struct slab_head *slabhead, int flags){
 	struct slab *slab = (struct slab *)
-						kmalloc_pg(slabhead->gfpflags, slabhead->gfporder);
+						__alloc_pages(slabhead->gfpflags, slabhead->gfporder);
 	slab->inuse = 0;
 	slab->free = 0;
 	slab->objs = (void *)((u32)slab + PAGE_SIZE * (1 << slabhead->gfporder) - \

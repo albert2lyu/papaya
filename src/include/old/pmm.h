@@ -1,9 +1,8 @@
 #ifndef PMM_H
 #define PMM_H
 #include<valType.h>
-#include<page.h>
+#include<asm/page.h>
 
-#define KV(physical_addr) ((u32)(physical_addr)+PAGE_OFFSET)
 //for kmalloc
 //16M ~ 18M occupied by ramdisk
 #define HEAP_BASE 18*0x100000

@@ -5,6 +5,7 @@
 #include<valType.h>
 #include<linux/assert.h>
 #include<linux/byteorder/generic.h>
+#include<linux/string.h>
 //杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
 static inline unsigned str_hash(const char *str, int len){
     unsigned seed = 131; // 31 131 1313 13131 131313 etc..
@@ -47,23 +48,22 @@ static inline unsigned __BSR(unsigned x){
 	return highest;
 }
 
-static inline unsigned ceil_align(unsigned x, unsigned granularity){
-	unsigned mask = granularity - 1;
+static inline ulong ceil_align(ulong x, ulong granularity){
+	ulong mask = granularity - 1;
 	return (x + mask) & ~mask;
 }
 
+static inline ulong floor_align(ulong x, ulong align){
+	ulong mask = align - 1;
+	return x & mask;
+}
 #include<mm.h>
 /**the following two macros aim at beautify code.
  * and,can you write a 'break_say'?
  */
 #define return_say(msg)		do{oprintf("%s",msg);return;} while(0)
 #define returnx_say(x,msg)	do{oprintf("%s",msg);return x;} while(0)
-/**emulate binary-digit.
- * note! this macro never checks security of 'x',so make sure x no more
- * than 8 bit. write like B(00000100). case like B(000011110) is wrong
- */
-#define B(x) ((0x##x&1)+(0x##x>>4&1)*2+(0x##x>>8&1)*4+(0x##x>>12&1)*8+\
-	(0x##x>>16&1)*16+(0x##x>>20&1)*32+(0x##x>>24&1)*64+(0x##x>>28&1)*128)
+
 void detect_cpu(void);//send cpu information to specified area
 extern void dispAX();
 extern void dispEAX();
@@ -118,11 +118,6 @@ bool  bitsclear_long(u32 addr, int bit_off, int num);
 
 int bit1_count(char*addr,int bytes);
 void memcpy(void*dest,void*src,int bytes);
-int strlen(char*str);
-char*strcpy(char*dest,char*src);
-char*strncpy(char*dest, const char*src, int n);
-int strcmp(const char *str1, const char *str2);
-int strncmp(const char *str1, const char *str2, int n);
 
 #define DSI(str,i)\
 dispStr(str,0x400);\

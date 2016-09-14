@@ -1,8 +1,10 @@
 #ifndef X86_PAGE_H
 #define X86_PAGE_H
+#include<valType.h>
 
 #define PAGE_SHIFT 12
 #define PAGE_SIZE 0x1000
+#define PAGE_MASK 0xfff
 #define pa_idx(paddr) ((paddr)>>PAGE_SHIFT)
 #define pa_pg pa_idx
 
@@ -24,8 +26,8 @@
 										:"r"(0));
 
 /*get page struct by a virtual address*/
-#define __va_pg(vaddr) (mem_map + (((vaddr) - PAGE_OFFSET) >> 12))
-#define __pa_pg(paddr) (mem_map + ((paddr) >> 12))
+#define __va2pg(vaddr) (mem_map + (((vaddr) - PAGE_OFFSET) >> 12))
+#define __pa2pg(paddr) (mem_map + ((paddr) >> 12))
 
 
 // >不一定比“|, &"用起来更方便。先局部的用一用，尤其是pte
@@ -47,6 +49,10 @@ union pte{
 		unsigned avl: 3;
 		unsigned physical: 20;
 	};
+	struct{
+		unsigned flags: 12;	
+		unsigned: 20;
+	};
 };
 
 union linear_addr{
@@ -65,6 +71,30 @@ union cr3{
 		unsigned physical: 20;
 	};
 };
+
+union pgerr_code{
+	u32 value;
+	struct{
+		unsigned protection: 1;
+		unsigned on_write: 1;
+		unsigned from_user: 1;
+		unsigned dirty_rsv: 1;
+		unsigned instruction: 1;
+		unsigned : 27;
+	};
+	struct{
+		unsigned $nopage: 1;
+		unsigned $on_read: 1;
+		unsigned $in_kernel: 1;
+		unsigned: 1;
+		unsigned $data: 1;
+		unsigned: 27;
+	};
+};
 #pragma pack(pop)
 
+#define PAGE_OFFSET 0XC0000000
+#define __pa(vaddr) ((unsigned)(vaddr) - PAGE_OFFSET)
+#define __va(paddr) ((unsigned)(paddr) + PAGE_OFFSET)
+#define KV __va
 #endif

@@ -7,8 +7,8 @@
 #include<elf.h>
 #include<fork.h>
 #include<linux/sched.h>
-static struct slab_head * mm_cache;
-static int pgerr_count;
+struct slab_head * mm_cache;
+struct slab_head * vm_area_cache;
 u32 gmemsize=0;
 char testbuf[1024];
 void init_memory(void){
@@ -58,6 +58,7 @@ void init_memory(void){
     This only applies when the No-Execute bit is supported and enabled. 
 */
 
+#if 0
 /**
  * page-error exception handler
  * alloc a physical page and mapped it to the ill virtual page
@@ -77,13 +78,12 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 	);
 	if(err_addr == 0) spin("attempt to access address 0");
 	//u32 err_code=current->pregs->err_code;
-	oprintf("page error: err_code:%x, err_addr:%x,eip:%x,esp:%x\n", err_code, err_addr, preg->eip, preg->esp);
-		oprintf("%s: %c %c\n",(err_code&1)?"page protection error":"page not exist error",(err_code&B(0100))?'U':'S',(err_code&B(0010))?'W':'R');
+	//oprintf("page error: err_code:%x, err_addr:%x,eip:%x,esp:%x\n", err_code, err_addr, preg->eip, preg->esp);
+		//oprintf("%s: %c %c\n",(err_code&1)?"page protection error":"page not exist error",(err_code&B(0100))?'U':'S',(err_code&B(0010))?'W':'R');
 	oprintf("sick process:%s,pcb:%x\n",current->p_name,current);
 	if((err_code&B(0001)) == 0){
 	/**page fault:page not exist*/
 		/*为init进程加载代码页*/
-		#if 0
 		if(strcmp(current->p_name, "init") == 0 && (err_addr>>12 == 0x8048)){
 			int vpg = err_addr >> 12;
 			map_pg((u32 *)KV(current->cr3), vpg, alloc_page(__GFP_ZERO, 0), PG_USU, PG_RWR);	/*加载代码页.text, .rodata*/
@@ -98,7 +98,6 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 		else{
 			map_pg((u32*)KV(current->cr3),err_addr>>12,alloc_page(__GFP_ZERO,0),PG_USU,PG_RWW);
 		}	
-		#endif
 		if(pgerr_count==2) spin("pgerr_count == 2");
 	}
 
@@ -141,47 +140,16 @@ void do_page_fault(stack_frame *preg, unsigned err_code){
 	return;
 }
 
+#endif
 
-struct page *alloc_pages(u32 gfp_mask, int order){
-	/**discard gfp_mask for temporary*/
-	struct page *page;
-	extern int avoid_gcc_complain;
-	if(gfp_mask & __GFP_DMA){
-		page = (void *)__rmquene(&zone_dma, order);
-	}
-	else if(gfp_mask & __GFP_HIGHMEM){	/*BUG 高端内存区不能是全映射的，而且根本没页表*/
-		avoid_gcc_complain = 
-		( page = (void *)__rmquene(&zone_highmem, order) ) ||
-		( page = (void *)__rmquene(&zone_normal, order) ) ||
-		( page = (void *)__rmquene(&zone_dma, order) ) 	;
-	}
-	else
-		avoid_gcc_complain = 
-		( page = (void *)__rmquene(&zone_normal, order) ) ||
-		( page = (void *)__rmquene(&zone_dma, order) )	;
-		
-	assert(page);
-	if(gfp_mask & __GFP_ZERO){
-		unsigned ppg = page - mem_map;
-		char *vaddr = (char *)KV(ppg << 12);
-		memset(vaddr, 0, 4096<<order);
-	}
-	return page;
-}
-
-
-char *__get_free_pages(u32 gfp_mask, int order){
-	u32 ppg = page_idx(alloc_pages(gfp_mask, order));
-	return (char*)KV(ppg<<12);
-}
-
-inline void map_pg(u32*dir,int vpg,int ppg,int us,int rw){
+void map_pg(u32*dir,int vpg,int ppg,int us,int rw){
 	/**check the validation of page dir-entry. does it point to a valid page
 	 * table?if not,alloc a clean page as page-table*/
 	u32 *dirent = dir + PG_H10(vpg);
 	if((*dirent & PG_P) == 0){
 /*		oprintf("@map_pg bad entry,alloc one page as table\n");*/
-		*dirent  = alloc_page(__GFP_ZERO,0)<<12|us|PG_RWW|PG_P;
+		//在pgdir的entry里，不对U/S, R/W做控制，留给page table
+		*dirent  =__pa(__alloc_page(__GFP_ZERO) )| PG_USU | PG_RWW | PG_P;	
 	}
 	u32 *tbl = (u32*)KV((*dirent)>>12<<12);/**trip attr-bit*/
 /*	oprintf("@map_pg tbl at:%x\n",tbl);*/
@@ -241,6 +209,8 @@ void mm_init(void){
 
 void mm_init2(void){
 	mm_cache =  kmem_cache_create("mm_cache", sizeof(struct mm), 0,
+										SLAB_HWCACHE_ALIGN, 0, 0);
+	vm_area_cache = kmem_cache_create("vma_cache", sizeof(struct vm_area), 0,
 										SLAB_HWCACHE_ALIGN, 0, 0);
 }
 

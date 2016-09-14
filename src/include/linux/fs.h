@@ -111,4 +111,9 @@ int sys_read(unsigned, char*, unsigned);
 struct slab_head *inode_cache;
 struct slab_head *file_cache;
 
+
+struct file * k_open(char *path, ulong flags, ulong mode);
+int k_seek(struct file *file, int offset, unsigned origin);
+int k_read(struct file *file, char *buf, unsigned size);
+
 #endif

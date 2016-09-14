@@ -138,9 +138,10 @@ void schedule(void){
 	 * 2, 现在已经是在向next进程切换了。
 	 */
 	if(next->mm){
+		assert(next->regs.cs = (u32)&selector_plain_c0);
 		/*如果没有这一句，进程仍然能正常返回到用户空间并运行，只是下次中断
 		 * 陷入内核时，它就找不到自己的内核栈了*/
-		g_tss->esp0 = (unsigned)next + 0x2000;	
+		g_tss->esp0 = (unsigned)next + THREAD_SIZE;	
 
 		//这一句好。
 		__asm__ __volatile__("movl %0, %%cr3\n\t"
@@ -180,6 +181,7 @@ void schedule(void){
 						:"m"(next->thread.esp), "m"(next->thread.eip),"b"(current)
 						);
 	if(IF) sti();	//TODO 上面的pushf/popf还必要吗 
+					//感觉没必要，schedule是一段关键的代码，从开头就关中断了
 					//像这样的sti（)还是减少吧
 	return;
 }

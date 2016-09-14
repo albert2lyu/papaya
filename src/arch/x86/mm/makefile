@@ -1,4 +1,4 @@
-all: clean ioremap.c
+all: clean ioremap.c fault.o
 
 %.o:%.c
 	@gcc -c -o $@ $< $(cflags)

@@ -81,7 +81,7 @@ int oprintf(char *format, ...){
 	size_t upsize = mm_available ? 0: 1024;
 	char stkroom[upsize];
 	/* four pages, 16K */
-	char *buf = mm_available ? kmalloc_pg(0, BUF_PG_ORDER) : stkroom;
+	char *buf = mm_available ? (void *)__alloc_pages(0, BUF_PG_ORDER) : stkroom;
 	char *read = buf;
 
 	int length = __sprintf(buf, format, (u32 *)(&format + 1));
@@ -118,7 +118,7 @@ int oprintf(char *format, ...){
 	open_window(POS_L(cursor) - PAGE_H + 1 + 4);
 	if(IF) sti();
 	if(mm_available){
-		kfree_pg((unsigned)buf, BUF_PG_ORDER);
+		__free_pages(buf, BUF_PG_ORDER);
 	}
 	return length;
 }

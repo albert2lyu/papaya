@@ -1,1 +1,9 @@
-objdump -D -mi8086 -bbinary xx.bin
+*
+  objdump -D -mi8086 -bbinary xx.bin
+
+*
+  objdump时，注意-D和-d的区别，似乎前者出来的信息要全一些
+
+*
+  objdump -D -S g_kernel.elf | less
+  -S是源码与汇编对照

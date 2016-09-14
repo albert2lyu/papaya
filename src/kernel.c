@@ -14,6 +14,7 @@
 #include<linux/pci.h>
 #include<linux/skbuff.h>
 #include<linux/timer.h>
+#include<linux/binfmts.h>
 char *testbuf;
 char *bigbuf;
 int avoid_gcc_complain;
@@ -82,7 +83,7 @@ void kernel_c(){
 	 * 5, 所以我们来避免产生这种”错误局面“，我们把它的time_slice生成 0xffffffff,
 	 * 同时也能提醒内核程序员：你要手动让他sleep，不然别的进程会饿死。
 	 */
-	bigbuf = (void *)kmalloc_pg(__GFP_DEFAULT, 8+1);//4k * 256 * 2 = 2M
+	bigbuf = (void *)__alloc_pages(__GFP_DEFAULT, 8+1);//4k * 256 * 2 = 2M
 	//struct pcb *f1 = create_process((u32)func1,9,10,"func1",0);	
 	struct pcb *f0 = create_process((u32)func0,9,0xffffffff,"func0");
 	//struct pcb *f2 = create_process((u32)func2,9,5,"func2",1);
@@ -101,7 +102,7 @@ void kernel_c(){
 /*	__ext_pcb = create_process((u32)fs_ext, 9, 0x0fffffff,"ext", 0);*/
 /*	__hs_pcb = create_process((u32)hs, 9, 0x0fffffff,"hs", 0);*/
 
-	idle=(struct pcb*)kmalloc_pg(__GFP_DEFAULT,1);
+	idle=(struct pcb*)__alloc_pages(__GFP_DEFAULT,1);
 	init_pcb(idle,idle_func,10,0xffffffff,"idle",0);
 	
 	/**
@@ -139,8 +140,9 @@ void timer_handler(void *data){
 }
 
 void func0(void){
+	extern struct linux_binfmt elf_format;
+	register_binfmt(&elf_format);
 	#if 0
-	int x;
 	__asm__ __volatile__(".intel_syntax prefix\n\t"
 						"int 0x80\n\t"
 						".att_syntax prefix\n\t"
@@ -148,7 +150,8 @@ void func0(void){
 						:"a"(1)
 						);
 	#endif
-	kernel_thread(func2, 123, 0);	
+	kernel_thread(func2, (void *)123, 0);	
+
 	while(1){
 		//mdelay(30 );
 		oprintf("%s ", "func0 ");
@@ -194,6 +197,15 @@ void func_init(void){
 	//TODO rbytes的返回值是对的，但实际读入的却不止 指定的size这么多
 	int rbytes = sys_read(fd, testbuf, 100);
 	avoid_gcc_complain = rbytes = (unsigned)&indir;
+
+	int x = 0;
+	__asm__ __volatile__(
+						"int $0x80\n\t"
+						:"=a"(x)
+						:"a"(2), "b"("/home/doado"), "c"(0), "d"(0)
+						);
+	oprintf("execve failed, error code %u ", x);
+	while(1);
 
 	//assert("func init keep running" && 0);
 	//while(1);

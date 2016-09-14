@@ -33,6 +33,7 @@ void _k_show_var(unsigned var,unsigned var_type){
 
 */
 //eax=4
+#if 0
 void k_open(char*path,int mod){
 /*	askfs(COMMAND_OPEN,path,0,0,0,0,0,0);*/
 }
@@ -56,6 +57,7 @@ void k_watch(u32 addr,int write_only){
 void k_seek(int fd,int offset,int whence){
 /*	askfs(COMMAND_SEEK,0,0,fd,0,0,offset,whence);*/
 }
+#endif
 
 
 

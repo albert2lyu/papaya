@@ -26,7 +26,6 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name){
 	baby->pid=0;
 	baby->time_slice=baby->time_slice_full=time_slice;
 	baby->p_name=p_name;
-	baby->ring= 0;
 	//baby->pregs=&baby->regs;
 	baby->thread.esp = (int)&baby->regs;
 	baby->thread.eip = (int)restore_all;
@@ -52,7 +51,7 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name){
 
 struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name){
 //	oprintf("@create_process addr=%x\n",addr);
-	struct pcb *baby = (struct pcb*)kmalloc_pg(__GFP_DEFAULT,1);
+	struct pcb *baby = (struct pcb*)__alloc_pages(__GFP_DEFAULT,1);
 	init_pcb(baby,addr,prio,time_slice,p_name);
 	oprintf("new process:baby addr:%x\n",baby);
 	LL_I_INCRE(list_active,baby,prio);	

@@ -396,7 +396,7 @@ static void on_rx(struct net_device *netdev){
  * 之后就返回。 如果ISR里还有置位，它自然还会触发新的中断。 FIXME  对吗？
  * 不，不该这样做，应该尽最快把ISR空闲出来，这样新的网卡中断能表征出来。
  */
-static void on_intr(int irq, void *dev, struct stack_frame *regs){
+static void on_intr(int irq, void *dev, struct pt_regs *regs){
 	struct net_device *netdev = dev;
 	/* the interupt Status Register reflects all current pending interrupts, regardless of
 	 * the state of the corresponding mask bit in the IMR.

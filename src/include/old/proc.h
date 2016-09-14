@@ -55,7 +55,7 @@ struct thread{
 };
 
 /**the stack frame when cpu traps into kernel for exception or interrupt*/
-typedef struct {
+typedef struct pt_regs{
 	u32 ebx,ecx,edx,esi;		/**we use four registers to pass syscall args*/
 	u32 edi,ebp,eax;
 	u32 ds,es,gs,fs;
@@ -69,6 +69,7 @@ struct eflags_stack{
 				int esp;	
 };
 #define PCB_SIZE 0x2000
+#define THREAD_SIZE 0x2000
 /**process control block. all information and property of a process.
  **/
 struct pcb{
@@ -83,9 +84,7 @@ struct pcb{
 			u32 prio;
 			u32 time_slice,time_slice_full;
 			u32 msg_type,msg_bind;
-			//u32 *cr3;	/*must be cr3, relied by pointer calculate*/
 			struct mm *mm;
-			u32 ring;
 			struct thread thread;
 			struct fs_struct *fs;
 			struct files_struct *files;

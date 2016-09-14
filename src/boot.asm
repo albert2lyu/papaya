@@ -195,7 +195,7 @@ mov edi,0x101000
 	add eax,0x1000
 	loop .filltbl
 ;map 0x7000~0x8fff now
-;1~2M都是page table(最开始是一个pagedir,最末尾有一段没用)，为您成了3G-3G,896M 
+;1~2M都是page table(最开始是一个pagedir,最末尾有一段没用)，完成了3G-3G,896M 
 ;向0~896M的映射。 我们从最末尾分配4K（这个page肯定还没用，很安全)当作页表，
 ;然后把这个页表注册在page directory的entry 0，它就能映射虚拟地址的0~4M了，我
 ;们想映射的是虚存地址的7c00~8fff,因为boot.bin的代码分布在(7c00+)。因为接下来

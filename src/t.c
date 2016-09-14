@@ -1,64 +1,39 @@
+#include<assert.h>
 #include<stdio.h>
-#pragma pack(push)
-#pragma pack(1)
-union pte{
-	int value; 		
-	struct {
-		unsigned present: 1;
-		unsigned writable: 1;
-		unsigned user: 1;
-		unsigned : 2;
-		unsigned accessed: 1;
-		unsigned dirty: 1;
-		unsigned : 2;
-		unsigned avl: 3;
-		unsigned physical: 20;
-	};
+struct flower{
+	struct flower *prev, *next;
+	struct flower *_prev, *_next;
+	int age;
 };
 
-union linear_addr{
-	unsigned value;
-	struct{
-		unsigned offset: 12;	
-		unsigned tbl_idx: 10;
-		unsigned dir_idx: 10;
-	};
-};
+//递增环链，寻找最小姊
+#define O_SCAN_UNTIL_MEET_LARGER(root, mb, value)		\
+({														\
+	assert( (root) );							\
+	typeof(root) node = root;							\
+	do{													\
+		if( (node)->mb > value) break;				\
+		node = node->next;								\
+	}while( node != (root));							\
+	node;												\
+})
+int insert(struct flower *root, struct flower*new){
+	O_SCAN_UNTIL_MEET_LARGER(root, age, 10);
+}
 
-#pragma pack(pop)
-
-#define DO(stru) ({ *(int *)&(stru) &= ~0xfff;  stru; })
-//#define DO(stru) ({ (stru) &= ~0xfff;  stru; })
-
-/*  @desc	mask the highest @m bits of digit @x.
-			Note, just make a right-value, @x won't be changed.
- *  @x	any type of "u32, u16, u8" is ok
-		POINTER not allowed.	
-		signed digit is allowed, but not suggested.
- *  @m	how many bits you want to mask
- */
-#define MASK_H(x, m) ({							\
-					int n = sizeof(x) * 8;		\
-					int throw = 32 - n + (m);		\
-					unsigned u = x;	\
-					u = u << throw >> throw;	\
-					u;					\
-					})
-
-// L means lowest
-#define MASK_L(x, m) ((x) >> (m) << (m))
-
-int main(void){
-	int xx = MASK_H( (unsigned short)0xffff, 7);
-	printf("%x", xx);
-	#if 0
-	union linear_addr laddr;
-	laddr.value = 0x40333;
-	
-	printf("%p", laddr);
-	#endif
+int main(int argc, char *argv[], char *envp[]){
+	//printf("a:%x, %x, %x", VM_GROWSDOWN, VM_READ, VM_EXEC);
+	struct flower red_rose;
+	struct flower blue_rose;
+	struct flower *red = &red_rose;
+	struct flower *blue = &blue_rose;
+	//printf("argc:%d, argv:%p, envc:%x, envp:%p", argc, argv, envc, envp);
+	printf("%p", (unsigned *)0x1 + 4);
+	//int a = insert(red, blue);
+	//printf("%d", a);
 	return 0;
 }
+
 
 
 

@@ -1,7 +1,6 @@
 #include<mmzone.h>
 #include<utils.h>
 
-static void __free_pages(page_t *page, int order);
 void init_free_area(int zone_id, int start_idx);
 void __free_pages_bulk(struct page *page, zone_t *zone, int order);
 void cleave(free_area_t *free_area, int order);
@@ -47,7 +46,7 @@ void init_free_area(int zone_id, int start_idx){
 		zone_map[linked]._count = 1;
 		zone_map[linked].private = 8;
 		//__free_pages_bulk(zone_map + linked, zone, 8);
-		__free_pages(zone_map + linked, 8);
+		free_pages(zone_map + linked, 8);
 		//linked++;
 		linked += 1 << 8;	/* 按M来初始化 */
 	}
@@ -171,7 +170,7 @@ void cleave(free_area_t *free_area, int order){
 
 
 //TODO here we have bug...	zone_t *__zones[3];
-static void __free_pages(page_t *page, int order){
+void free_pages(page_t *page, int order){
 	int IF = cli_ex();
 
 	zone_t *zone = __zones[page->PG_zid];
@@ -186,14 +185,33 @@ static void __free_pages(page_t *page, int order){
 }
 
 
-/**
- * similar to __free_pages(), but receives linear address of the first page 
- * frame as argument.
- */
-void free_pages(unsigned frame_addr, int order){
-	unsigned ppg = __pa(frame_addr) >> 12;	
-	__free_pages(mem_map + ppg, order);
+struct page *alloc_pages(u32 gfp_mask, int order){
+	/**discard gfp_mask for temporary*/
+	struct page *page;
+	extern int avoid_gcc_complain;
+	if(gfp_mask & __GFP_DMA){
+		page = (void *)__rmquene(&zone_dma, order);
+	}
+	else if(gfp_mask & __GFP_HIGHMEM){	/*BUG 高端内存区不能是全映射的，而且根本没页表*/
+		avoid_gcc_complain = 
+		( page = (void *)__rmquene(&zone_highmem, order) ) ||
+		( page = (void *)__rmquene(&zone_normal, order) ) ||
+		( page = (void *)__rmquene(&zone_dma, order) ) 	;
+	}
+	else
+		avoid_gcc_complain = 
+		( page = (void *)__rmquene(&zone_normal, order) ) ||
+		( page = (void *)__rmquene(&zone_dma, order) )	;
+		
+	assert(page);
+	if(gfp_mask & __GFP_ZERO){
+		unsigned ppg = page - mem_map;
+		char *vaddr = (char *)KV(ppg << 12);
+		memset(vaddr, 0, 4096<<order);
+	}
+	return page;
 }
+
 
 
 

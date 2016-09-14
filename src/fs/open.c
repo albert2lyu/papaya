@@ -53,7 +53,7 @@ int sys_open(char *path, unsigned flags, unsigned mode){
 	file->mode = (flags + 1) & 3;	/* &3是确保只取低两位*/
 
 
-	return 0;
+	return fd;
 }
 
 

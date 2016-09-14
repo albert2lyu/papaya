@@ -1,5 +1,12 @@
 #ifndef MYLIST_H
 #define MYLIST_H
+/*　> 链表宏的好处是，可以对无视数据结构，对其做统一的链表操作。
+ *  > 缺点是，这相当于模板。会增加代码体积。
+ *    所以，如果某个数据类型的某种链表操作太频繁，要专门写个函数。
+ *  > 跟list_head对比，链表宏的主要明显劣势在于分支预测。但这种链表又不能
+ *    组成环链，因为root指针的存在...
+ *  
+ */
 
 /* 'll2' type link-list. It's nothing new, just with a pointer to the tail
 struct ll2{
@@ -230,6 +237,23 @@ struct ll2{
 		}\
 	}while(0)
 
+//寻找最小姊
+//scan for the first apperance of 'node->key > value'
+#define LL_SCAN_ON_kEY_B(root, key, value)						\
+	({															\
+		typeof(root) curr = root;								\
+		while(curr && curr->key <= (value) ) curr = curr->next;	\
+		curr;													\
+	})
+
+
+//scan for the first apperance of 'node->key < value'
+#define LL_SCAN_ON_KEY_S(root, key, value)						\
+	({															\
+		typeof(root) curr = root;								\
+		while(curr && curr->key >= (value) ) curr = curr->next;	\
+		curr;													\
+	})
 
 /* 检查node是否在root指示的list里 */
 #define LL_CHECK(root, node)									\
@@ -243,6 +267,85 @@ struct ll2{
 		root = backup;											\
 	}while(0)
 
+
+/* 1, 跟LL_I_INCRE是同样的功能。　以后会取消那个宏
+ * 2, 这是最简单的C语言表达，但也许出不来最佳的汇编码。
+ */
+#define LL_I_INCRE_ON(root, new, mb)						\
+({															\
+	new->prev = 0;											\
+	new->next = root;										\
+	while(new->next && new->next->mb < new->mb){			\
+		new->prev = new->next;								\
+		new->next = new->next->next;						\
+	}														\
+	if(new->next) new->next->prev = new;					\
+	if(new->prev) new->prev->next = new;					\
+	else root = new->next;									\
+})
+
+
+// >下面是环形链表的操作宏。
+// >环形链表的操作效率要高一些，因为减少了分支预测。
+// >前缀字母O是象形文字，表示环形链表
+// >这些操作宏都不考虑root为0的情况。
+// >TODO 记得加括号
+#define O_INSERT_AFTER(Prev, new)				\
+({				\
+	new->next = Prev->next;				\
+	new->_prev = Prev;				\
+	Prev->next->prev = new;				\
+	Prev->next = new;				\
+})
+
+#define O_INSERT_BEFORE(Next, new)				\
+({				\
+	new->next = Next;				\
+	new->prev = Next->prev;				\
+	Next->prev->next = new;				\
+	Next->prev = new;				\
+})
+
+#if 0
+#define OL_I_INCRE_ON(root, new, mb)
+({
+	assert(root && new);
+	typeof(root) rightone = root;
+	while(new->mb > rightone->mb && right->next != root){
+		rightone = rightone->next;
+	}
+	OL_I_BEFORE(rightone, new);
+	if(root->mb > new->mb) root = new;
+})
+#endif
+
+// >这是O_I_INCRE_ON的第二个版本，上面是version 1
+// >尝试不用leftone这个变量呢？直接用new->next,脑海里模型，是不断递增安插new
+#define O_I_INCRE_ON(root, new, mb)				\
+({												\
+	assert(root && new);						\
+	__typeof__(root) leftone = root->prev;			\
+	while(new->mb > leftone->mb){				\
+		leftone = leftone->prev;				\
+		if(leftone == root->prev){				\
+			root = new;				\
+			break;				\
+		}				\
+	}				\
+	O_INSERT_AFTER(leftone, new);				\
+})
+
+//递增环链，寻找最小姊
+#define O_SCAN_UNTIL_MEET_LARGER(root, mb, value)		\
+({														\
+	assert( (root) );							\
+	__typeof__(root) node = root;							\
+	do{													\
+		if( (node)->mb > value) break;				\
+		node = node->next;								\
+	}while( node != (root));							\
+	node;												\
+})
 
 
 

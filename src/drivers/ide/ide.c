@@ -87,7 +87,7 @@ static void write_intr(struct ide_hwif *hwif){
 	ide_do_request(cur_rq->dev_id);
 }
 
-static void ide_intr(int irq, void *_hwif, struct stack_frame *reg){
+static void ide_intr(int irq, void *_hwif, struct pt_regs *reg){
 	assert(((struct ide_hwif *)_hwif)->handler);
 	//oprintf("ide intr invoked\n");
 	((struct ide_hwif*)_hwif)->handler(_hwif);

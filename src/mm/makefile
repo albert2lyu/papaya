@@ -1,4 +1,4 @@
-all: clean slab.o
+all: clean slab.o memory.o mmap.o
 
 %.o:%.c
 	@gcc -c -o $@ $< $(cflags)

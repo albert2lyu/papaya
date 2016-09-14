@@ -1,14 +1,7 @@
 #include<linux/fs.h>
 #include<linux/errno.h>
 
-/*
-  @origin 
-  SEEK_END:	The offset is set to the size of the file plus offset bytes.
- */
-int sys_lseek(unsigned fd, int offset, unsigned origin){
-	if(fd >= current->files->max_fds) return -EINVAL;
-
-	struct file *file = current->files->filep[fd];
+static int do_lseek(struct file *file, int offset, unsigned origin){
 	switch(origin){
 		case 1:
 			offset += file->pos;
@@ -20,6 +13,19 @@ int sys_lseek(unsigned fd, int offset, unsigned origin){
 	//if(offset > ..)		//'hole' operation not implemented yet
 	file->pos = offset;
 
+	return offset;
+}
+/*
+  @origin 
+  SEEK_END:	The offset is set to the size of the file plus offset bytes.
+ */
+int sys_lseek(unsigned fd, int offset, unsigned origin){
+	struct file *file = fcheck(fd);
+	offset =  do_lseek(file, offset, origin);
+	if(offset < 0) {
+		return -1;
+		//errno = offset;
+	}
 	return offset;
 }
 
@@ -45,8 +51,8 @@ int sys_close(unsigned fd){
 }
 
 
-int sys_read(unsigned fd,  char *buf, unsigned size){
-	struct file *file = fcheck(fd);
+//这样一个接口，内核稍微分装一下，可以对外当做系统调用, sys_xx; 对内自己用, k_xx
+static int do_read(struct file *file, char *buf, unsigned size){
 	if(!file) return -EBADF;
 	if(!(file->mode & FMODE_READ))	return -EACCES;
 
@@ -55,8 +61,31 @@ int sys_read(unsigned fd,  char *buf, unsigned size){
 	int ret = file->dentry->inode->file_ops->read(file, buf, size, 0);
 	return ret;
 }
+int sys_read(unsigned fd,  char *buf, unsigned size){
+	int bytes_r;
+	struct file *file = fcheck(fd);
+	bytes_r =  do_read(file, buf, size);
+	if(bytes_r < 0){
+		//errno = bytes_r;
+		return -1;
+	}
+	return bytes_r;
+}
+
+//k_打头的，都是直接供内核调用的，且不经过syscall。否则用kernel_打头
+//这些函数不会设置errno。它们的返回值目前也比较bare。暂时不考虑跟系统调用保持一致。
+//TODO 不应该通过sys_open,不应该leave footprint on current->filep[]
+struct file * k_open(char *path, ulong flags, ulong mode){
+	int fd = sys_open(path, flags, mode);
+	return fget(fd);
+}
+
+int k_read(struct file *file, char *buf, unsigned size){
+	return do_read(file, buf, size);
+}
 
 
-
-
+int k_seek(struct file *file, int offset, unsigned origin){
+	return do_lseek(file, offset, origin);	
+}
 

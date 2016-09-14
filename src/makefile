@@ -64,6 +64,7 @@ clean_src:
 _git:
 	make clean_src
 	-mv tmp ~/Documents/tmpsrc_for_git/
+	-mv *.out ~/Documents/tmpsrc_for_git/
 
 _tig:
 	-mv ~/Documents/tmpsrc_for_git/* ./

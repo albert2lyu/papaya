@@ -2,12 +2,13 @@
 #include<irq.h>
 #include<proc.h>
 #include<linux/bh.h>
+static u32 count_irq_enter, count_irq_out;
 /**生成一个irqacion，并挂到中断服务队列里
 * @irq note! should sub by 0x20.
 * note, the status is marked IRQ_DISABLED, so you should clear this bit manually
 * after you do 'request_irq',(see time.c init_time()) otherwise...
 */
-int request_irq(int irq, void (*handler)(int, void*, struct stack_frame *), unsigned flags, void *dev){
+int request_irq(int irq, void (*handler)(int, void*, struct pt_regs *), unsigned flags, void *dev){
 	if(irq < 0 || irq >=NR_IRQS || !handler) return -EINVAL;
 
 	struct irqaction *action = kmalloc(sizeof(struct irqaction));
@@ -40,6 +41,7 @@ int setup_irq(int irq, struct irqaction *new){
  * 1,暂时不实现REPLAY操作
  */
 unsigned do_IRQ(stack_frame regs){
+	count_irq_enter++;
 	int err_code = regs.err_code + 256;
 	int irq = err_code - 0x20;
 	//if(irq != 0) oprintf(" !%u ", irq);
@@ -57,7 +59,6 @@ unsigned do_IRQ(stack_frame regs){
 			assert(!(isr & 0x80));
 			assert(imr & 0x80);
 			//oprintf("\n imr:%x, isr:%x\n", imr, isr);
-			return 0;
 		default:
 			//oprintf("8159A ack:%u\n", irq);
 			desc->hw_handler->ack(irq);	
@@ -65,7 +66,7 @@ unsigned do_IRQ(stack_frame regs){
 	if(irq == 1){
 		//oprintf("\n a key pressed \n");
 		int key_code=in_byte(0x60);
-		oprintf(" *%x* ", key_code);	
+		oprintf("don't use keyboard.. a bug on irq_cnt_in may already happend, *%x* ", key_code);	
 		extern int __less_go;
 		if(key_code <= 0x34) __less_go = true;		//igonre break code
 		return 0;
@@ -108,9 +109,13 @@ out:
 	}
 	else do_bh();
 
+	count_irq_out++;
 	return 0;
 }
 
+bool in_interrupt(){
+	return count_irq_enter == count_irq_out;
+}
 /**
  * 1,返回值暂时是无意义的。
  */
