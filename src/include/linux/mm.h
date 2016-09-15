@@ -103,4 +103,6 @@ void vm_update_pgprot(struct vm_area *vma);
 u32 get_unmapped_area(u32 addr, u32 len);
 void * mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 offset);
 struct vm_area *find_vma(struct mm *mm, u32 addr);
+
+int common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode);
 #endif

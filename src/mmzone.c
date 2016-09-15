@@ -1,6 +1,7 @@
 #include<mmzone.h>
 #include<utils.h>
 
+int page_is_buddy(struct page *page, int order);
 void init_free_area(int zone_id, int start_idx);
 void __free_pages_bulk(struct page *page, zone_t *zone, int order);
 void cleave(free_area_t *free_area, int order);

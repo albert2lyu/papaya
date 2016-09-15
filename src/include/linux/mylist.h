@@ -290,12 +290,12 @@ struct ll2{
 // >前缀字母O是象形文字，表示环形链表
 // >这些操作宏都不考虑root为0的情况。
 // >TODO 记得加括号
-#define O_INSERT_AFTER(Prev, new)				\
+#define O_INSERT_AFTER(_prev, new)				\
 ({				\
-	new->next = Prev->next;				\
-	new->_prev = Prev;				\
-	Prev->next->prev = new;				\
-	Prev->next = new;				\
+	new->next = _prev->next;				\
+	new->prev = _prev;				\
+	_prev->next->prev = new;				\
+	_prev->next = new;				\
 })
 
 #define O_INSERT_BEFORE(Next, new)				\
@@ -321,7 +321,7 @@ struct ll2{
 
 // >这是O_I_INCRE_ON的第二个版本，上面是version 1
 // >尝试不用leftone这个变量呢？直接用new->next,脑海里模型，是不断递增安插new
-#define O_I_INCRE_ON(root, new, mb)				\
+#define O_INSERT_INCRE_ON(root, new, mb)				\
 ({												\
 	assert(root && new);						\
 	__typeof__(root) leftone = root->prev;			\

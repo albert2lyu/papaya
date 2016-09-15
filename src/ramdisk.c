@@ -11,7 +11,7 @@ int cell_read(char *file, char *buf){
 	int cellid = search_file(file);
 	if(cellid == -1) return 0;	
 	char *src = cellmbr + (cellid*CELL_SECTORS + 1) * 512;
-	memcp(buf, src, 1024);
+	memcpy(buf, src, 1024);
 	return 0;
 }
 

@@ -66,7 +66,7 @@ int do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs){
 	char **usr_args = envp;	//arguments vector passed from user space
 	char **stack_args = stack_envp;		//记录送上用户堆栈之后，每个参数的地址
 	copy_args_to_user_stack:
-	for(i = 0; usr_args[i]; i++){
+	for(i = 0; usr_args && usr_args[i]; i++){
 		int len = strnlen(usr_args[i], __4K);	if(len == __4K) return -EINVAL;
 		esp -= len;
 		strcpy((char *)esp, usr_args[i]);

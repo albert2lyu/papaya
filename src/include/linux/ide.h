@@ -1,3 +1,5 @@
+#ifndef IDE_H
+#define IDE_H
 #include<linux/blkdev.h>
 
 #define WIN_READ 0x20
@@ -77,3 +79,6 @@ struct ide_hwif{
 	void (*handler)(struct ide_hwif *);
 };
 
+void ide_init(void);
+void ide_read_partation(int major, int drive);
+#endif

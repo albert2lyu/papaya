@@ -55,7 +55,7 @@ static inline ulong ceil_align(ulong x, ulong granularity){
 
 static inline ulong floor_align(ulong x, ulong align){
 	ulong mask = align - 1;
-	return x & mask;
+	return x & ~mask;
 }
 #include<mm.h>
 /**the following two macros aim at beautify code.

@@ -1,6 +1,8 @@
 #include<linux/mm.h>
 #include<linux/fs.h>
+#include<linux/mylist.h>
 
+void insert_vm_area(struct vm_area *new);
 struct page *
 do_no_page(struct vm_area *area, u32 address, union pgerr_code errcode){
 	spin("ddd");
@@ -71,6 +73,10 @@ void * do_mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file
 		vma->ops = 0;
 	}
 	vm_update_pgprot(vma);
+
+	assert(vma->mm->vma);		//至少有stack vm area	
+	//O_INSERT_INCRE_ON(vma->mm->vma, vma, start);			//TODO use insert_vm_area()
+	insert_vm_area(vma);
 	return (void*)addr;
 }
 
@@ -135,7 +141,23 @@ void * mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file, u
 	return ret;
 }
 
-
+void insert_vm_area(struct vm_area *new){
+	assert(new  && new->mm && new->mm->vma);
+	struct mm *mm = new->mm;
+	struct vm_area *root = mm->vma;
+	struct vm_area *node = mm->vma;
+	do{
+		if(node->start > new->start){
+			break;
+		}
+		node = node->next;
+	}while(node != root);
+	if(new->start < root->start) mm->vma = new;
+	new->next = node;
+	new->prev = node->prev;
+	node->prev = new;
+	new->prev->next = new;
+}
 
 
 

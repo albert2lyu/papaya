@@ -21,14 +21,28 @@ int insert(struct flower *root, struct flower*new){
 	O_SCAN_UNTIL_MEET_LARGER(root, age, 10);
 }
 
+enum{
+	sys_fork = 88,
+};
+enum{
+	NR_fork = 2,
+	NR_execve = 4,
+};
+#define ENTRY(name) [NR_ ## name] = sys_ ## name
+unsigned long func_table[255] =
+{
+	ENTRY(fork),
+	//ENTRY(execve),
+};
 int main(int argc, char *argv[], char *envp[]){
-	//printf("a:%x, %x, %x", VM_GROWSDOWN, VM_READ, VM_EXEC);
+	
+	printf("a:%x, %x, %x", func_table[2], func_table[4], func_table[9]);
 	struct flower red_rose;
 	struct flower blue_rose;
 	struct flower *red = &red_rose;
 	struct flower *blue = &blue_rose;
 	//printf("argc:%d, argv:%p, envc:%x, envp:%p", argc, argv, envc, envp);
-	printf("%p", (unsigned *)0x1 + 4);
+	//printf("%p", (unsigned *)0x1 + 4);
 	//int a = insert(red, blue);
 	//printf("%d", a);
 	return 0;

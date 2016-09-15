@@ -2,6 +2,7 @@
 #include<proc.h>
 #include<disp.h>
 #include<linux/byteorder/generic.h>
+#include<linux/printf.h>
 void dump_sys(){
 }
 

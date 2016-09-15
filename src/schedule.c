@@ -2,6 +2,7 @@
 #include<proc.h>
 #include<utils.h>
 #include<linux/sched.h>
+#include<linux/printf.h>
 /**account clock interrupt. this variable is the base of system soft-clock*/
 unsigned ticks;
 

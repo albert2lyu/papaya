@@ -4,7 +4,7 @@
 
 #define PAGE_SHIFT 12
 #define PAGE_SIZE 0x1000
-#define PAGE_MASK 0xfff
+#define PAGE_MASK (~0xfff)
 #define pa_idx(paddr) ((paddr)>>PAGE_SHIFT)
 #define pa_pg pa_idx
 

@@ -8,9 +8,10 @@
 static int load_elf_binary(struct linux_binprm *bprm, struct pt_regs *regs){
 	Elf32_Ehdr *eheader = (void *)bprm->buf;
 	int phnum = eheader->e_phnum;
-										assert(	eheader->e_ident[0] == 'e'  &&
-												eheader->e_ident[1] == 'l'  && 
-												eheader->e_ident[2] == 'f');
+										assert(	eheader->e_ident[0] == 0x7f &&
+												eheader->e_ident[1] == 'E'  &&
+												eheader->e_ident[2] == 'L'  && 
+												eheader->e_ident[3] == 'F');
 	Elf32_Phdr *phdr = (void *)__alloc_page(0);
 	int offset = k_seek(bprm->file, eheader->e_phoff, 0);
 										assert(offset == eheader->e_phoff);
@@ -50,7 +51,7 @@ static int load_elf_binary(struct linux_binprm *bprm, struct pt_regs *regs){
 	regs->fs = regs->gs = 0;
 	regs->ds = regs->es = regs->ss  =  (u32)&selector_plain_d3;
 	regs->eip = (ulong)eheader->e_entry; 
-	return 1;
+	return 0;
 }
 
 struct linux_binfmt elf_format = {

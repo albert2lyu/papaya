@@ -13,6 +13,7 @@ int kernel_thread(int (*fn)(void *), void *arg, unsigned flags);
 
 int 
 do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs);
-	
+int schedule_timeout(unsigned msec);
 
+void do_timer(void);
 #endif

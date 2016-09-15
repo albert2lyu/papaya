@@ -16,7 +16,7 @@ unsigned loadelf(char *img){
 	for (int i = 0; i < eheader->e_phnum; i++){
 		if(pheader[i].p_type != 1) continue;
 		memset((void *)pheader[i].p_vaddr, pheader[i].p_memsz, 0);
-		memcp((void *)pheader[i].p_vaddr, img + pheader[i].p_offset, pheader[i].p_filesz);
+		memcpy((void *)pheader[i].p_vaddr, img + pheader[i].p_offset, pheader[i].p_filesz);
 	}
 	return eheader->e_entry;
 }

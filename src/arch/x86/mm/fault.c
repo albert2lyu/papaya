@@ -1,6 +1,7 @@
 #include<asm/page.h>
 #include<linux/mm.h>
 #include<proc.h>
+#include<irq.h>
 
 static int count_pgerr;
 /*

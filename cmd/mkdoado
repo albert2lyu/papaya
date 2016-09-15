@@ -1,0 +1,3 @@
+#!/bin/bash
+gcc -c doado.c -fno-builtin
+ld -static -e doado -o doado doado.o

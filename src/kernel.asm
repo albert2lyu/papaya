@@ -22,8 +22,7 @@ global i20h
 global p3
 global outofproc
 global base_tss
-; func_table entry
-extern _k_show_chars,k_sleep,k_obuffer_shift,_k_show_var,k_open,k_read,k_write,k_close,k_watch,k_seek,k_getchar,sys_fork, sys_execve
+extern func_table
 extern wake_hs,do_page_fault
 extern no_reenter
 extern dump_sys
@@ -436,18 +435,18 @@ sec_data:
 msg:db 'spin',0
 
 ;sys_call table,store address of function
-func_table:
-    dd _k_show_chars ;0 _k_show_chars
-    dd sys_fork	;1
-    dd sys_execve ;2		
-    dd 0 ;3		_k_show_var
-    ;dd k_open ;4		k_open
-    ;dd k_read ;5		k_read
-    ;dd k_write ;6		k_write
-    ;dd k_close ;7		k_close
-    dd 0 ;8		k_watch
-    ;dd k_seek ;9		k_seek
-	dd k_getchar	;10
+;func_table:
+;    dd _k_show_chars ;0 _k_show_chars
+;    dd sys_fork	;1
+;    dd sys_execve ;2		
+;    dd 0 ;3		_k_show_var
+;    ;dd k_open ;4		k_open
+;    ;dd k_read ;5		k_read
+;    ;dd k_write ;6		k_write
+;    ;dd k_close ;7		k_close
+;    dd 0 ;8		k_watch
+;    ;dd k_seek ;9		k_seek
+;	dd k_getchar	;10
 outofproc:
     dd 1
 kernel_esp:

@@ -158,7 +158,7 @@ static int read(struct file *file, char *buf, unsigned size, unsigned *ppos){
 	ll_rw_block2(inode->dev, READ, first, 1, firstbuf);
 	if(last != first) ll_rw_block2(inode->dev, READ, last, 1, lastbuf);
 
-	int first_left = pos % 1024;
+	int first_left = pos % 1024;		//byte count in left side of first block
 	int first_right = 1024 - first_left;
 	char *addr = buf + first_right;
 	for(int i = first + 1; i <= last - 1; i++){
@@ -166,7 +166,7 @@ static int read(struct file *file, char *buf, unsigned size, unsigned *ppos){
 		addr += 1024;
 	}
 	
-	memcpy(buf, firstbuf + first_left, first_right);
+	memcpy(buf, firstbuf + first_left, min(first_right, size) );
 	if(last != first) memcpy(addr, lastbuf, end % 1024 + 1);
 
 	return size;

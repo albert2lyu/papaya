@@ -1,6 +1,8 @@
 #include<linux/timer.h>
 #include<time.h>
 #include<irq.h>
+#include<linux/sched.h>
+#include<linux/bh.h>
 static int time_bh;
 static void timer_interrupt(int irq, void *dev, struct pt_regs *regs){
 	//oprintf("timer_interrupt:%u\n",irq);	
@@ -8,8 +10,9 @@ static void timer_interrupt(int irq, void *dev, struct pt_regs *regs){
 	mark_bh(time_bh);
 }
 
-void time_bottomhalf(void *data){
+int time_bottomhalf(void *data){
 	my_timerlist_dida();			//嘀嗒	
+	return 0;
 }
 void init_time(void){
 	/** request irq0, namely IGATE 0x20 */

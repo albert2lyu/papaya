@@ -1,6 +1,7 @@
 #include<i8259.h>
 #include<irq.h>
 #include<utils.h>
+#include<asm/bit.h>
 
 #define PIC1		0x20		/* IO base address for master PIC */
 #define PIC2		0xA0		/* IO base address for slave PIC */
@@ -94,8 +95,8 @@ void mask_and_ack_8259A(u32 irq){
 static void write_imr_bit(bool master, int bit_offset, int value){
 	unsigned port = master ? 0x21 :0xa1;
 	unsigned mask = in_byte(port);
-	if(value) __bt((u32)&mask, bit_offset);
-	else __btr((u32)&mask, bit_offset);
+	if(value) __bt(&mask, bit_offset);
+	else __btr(&mask, bit_offset);
 	out_byte(port, mask);	
 }
 

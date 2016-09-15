@@ -2,7 +2,11 @@
 #include<irq.h>
 #include<proc.h>
 #include<linux/bh.h>
+#include<i8259.h>
+#include<linux/printf.h>
 static u32 count_irq_enter, count_irq_out;
+int handle_IRQ_event(int irq);
+int setup_irq(int irq, struct irqaction *new);
 /**生成一个irqacion，并挂到中断服务队列里
 * @irq note! should sub by 0x20.
 * note, the status is marked IRQ_DISABLED, so you should clear this bit manually
@@ -114,7 +118,7 @@ out:
 }
 
 bool in_interrupt(){
-	return count_irq_enter == count_irq_out;
+	return count_irq_enter != count_irq_out;
 }
 /**
  * 1,返回值暂时是无意义的。

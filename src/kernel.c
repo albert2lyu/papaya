@@ -15,6 +15,12 @@
 #include<linux/skbuff.h>
 #include<linux/timer.h>
 #include<linux/binfmts.h>
+#include<linux/printf.h>
+#include<time.h>
+#include<i8259.h>
+#include<linux/NR_syscall.h>
+void blkdev_layer_init(void);
+
 char *testbuf;
 char *bigbuf;
 int avoid_gcc_complain;
@@ -37,6 +43,7 @@ void usr_func(void);
 struct pcb *idle;
 static void probe(void);
 
+extern void init_display(void);
 void kernel_c(){
 	init_display();
 	write_bar(2, 2, "BH ", "see");
@@ -103,7 +110,7 @@ void kernel_c(){
 /*	__hs_pcb = create_process((u32)hs, 9, 0x0fffffff,"hs", 0);*/
 
 	idle=(struct pcb*)__alloc_pages(__GFP_DEFAULT,1);
-	init_pcb(idle,idle_func,10,0xffffffff,"idle",0);
+	init_pcb(idle,(u32)idle_func,10,0xffffffff,"idle");
 	
 	/**
 	 * 1, 不要用create_process创建idle进程，因为这个函数会把它挂入list_active里。	 * 2, 不要让idle进程休眠，因为sleep_active对它的操作会出错。
@@ -116,7 +123,7 @@ void kernel_c(){
 	 * (for example,'current'(see in proc.h) will be invalid when esp register
 	 * not in the kernel stack of a process.
 	 */
-	ramdisk_init(); 
+	//ramdisk_init(); 
 /*	cell_read("t.c", testbuf);*/
 /*	oprintf("%s", testbuf);*/
 /*	spin("ss");*/
@@ -199,10 +206,11 @@ void func_init(void){
 	avoid_gcc_complain = rbytes = (unsigned)&indir;
 
 	int x = 0;
+	char *argv[] = {"doado", "arg1", 0};
 	__asm__ __volatile__(
 						"int $0x80\n\t"
 						:"=a"(x)
-						:"a"(2), "b"("/home/doado"), "c"(0), "d"(0)
+						:"a"(NR_execve), "b"("/doado"), "c"(argv), "d"(0)
 						);
 	oprintf("execve failed, error code %u ", x);
 	while(1);

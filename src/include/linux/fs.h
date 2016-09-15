@@ -97,7 +97,11 @@ static inline struct file *fcheck(unsigned fd){
 	return current->files->filep[fd];
 }
 static inline struct file *fget(int fd){
-	return 0;
+	struct file *file = fcheck(fd);
+	if(file){
+		file->count++;
+	}
+	return file;
 }
 void register_filesystem(char *name, int (*read_super)(struct super_block *));
 struct vfsmount * do_mount(u16 dev, char *dir, char *type);

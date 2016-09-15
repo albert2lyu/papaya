@@ -183,6 +183,8 @@ static inline void flagi_pop(void){
 						 );
 	
 }
+void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name);
+void fire_thread(struct pcb *p);
 #endif
 
 

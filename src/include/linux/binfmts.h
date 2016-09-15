@@ -1,5 +1,6 @@
 #ifndef BINFMTS_H
 #define BINFMTS_H
+#include<valType.h>
 struct pt_regs;
 
 struct linux_binprm{
@@ -16,4 +17,5 @@ struct linux_binfmt{
 	struct linux_binfmt *next, *prev;		
 };
 
+bool register_binfmt(struct linux_binfmt* binfmt);
 #endif

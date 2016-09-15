@@ -5,5 +5,6 @@
 int __sprintf(char *buf, char *format, u32 *args);
 int sprintf(char *buf, char *format, ...);
 int printf(char *format, ...);
+void write_bar(int x, int y, char *title, char *content);
 
 #endif

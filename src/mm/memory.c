@@ -22,9 +22,9 @@ void __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){
 	union linear_addr laddr = {value:vaddr};
 	union pte *dirent = pgdir + laddr.dir_idx;
 	if(dirent->present == 0){
-		dirent->value = (ulong)__pa(__alloc_page(__GFP_ZERO)) | PG_USU | PG_RWW | PG_P;
+		dirent->value = __pa(__alloc_page(__GFP_ZERO)) | PG_USU | PG_RWW | PG_P;
 	}
-	union pte *pgtbl = (void *)(dirent->value & PAGE_MASK);	
+	union pte *pgtbl = (void *)__va(dirent->value & PAGE_MASK);	
 	pgtbl[laddr.tbl_idx].value = (ulong)__pa(__alloc_page(0)) | pgprot;
 }
 
