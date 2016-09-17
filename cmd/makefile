@@ -1,6 +1,10 @@
 # 这个makefile供src下的makefile调用。他能更新完dimg的依赖后再调用这儿的make。
 # 所以，如果你在cmd下运行这个make,一定要保证它的依赖都已经解决。
-all:cell _dimg
+all:cell _dimg doado
+
+doado: doado.c
+	gcc -c doado.c -fno-builtin -std=c99 -g
+	ld -static -e doado -o doado doado.o
 
 _dimg:_dimg.c ../src/boot.asm
 	gcc -c _dimg.c -o _dimg.o -std=c99 -Wno-implicit-function-declaration -g
@@ -12,6 +16,7 @@ cell:cell.c
 clean:
 	rm cell -f
 	rm _dimg -f
+	rm doado -f
 	rm *.o -f
 	rm *~ -f
 
@@ -27,3 +32,5 @@ _git:
 # 把git动作里挪走的文件搬回来
 _tig:
 	-mv ~/Documents/tmpcmd_for_git/* ../cmd/
+
+

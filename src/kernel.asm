@@ -23,7 +23,7 @@ global p3
 global outofproc
 global base_tss
 extern func_table
-extern wake_hs,do_page_fault
+extern wake_hs,do_page_fault, do_breakpoint_fault
 extern no_reenter
 extern dump_sys
 extern key_handler
@@ -146,9 +146,9 @@ divide_error:
 len_divide_error equ $ - divide_error
 
 single_step:
-	push 0xffffffff
-	push 1
-	jmp exception_handler_step1
+	push 0
+	push do_breakpoint_fault	
+	jmp error_code
 len_single_step equ $ - single_step
 
 nmi:
@@ -158,11 +158,10 @@ nmi:
 len_nmi equ $ - nmi
 
 breakPoint:
-	save
-	delay (1<<25)
-	jmp $
-	;recover
-	iret
+	push 0
+	push do_breakpoint_fault	
+	jmp error_code
+
 len_breakPoint equ $ - breakPoint
 
 overflow:

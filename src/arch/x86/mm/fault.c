@@ -64,8 +64,11 @@ void do_page_fault(struct pt_regs *pregs, union pgerr_code errcode){
 	return;
 }
 
-
-
+//exception 1, no error code
+int do_breakpoint_fault(struct pt_regs *regs){
+	spin("breakpoint fault\n");
+	return 0;
+}
 
 
 

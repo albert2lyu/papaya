@@ -44,7 +44,28 @@ struct pcb *idle;
 static void probe(void);
 
 extern void init_display(void);
+#include"../debug/debug.h"
 void kernel_c(){
+	//小心，数据断点和指令断点，一个是陷阱，一个是故障。
+	//http://f.osdev.org/viewtopic.php?f=1&t=25540&p=212462&hilit=dr7&sid=45ea840669700790a2b0cc4adcd24a21#p212462 提到了bochs对CR6的模拟（即未在cr7里激活的断点也要标记到cr6寄存器里)处理的有问题，是gray area
+	//尝试同一个系统多bochs呢，不需要虚拟机吧。不同目录下的？
+	assert(sizeof(union dr_ctrl) == 4);
+	union dr_ctrl dr7= {value:0};
+	__asm__ __volatile__ (
+						"mov %%dr7, %0\n\t"
+						:"=r"(dr7.value)
+						);
+	dr7.LEN0 = BRK_ADDR_ALIGN_4;	
+	dr7.RWE0 =  RWE_WR;	
+	 dr7.G0 =  dr7.G1 = 1;
+	#if 1
+	__asm__ __volatile__ (
+						"mov %0, %%dr7\n\t"
+						:
+						:"r"(dr7.value)
+						);
+	
+	#endif
 	init_display();
 	write_bar(2, 2, "BH ", "see");
 

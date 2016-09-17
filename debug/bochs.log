@@ -1,0 +1,50 @@
+dbg_main.cc:
+  bx_dbg_user_input_loop();
+
+//////
+
+【关于bx_address的位数】
+// now that Bit32u and Bit64u exist, defined bx_address
+#if BX_SUPPORT_X86_64
+typedef Bit64u bx_address;
+#else
+typedef Bit32u bx_address;
+#endif
+
+* 用sizeof(bx_address)在我的机器上测的是4
+* 测的sizeof(Bit64u)是8.
+
+【crregs.cc】
+CR寄存器的模拟。
+dr7的断点功能也是在这儿实现的。
+code_breakpoint_match(bx_address laddr)
+		==========(调用)=======>hwdebug_compare(bx_address laddr_0, ...)
+
+另外，hwbreakpoint_match(bx_address laddr, ..)也是调用的hwdebug_compare
+似乎一个是代码断点，一个是数据断点
+
+
+*
+  hwbreakpoint_match(laddr,..)只在cpu/paging.cc和cpu/proc_ctrl.cc里被调用，但全都是X86_DEBUGGER的条件编译。我在这个函数里加了assert(0),bochs根本不会崩溃。
+  code_breakpoint_match这个函数也是都在X86_DEBUGGER里的条件编译里。
+
+*
+  bochs对gdb发来的消息包的处理集中在gdbsub.cc里的debug_loop().
+
+*
+  发现gdb和gdb-stub的n,s的交互可以这样实现。
+  (si,ni就直接传递bochs,它能直接执行，相当于internal debugger里的s,n)
+  而n，s，gdb端可以从所加载的g_kernel.elf算出来下一个语句的地址，然后把断点下在那儿。
+  我今天有几次发现gdb的确是这样做的。
+  就是每次n或者c的enter之后，它就把断点下发bochs让它插入，等停下来，又立刻告知bochs让它删除。跑题了。。每次n enter之后，gdb就告知bochs在下下一条语句插入读断点。
+  注意是下下条语句。而不是下一条。是不是因为开始预取下下条的时候，也就是即将执行下一条的时候。
+  但有几次n，却什么也没有插入。
+  另外，条件语句的话，是不是要插入两个断点。
+  
+
+
+
+
+
+
+

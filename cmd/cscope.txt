@@ -1,0 +1,4 @@
+cscope -Rbkq
+
+* 不要使用cs add *.out .. 好像没用　
+  用cs add cscope.out

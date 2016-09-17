@@ -1,11 +1,9 @@
-#include "../src/include/linux/NR_syscall.h"
+#include "syscall.h"
+
+static char g_array[10] = {1, 2, 3, 4, 5, 6};
 void doado(void){
 	int x;
-	__asm__ __volatile__(
-						"int $0x80\n\t"
-						:
-						:"a"(NR_printf), "b"("user space from kernel: %u"), "c"(1234)
-						);
-	while(x++){
+	for(int i = 0; i < 10; i++) printf("%u\n", g_array[i]);
+	while(2){
 	}
 }

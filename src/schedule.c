@@ -99,7 +99,14 @@ void do_timer(void){
  * 2, 考虑eflags在切换前后是否需要保持保存，恢复。以及能否保存，恢复。
  */
 void schedule(void){
-	int IF = cli_ex();
+	int IF;
+	#if 0
+	__asm__ __volatile__("mov %0, %%dr0\n\t"
+						:
+						:"r"(&IF)
+						);
+	#endif
+	IF = cli_ex();
 
 /*	oprintf("begin schedule\n");*/
 	current->need_resched = 0;
@@ -139,7 +146,13 @@ void schedule(void){
 	 * 2, 现在已经是在向next进程切换了。
 	 */
 	if(next->mm){
-		assert(next->regs.cs = (u32)&selector_plain_c0);
+		//不能这样断言，因为papaya从内核线程execve出来的那个用户进程
+		//在execve的过程中，它会sleep(因为要加载可执行文件),那，它醒过来肯定
+		//是被schedule挑中的。而此时它的8K栈底的regs还没有初始化。
+		//它execve结束，返回到用户空间，也是通过float regs resume的。
+		//一直到它第一次从用户空间陷入内核，底部的regs才会得到初始化。
+		//assert(next->regs.cs == (u32)&selector_plain_c3);
+
 		/*如果没有这一句，进程仍然能正常返回到用户空间并运行，只是下次中断
 		 * 陷入内核时，它就找不到自己的内核栈了*/
 		g_tss->esp0 = (unsigned)next + THREAD_SIZE;	

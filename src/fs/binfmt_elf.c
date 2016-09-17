@@ -51,6 +51,7 @@ static int load_elf_binary(struct linux_binprm *bprm, struct pt_regs *regs){
 	regs->fs = regs->gs = 0;
 	regs->ds = regs->es = regs->ss  =  (u32)&selector_plain_d3;
 	regs->eip = (ulong)eheader->e_entry; 
+	//g_tss->esp0 = (unsigned long)current + THREAD_SIZE;
 	return 0;
 }
 

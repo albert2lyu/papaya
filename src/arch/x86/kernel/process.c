@@ -33,7 +33,7 @@ int sys_printf(struct pt_regs regs){
 	__asm__ __volatile__ ("push %0\n\t"
 						  "push %1\n\t"
 						  "call oprintf\n\t"
-						  "add 8, %%esp\n\t"
+						  "add $8, %%esp\n\t"
 						  :
 						  :"c"(regs.ecx), "b"(regs.ebx)
 						  );	

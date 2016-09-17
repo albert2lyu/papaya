@@ -9,5 +9,6 @@ unsigned long func_table[255] =
 {
 	ENTRY(fork),
 	ENTRY(execve),
+	ENTRY(printf),
 };
 
