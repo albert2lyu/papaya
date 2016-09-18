@@ -44,7 +44,8 @@ int do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs){
 		u32 * pgdir = __alloc_page(__GFP_ZERO);
 		memcpy(pgdir + 256 * 3, (u32 *)__va(__1M) + 256*3, 224 * 4);
 		mm->cr3.value = __pa(pgdir);
-		mm->vma = 0;
+		mm->start_brk = mm->brk = 0;
+		mm->vma =  0;
 		current->mm = mm;
 	}
 	else spin("you have mm_struct?");

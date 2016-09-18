@@ -101,8 +101,28 @@ extern struct slab_head *vm_area_cache;
 extern struct slab_head * mm_cache;
 void vm_update_pgprot(struct vm_area *vma);
 u32 get_unmapped_area(u32 addr, u32 len);
-void * mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 offset);
-struct vm_area *find_vma(struct mm *mm, u32 addr);
+struct vm_area *find_vma(struct mm *mm, unsigned long addr);
+void * mmap(ulong addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 offset);
 
 int common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode);
+
+//看看@start_addr和@end_addr这一段区间是否跟某个vma接壤
+static inline struct vm_area *
+find_vma_intersection(struct mm *mm, 
+					unsigned long start_addr, unsigned long end_addr)
+{
+	struct vm_area *beneath = find_vma(mm, start_addr);	
+	if(beneath && beneath->start < end_addr){
+		return beneath;
+	}
+	return 0;
+}
+
+bool __release_address(union pte *pgdir, unsigned long vaddr);
+bool __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot);
+bool vm_area_shrink(struct vm_area *vma, unsigned long new_end);
+bool vm_area_expand(struct vm_area *vma, unsigned long new_end);
+unsigned long k_brk(unsigned long brk);
+
+#define PGDIR_OF_MM(mm) ( (union pte *)__va(mm->cr3.value & PAGE_MASK) )
 #endif

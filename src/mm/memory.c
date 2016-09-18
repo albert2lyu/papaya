@@ -17,8 +17,7 @@ void vm_update_pgprot(struct vm_area *vma){
  * @flags  新的页表项的低12位。
  *		   因为每个vm_area	都有自己的pgprot模板。这个参数正是因此才有的。
  */
-void __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){
-
+bool __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){
 	union linear_addr laddr = {value:vaddr};
 	union pte *dirent = pgdir + laddr.dir_idx;
 	if(dirent->present == 0){
@@ -26,8 +25,27 @@ void __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){
 	}
 	union pte *pgtbl = (void *)__va(dirent->value & PAGE_MASK);	
 	pgtbl[laddr.tbl_idx].value = (ulong)__pa(__alloc_page(0)) | pgprot;
+	return true;
 }
 
+/* @vaddr　我们把这个vaddr作4K对齐，然后解除这个页的映射。
+ * 目前只考虑断开普通的物理页，不考虑磁盘页(swap)等等。
+ */
+bool __release_address(union pte *pgdir, unsigned long vaddr){
+	union linear_addr laddr = {value: vaddr};		
+	union pte *dirent = pgdir + laddr.dir_idx;
+	if(dirent->present){
+		union pte *table = (void *)__va( dirent->value & PAGE_MASK);
+		long idx = laddr.tbl_idx;
+		if(table[idx].present){
+			long ppg = table[idx].physical;
+			free_page(mem_map + ppg);		//断开前尝试释放物理页
+			table[idx].value = 0;					//断开映射
+			return true;;
+		}
+	}
+	return false;
+}
 
 /* just map it to a physical page 
  */

@@ -1,7 +1,11 @@
+/* 虽然本模块提供了其他接口，但是重点还是do_mmap_pgoff,sys_brk.
+ */
+
 #include<linux/mm.h>
 #include<linux/fs.h>
 #include<linux/mylist.h>
 
+static unsigned long do_brk(struct mm *mm, unsigned long brk);
 void insert_vm_area(struct vm_area *new);
 struct page *
 do_no_page(struct vm_area *area, u32 address, union pgerr_code errcode){
@@ -53,6 +57,8 @@ struct vm_operations mmap_area_ops =
 //所以我把的参数的名字变一下。
 /* u32 do_mmap(u32 addr, u32 len, int prot, int flags, int fd, u32 pgoff){ */
 void * do_mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 pgoff){
+	if(len == 0) return 0;
+
 	//u32 file_off = pgoff << PAGE_SHIFT;
 	addr = ceil_align(addr, __4K);
 	len = ceil_align(len, __4K);
@@ -82,11 +88,11 @@ void * do_mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file
 
 /* find the first vm_area whose end > addr, NULL if none. 
  * 为什么不更进一步，精确到 that_vma->start <= addr呢。
- * 因为这样更灵活，这个函数的作用不止是定位某个addr位于哪个vm_area。
- * 别的用途，像比，给定某个addr(它位于一个空闲的address range)，
- * 我们想知道这个addr后面紧跟的vm_area。
+   因为这样更灵活，这个函数的作用不止是定位某个addr位于哪个vm_area。
+   别的用途，像比，给定某个addr(它位于一个空闲的address range)，
+   我们想知道这个addr后面紧跟的vm_area。
  */
-struct vm_area *find_vma(struct mm *mm, u32 addr){
+struct vm_area *find_vma(struct mm *mm, unsigned long addr){
 	struct vm_area *right_one = O_SCAN_UNTIL_MEET_LARGER(mm->vma, end, addr);
 	return right_one;
 }
@@ -135,9 +141,10 @@ u32 get_unmapped_area(u32 addr, u32 len){
 /* You can call it. This is the kernel version.
  * @offset  file offset, by unit of byte
  */
-void * mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 offset){
+void * mmap(ulong addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 offset){
 	assert(addr % __4K == 0 && offset % __4K == 0);
 	void *ret = do_mmap(addr, len, vm_flags, map_flags, file, offset >> 12);	
+	assert(ret == (void *)addr);	//这个函数由内核调用，我要保证它总是成功
 	return ret;
 }
 
@@ -158,6 +165,81 @@ void insert_vm_area(struct vm_area *new){
 	node->prev = new;
 	new->prev->next = new;
 }
+
+/* brk area看上去就是一个普通的vma，但linux没有调用do_mmap，而是自己重新写了一
+   遍。 它肯定有它的理由，等我明白它的理由，非那样做不可的时候，我再把papaya的
+   brk写得那么复杂吧。
+ */
+unsigned long sys_brk(unsigned long brk){
+	//struct mm *mm = current->mm;
+	return 0;	
+}
+
+
+unsigned long k_brk(unsigned long brk){
+	return do_brk(current->mm, brk);
+}
+
+/* 4K对齐。
+ * @return new break on success,  and current break on failure.
+ */
+static unsigned long do_brk(struct mm *mm, unsigned long brk){
+	unsigned long newbrk, oldbrk;
+	long  newbytes;
+											assert(mm->start_brk && mm->brk);
+	newbrk = ceil_align(brk, __4K);
+	oldbrk = mm->brk;			//mm->brk一定是对齐的，不用检查
+	newbytes = newbrk - oldbrk;
+	if(newbytes == 0) goto failed;	//也许不该失败，人家就是想brk到原处呢?
+
+	if(mm->brk == mm->start_brk){	//brk area not initialized yet
+		if(newbytes <= 0) goto failed;
+		mmap(mm->start_brk, newbytes, VM_READ | VM_WRITE, 0, 0, 0);
+		goto success;
+	}
+	struct vm_area *brk_area = find_vma(mm, mm->start_brk);
+									assert(brk_area->start == mm->start_brk);
+	if(newbytes > 0){
+		vm_area_expand( brk_area, newbrk);
+	}
+	else{	//(newbytes < 0)
+		vm_area_shrink( brk_area, newbrk );
+	}
+	success:	
+		mm->brk = newbrk;
+		return newbrk;	
+	failed:		return oldbrk;
+}
+
+bool vm_area_expand(struct vm_area *vma, unsigned long new_end){
+											assert(new_end > vma->end 
+													&& new_end % __4K == 0);
+	//struct vm_area *barrier;
+	if( find_vma_intersection(vma->mm, vma->end, new_end) )
+			return false;
+	vma->end = new_end;
+	return true;
+}
+
+bool vm_area_shrink(struct vm_area *vma, unsigned long new_end){
+											assert(new_end < vma->end
+													&& new_end > vma->start
+													&& new_end % __4K == 0);
+	for(int vaddr = vma->end; vaddr < new_end; vaddr += __4K){
+		__release_address( PGDIR_OF_MM(vma->mm), vaddr );
+	}
+	vma->end = new_end;
+	return true;
+}
+
+
+
+
+
+
+
+
+
 
 
 

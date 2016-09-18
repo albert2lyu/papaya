@@ -335,15 +335,20 @@ struct ll2{
 	O_INSERT_AFTER(leftone, new);				\
 })
 
-//递增环链，寻找最小姊
+/* 递增扫描环链，寻找最小姊
+ * 如果找不到(这个vlaue在链表里是最大的了)，返回0
+ */
 #define O_SCAN_UNTIL_MEET_LARGER(root, mb, value)		\
 ({														\
-	assert( (root) );							\
-	__typeof__(root) node = root;							\
+	assert( (root) );									\
+	__typeof__(root) node = root;						\
 	do{													\
-		if( (node)->mb > value) break;				\
+		if( (node)->mb > value) break;					\
 		node = node->next;								\
-	}while( node != (root));							\
+		if(node != root) continue;						\
+		node = 0;										\
+		break;											\
+	}while(1);											\
 	node;												\
 })
 

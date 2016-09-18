@@ -7,6 +7,10 @@ struct pt_regs;
 struct mm{
 	union cr3 cr3;
 	struct vm_area *vma;
+	//start_data/code, end_data/code不需要4K对齐,但start_brk和brk是需要的
+	unsigned long start_code, end_code;
+	unsigned long start_data, end_data;
+	unsigned long start_brk, brk;
 };
 
 int kernel_thread(int (*fn)(void *), void *arg, unsigned flags);
