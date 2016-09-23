@@ -6,6 +6,7 @@
 #include<mm.h>
 #include<asm/resource.h>
 
+#define P_NAME_MAX 16
 
 extern struct tss base_tss;
 #define g_tss (&base_tss)
@@ -34,19 +35,25 @@ extern int selector_plain_c0,selector_plain_d0,selector_plain_c1,selector_plain_
 
 struct dentry;	struct vfsmount;	struct file;
 struct fs_struct{
-	struct dentry *root, *pwd, *altroot;
-	struct vfsmount *rootmnt, *pwdmnt, *altrootmnt;
+	int count;
+	struct dentry *root, *pwd;
+	struct vfsmount *rootmnt, *pwdmnt;
 };
 
 #define NR_OPEN_DEFAULT 32
 /* open file table structure
- * 1, @file_array points to __file_array at first, and will point to the new allocated
+ * 1, @file_array points to __file_array at first, and switch to the new allocated
  * file array(bigger size) when a process open two many files.
 */
 struct files_struct{
-	int max_fds;
+	 /* 
+	 fd_set *close_on_exec;		Feature CLOSE_ON_EXEC unimplemented 
+	 fd_set *open_fds;			We don't use it to speed up get_unused_fd()
+	 */
+	int max_fds;			/* max index of array filep[] */
 	struct file **filep;	/* current file array */
-	struct file *__file_array[NR_OPEN_DEFAULT];
+	struct file *origin_filep[NR_OPEN_DEFAULT];
+	int count;
 };
 
 struct thread{
@@ -80,7 +87,7 @@ struct pcb{
 			struct pcb *prev;
 			struct pcb *next;
 			u32 pid;
-			char *p_name;
+			char p_name[16];
 			u32 prio;
 			u32 time_slice,time_slice_full;
 			u32 msg_type,msg_bind;

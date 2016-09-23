@@ -4,9 +4,9 @@
 #include<linux/sched.h>
 #include<linux/bh.h>
 static int time_bh;
-static void timer_interrupt(int irq, void *dev, struct pt_regs *regs){
+static void timer_interrupt(int irq, void *dev, struct pt_regs *pregs){
 	//oprintf("timer_interrupt:%u\n",irq);	
-	do_timer();
+	do_timer(pregs);
 	mark_bh(time_bh);
 }
 

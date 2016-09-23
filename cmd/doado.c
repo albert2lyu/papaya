@@ -5,6 +5,8 @@ int static_array[1024];
 void doado(void){
 	int x;
 	for(int i = 0; i < 10; i++) printf("%u\n", g_array[i]);
+	int ret = fork();
+	printf("I am back ! %u\n", ret);
 	while(2){
 		static_array[1023] = 3;
 	}

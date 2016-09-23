@@ -36,7 +36,7 @@ cache_file_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode){
 	u32 offset = pgoff << PAGE_SHIFT;
 	common_no_page(vma, linear_addr, errcode);	//先映射给它物理页	
 	__cache_file_page(vma->file, linear_addr, offset);
-	return __va2pg(linear_addr);
+	return __va2page_t(linear_addr);
 }
 
 struct vm_operations mmap_area_ops = 
@@ -190,10 +190,10 @@ static unsigned long do_brk(struct mm *mm, unsigned long brk){
 	newbrk = ceil_align(brk, __4K);
 	oldbrk = mm->brk;			//mm->brk一定是对齐的，不用检查
 	newbytes = newbrk - oldbrk;
-	if(newbytes == 0) goto failed;	//也许不该失败，人家就是想brk到原处呢?
+	if(newbytes == 0) goto success;	//也许不该失败，人家就是想brk到原处呢?
 
 	if(mm->brk == mm->start_brk){	//brk area not initialized yet
-		if(newbytes <= 0) goto failed;
+		if(newbytes < 0) goto failed;
 		mmap(mm->start_brk, newbytes, VM_READ | VM_WRITE, 0, 0, 0);
 		goto success;
 	}
@@ -208,7 +208,8 @@ static unsigned long do_brk(struct mm *mm, unsigned long brk){
 	success:	
 		mm->brk = newbrk;
 		return newbrk;	
-	failed:		return oldbrk;
+	failed:		
+		return oldbrk;
 }
 
 bool vm_area_expand(struct vm_area *vma, unsigned long new_end){

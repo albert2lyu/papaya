@@ -18,7 +18,7 @@ static int get_unused_fd(void){
 	struct file **filep = kmalloc(4 * new_max);
 	memcpy(filep, files->filep, 4 * files->max_fds);
 	files->max_fds = new_max;
-	if(files->filep == files->__file_array) kfree(files->filep);
+	if(files->filep == files->origin_filep) kfree(files->filep);
 	files->filep = filep;
 
 	return i;	

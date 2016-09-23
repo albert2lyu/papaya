@@ -46,6 +46,8 @@ union vm_flags{
 
 		unsigned growsdown: 1;
 		unsigned growsup: 1;
+		unsigned denywrite: 1;
+		unsigned dontcopy: 1;
 	};
 	unsigned value;	
 };
@@ -65,7 +67,8 @@ enum{
 
 	VM_GROWSDOWN=		1<<8,
 	VM_GROWSUP  =		1<<9,
-	VM_DENYWRITE = 		1<<10,
+	VM_DENYWRITE= 		1<<10,
+	VM_DONTCOPY	=		1<<11,
 
 	VM_STACK = VM_READ | VM_WRITE | VM_GROWSDOWN | VM_MAYREAD | VM_MAYWRITE,
 };
@@ -125,4 +128,5 @@ bool vm_area_expand(struct vm_area *vma, unsigned long new_end);
 unsigned long k_brk(unsigned long brk);
 
 #define PGDIR_OF_MM(mm) ( (union pte *)__va(mm->cr3.value & PAGE_MASK) )
+extern struct slab_head *fs_struct_cache, *files_struct_cache;
 #endif

@@ -1,3 +1,4 @@
+set cscopequickfix=s-,c-,d-,i-,t-,e-,g- 
 map <F5> :colorscheme evening
 source ~/.vim/macros/gdb_mappings.vim
 set backspace=indent,eol,start

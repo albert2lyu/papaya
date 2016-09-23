@@ -9,7 +9,7 @@
 ROOT=/home/wws/lab/yanqi
 cheader_path=-I$(ROOT)/src/include/ -I$(ROOT)/include/ -I$(ROOT)/src/arch/x86/include/ -I$(ROOT)/src/arch/x86/include/asm/ -I$(ROOT)/src/include/old/
 
-cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -g -fno-stack-protector -nostdinc
+cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nostdinc
 
 #-Wno-implicit-function-declaration 
 export cflags

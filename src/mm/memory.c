@@ -1,6 +1,8 @@
 #include<asm/page.h>
 #include<linux/mm.h>
 
+//页表操作的函数，一定记得FLUSH_TLB;
+
 void vm_update_pgprot(struct vm_area *vma){
 	union pte *pte = &vma->empty_pte;
 	ulong vm_flags = vma->flags.value;
@@ -25,6 +27,7 @@ bool __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){
 	}
 	union pte *pgtbl = (void *)__va(dirent->value & PAGE_MASK);	
 	pgtbl[laddr.tbl_idx].value = (ulong)__pa(__alloc_page(0)) | pgprot;
+	FLUSH_TLB;
 	return true;
 }
 
@@ -41,6 +44,7 @@ bool __release_address(union pte *pgdir, unsigned long vaddr){
 			long ppg = table[idx].physical;
 			free_page(mem_map + ppg);		//断开前尝试释放物理页
 			table[idx].value = 0;					//断开映射
+			FLUSH_TLB;
 			return true;;
 		}
 	}

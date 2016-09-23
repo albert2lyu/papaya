@@ -122,4 +122,17 @@ static inline void * __alloc_page(u32 gfp)
 }
 
 
+
+
+
+//get/put page
+static inline struct page *get_page(struct page *page){
+	page->_count++;
+	return page;
+}
+
+static inline void put_page(struct page *page){
+	page->_count--;
+}
+
 #endif

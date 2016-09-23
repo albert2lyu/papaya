@@ -112,9 +112,7 @@ void kernel_c(){
 	 * 同时也能提醒内核程序员：你要手动让他sleep，不然别的进程会饿死。
 	 */
 	bigbuf = (void *)__alloc_pages(__GFP_DEFAULT, 8+1);//4k * 256 * 2 = 2M
-	//struct pcb *f1 = create_process((u32)func1,9,10,"func1",0);	
 	struct pcb *f0 = create_process((u32)func0,9,0xffffffff,"func0");
-	//struct pcb *f2 = create_process((u32)func2,9,5,"func2",1);
 	struct pcb *f_init = create_process((u32)func_init,4,0xffffffff,"func_init");
 	//struct pcb *u_f = create_process(0x8048000,9,100,"init",3);
 	//avoid_gcc_complain = (int)f1;

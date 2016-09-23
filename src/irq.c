@@ -5,7 +5,7 @@
 #include<i8259.h>
 #include<linux/printf.h>
 static u32 count_irq_enter, count_irq_out;
-int handle_IRQ_event(int irq);
+int handle_IRQ_event(int irq, struct pt_regs *);
 int setup_irq(int irq, struct irqaction *new);
 /**生成一个irqacion，并挂到中断服务队列里
 * @irq note! should sub by 0x20.
@@ -89,7 +89,7 @@ unsigned do_IRQ(stack_frame regs){
 	while(1){
 /*		oprintf("handle a irq%x signal\n", irq);*/
 /*		spin("handing");*/
-		handle_IRQ_event(irq);	/**这个过程中服务程序可能sti，造成新的中断送上来
+		handle_IRQ_event(irq, &regs);	/**这个过程中服务程序可能sti，造成新的中断送上来
 								  但同一channel的信号被串行化，不同channel的中断
 								  允许套嵌处理*/
 		if(!(desc->status & IRQ_PENDING)) break;
@@ -123,7 +123,7 @@ bool in_interrupt(){
 /**
  * 1,返回值暂时是无意义的。
  */
-int handle_IRQ_event(int irq){
+int handle_IRQ_event(int irq, struct pt_regs *pregs){
 	int status = 0;
 	struct irqaction *action = irq_desc[irq].action;
 /*	oprintf("irq:%x,%x\n", irq, irq_desc[irq].action);	*/
@@ -133,7 +133,7 @@ int handle_IRQ_event(int irq){
 			spin("sti now");
 			 __asm__ __volatile__ ("sti");
 		}
-		action->func(irq, action->dev, 0);		
+		action->func(irq, action->dev, pregs);		
 		__asm__ __volatile__ ("cli");
 
 		action = action->next;

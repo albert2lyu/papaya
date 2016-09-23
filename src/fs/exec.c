@@ -101,6 +101,10 @@ int do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs){
 												__free_page(stack_envp);
 	//step 4: search bin_handler
 	ret = search_binary_handler(&binprm, regs);	assert(ret == 0);
+
+	current->time_slice = current->time_slice_full = 10;
+	strncpy(current->p_name, filepath, P_NAME_MAX);
+
 	return ret;
 	//step 5: prepare return routine 这一步交给loader吧
 	//对，这样写就可爱的多，怎么清晰怎么来。不考虑安全性的代码，往往是最简洁的

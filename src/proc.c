@@ -12,6 +12,11 @@ int __eflags=0x1200;//IOPL=1,STI	__prefix, 避免gdb犯晕:p eflags
 
 /* only create ring 0 process */
 void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name){
+	extern  u32 NEED_RESCHED_OFFSET;
+	int off1 = (u32)&NEED_RESCHED_OFFSET ;
+	int off2 = MEMBER_OFFSET(struct pcb, need_resched);
+	assert(off1 == off2);
+
 	baby->regs.ss=(selector_plain_d[0]);
 	baby->regs.esp = (u32)&(baby->regs);
 	//baby->regs.esp=(ring==0)?(u32)&(baby->regs):USR_STACK_BASE;
@@ -25,14 +30,14 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name){
 	baby->prio=prio;
 	baby->pid=0;
 	baby->time_slice=baby->time_slice_full=time_slice;
-	baby->p_name=p_name;
-	//baby->pregs=&baby->regs;
+	strncpy(baby->p_name, p_name, P_NAME_MAX);
+
 	baby->thread.esp = (int)&baby->regs;
 	baby->thread.eip = (int)restore_all;
 	baby->fs = kmalloc0( sizeof(struct fs_struct));
 	baby->files = kmalloc0( sizeof( struct files_struct) );
-	baby->files->filep = baby->files->__file_array;
-	baby->files->max_fds = sizeof(baby->files->__file_array) / 4;
+	baby->files->filep = baby->files->origin_filep;
+	baby->files->max_fds = sizeof(baby->files->origin_filep) / 4;
 	baby->rlimits[RLIMIT_NOFILE].cur = 512;
 	baby->rlimits[RLIMIT_NOFILE].max = 1024;
 	baby->fstack.esp = -1;

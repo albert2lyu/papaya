@@ -50,21 +50,28 @@ void sleep_expire(struct pcb *p){
 
 	if(IF) sti();
 }
-void do_timer(void){
+void do_timer(struct pt_regs *pregs){
+	char barbuf[16];
+
 	ticks++;
 	if(ticks % 100 == 0){
 		char title[16] = { 148,' ', 0};
-		char buf[16];
-		sprintf(buf, "%u", ticks/100);
-		write_bar(0, 0, title, buf);
-	}//oprintf("-----clock %u-------------current:%s\n", ticks/100, current->p_name);
+		sprintf(barbuf, "%u", ticks/100);
+		write_bar(0, 0, title, barbuf);
+	}
 	if(ticks % 300 == 0) oprintf("^");
 
-/*	oprintf("now reduce timeslice of process :%s\n",current->p_name);*/
-	if(--current->time_slice == 0){
-		//oprintf("switch");
-		active_expire(current);
-		current->need_resched = 1;
+	//memset(barbuf, 0, sizeof(barbuf));
+	sprintf(barbuf, "%*x", 12, current->time_slice);
+	write_bar(0, 1, "#", barbuf);
+
+	if(pregs->cs & 3) {	//发生在内核态的石英晶片中断不递减时间片
+		assert(current->time_slice > 0);
+		if(--current->time_slice == 0){
+			oprintf("switch");
+			active_expire(current);
+			current->need_resched = 1;
+		}
 	}
 
 	/**handle process who is sleeping on MSGTYPE_TIMER*/
@@ -76,9 +83,8 @@ void do_timer(void){
 			curr->msg_bind--;
 /*			oprintf("check list_sleep,msg_bind:%u\n",curr->msg_bind);*/
 			if(curr->msg_bind==0){
-				 /**a process sleeping on MSGTYPE_TIMER will not always moved to
-				  * list_active when awaked,because it might already use out the
-				  * time slice.
+				 /**a process sleeping on MSGTYPE_TIMER won't always be moved to
+				  * list_active on waked, cause it's time slice  may be used out
 				  */
 				//oprintf("WAKE process %s now,it's time_slice = %u\n",curr->p_name,curr->time_slice);
 				if(curr->time_slice){
@@ -100,12 +106,6 @@ void do_timer(void){
  */
 void schedule(void){
 	int IF;
-	#if 0
-	__asm__ __volatile__("mov %0, %%dr0\n\t"
-						:
-						:"r"(&IF)
-						);
-	#endif
 	IF = cli_ex();
 
 /*	oprintf("begin schedule\n");*/
@@ -122,7 +122,7 @@ void schedule(void){
 	if(!list_active && list_expire){
 		struct pcb*p=list_expire;
 		while(p){
-			p->time_slice=p->time_slice_full;
+			p->time_slice = p->time_slice_full;
 			p=p->next;
 		}
 		EXCHG_PTR(list_active,list_expire);

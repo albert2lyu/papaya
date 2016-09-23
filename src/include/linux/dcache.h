@@ -21,6 +21,7 @@ struct dentry{
 	struct qstr name;		/* partial name */
 	struct dentry_operations *operations;
 	struct list_head vfsmount;
+	int count;
 
 	struct list_head hash;
 };
@@ -157,4 +158,12 @@ struct dentry *d_lookup(struct dentry *dir, struct qstr *name);
 struct slab_head *dentry_cache;
 
 int d_rehash(struct dentry *dir, unsigned hash);
+static inline struct dentry * dget(struct dentry *dentry){
+	dentry->count++;
+	return dentry;
+}
+
+static inline void dput(struct dentry *dentry){
+	dentry->count--;
+}
 #endif

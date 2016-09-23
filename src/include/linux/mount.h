@@ -10,6 +10,16 @@ struct vfsmount{
 	struct dentry *mountpoint;	
 	struct vfsmount *parent;
 	struct list_head clash;	/*those who are mounted on the same dentry */
+	int count;
 };
+
+static inline struct vfsmount *mntget(struct vfsmount *mnt){
+	mnt->count++;
+	return mnt;
+}
+
+static inline void mntput(struct vfsmount *mnt){
+	mnt->count--;
+}
 
 #endif

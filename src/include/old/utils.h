@@ -148,7 +148,7 @@ static inline void sti_safe(){
 */
 
 #define MEMBER_OFFSET(stru_type, member_name) \
-	(unsigned)&(((stru_type *)0)->member_name)
+	( (unsigned)&(((stru_type *)0)->member_name) )
 
 void memtest(void *, int len);
 void udelay(unsigned long usecs);

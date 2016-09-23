@@ -9,25 +9,29 @@
 #define pa_pg pa_idx
 
 #define PG_P 1
-#define PG_NP 0
 #define PG_USU 4
-#define PG_USS 0
 #define PG_RWW 2
-#define PG_RWR 0
-#define PG_COW (1<<8)
 /*TODO cancell the following two macros, and 'vpg', 'ppg' is a good transfer*/
 #define PG_H10(pg_id) (pg_id>>10)
 #define PG_L10(pg_id) (pg_id&(0x400-1))
 
-#define invlpg(vaddr) __asm__ __volatile__("invlpg %0": :"r"(vaddr)) 
+static inline void invlpg(void *vaddr){
+	__asm__ __volatile__("invlpg (%0)"::"r"(vaddr));
+}
+
 #define FLUSH_TLB __asm__ __volatile__("mov %%cr3, %0\n\t"	\
 										"mov %0, %%cr3\n\t"\
 										:\
-										:"r"(0));
+										:"r"(0))
 
 /*get page struct by a virtual address*/
-#define __va2pg(vaddr) (mem_map + (((vaddr) - PAGE_OFFSET) >> 12))
-#define __pa2pg(paddr) (mem_map + ((paddr) >> 12))
+#define __va2page_t(vaddr) (mem_map + (((vaddr) - PAGE_OFFSET) >> 12))
+#define __pa2page_t(paddr) (mem_map + ((paddr) >> 12))
+
+/* page table/directory entry ==> linear address of target page */
+#define pte2page(pte) ((void *)__va((pte).value & PAGE_MASK))
+#define pte2page_t(pte) ( mem_map + (pte).physical )
+
 
 
 // >不一定比“|, &"用起来更方便。先局部的用一用，尤其是pte
@@ -56,7 +60,7 @@ union pte{
 };
 
 union linear_addr{
-	unsigned value;
+	unsigned long value;
 	struct{
 		unsigned offset: 12;
 		unsigned tbl_idx: 10;
@@ -96,5 +100,18 @@ union pgerr_code{
 #define PAGE_OFFSET 0XC0000000
 #define __pa(vaddr) ((unsigned)(vaddr) - PAGE_OFFSET)
 #define __va(paddr) ((unsigned)(paddr) + PAGE_OFFSET)
+static inline union pte *__va2pte(void *vaddr, union pte *pgdir){
+	if(!pgdir) return 0;
+
+	union linear_addr laddr ;
+	laddr.value = (unsigned long)vaddr;
+	union pte *table = pte2page( pgdir[laddr.dir_idx] );
+	return table + laddr.tbl_idx;
+}
 #define KV __va
+
+
+
+
+
 #endif

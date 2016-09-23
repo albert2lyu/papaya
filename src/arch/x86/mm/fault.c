@@ -3,6 +3,8 @@
 #include<proc.h>
 #include<irq.h>
 
+static int on_protection_error(unsigned long err_addr, 
+						struct pt_regs *pregs, union pgerr_code);
 static int count_pgerr;
 /*
 31                4                             0
@@ -56,7 +58,7 @@ void do_page_fault(struct pt_regs *pregs, union pgerr_code errcode){
 		else spin("in vm_area gaps");
 	}
 	else{	//errcode.protection == 1
-		spin("protection error");	
+		on_protection_error(err_addr, pregs, errcode);
 	}
 
 	count_pgerr--;
@@ -64,6 +66,48 @@ void do_page_fault(struct pt_regs *pregs, union pgerr_code errcode){
 	return;
 }
 
+static int on_protection_error(unsigned long err_addr, 
+						struct pt_regs *pregs, union pgerr_code errcode){
+	if(errcode.from_user == false)	spin("kernel fault !");
+	if(errcode.on_write == false)	spin("page fault on read!");
+
+	//write fault
+	struct vm_area *err_area = find_vma( current->mm,  err_addr );
+	if(!err_area)	spin(" you touched kernel space !");
+	if(err_area->start  <= err_addr){	//happened within a vm area
+		union vm_flags vm_flags = err_area->flags;
+		bool cow = vm_flags.shared == false && vm_flags.maywrite;
+		if(cow){
+			struct page *that_page_t;	
+			union pte *that_pte;
+			void *that_page;
+			void * new_page;
+
+			that_page = (void *)(err_addr & PAGE_MASK);
+			that_page_t = __va2page_t(err_addr);
+			that_pte = __va2pte((void *)err_addr, PGDIR_OF_MM(current->mm));
+
+			that_pte->writable = true;
+			if(that_page_t->_count == 1){
+				goto done;
+			}
+
+			//copy on write
+			new_page = __alloc_page(0);
+			memcpy(new_page, that_page, PAGE_SIZE);
+
+			put_page(that_page_t);
+			that_pte->value |= __pa(new_page);
+
+			done:
+			invlpg((void *)err_addr);
+		}
+	}
+	else{
+		spin("in gap !");
+	}
+	return 0;	
+}
 //exception 1, no error code
 int do_breakpoint_fault(struct pt_regs *regs){
 	spin("breakpoint fault\n");

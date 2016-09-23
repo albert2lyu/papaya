@@ -12,18 +12,33 @@ int insert(struct flower *root, struct flower*new){
 
 
 static char g_array[10] = {1, 2, 3, 4, 5, 6};
+void foobar(void){
+	goto aaa;
+	for(int i =0; i < 10; i++){
+		int a = 0x123;
+		int b;
+		if (a > b)
+		aaa: printf("hellor :%d\n", a);
+	}
+}
+void erase(int v[]){
+	for(int i = 0; i < 10; i++){
+		v[i] = 0;
+	}
+}
 int main(int argc, char *argv[], char *envp[]){
+	#if 1
+	int x = 2;
+	goto aaa;
+		
 	
-	for(int i = 0; i < sizeof(g_array) / 4; i++) printf("%u\n", g_array[i]);
-	//printf("a:%x, %x, %x", func_table[2], func_table[4], func_table[9]);
-	struct flower red_rose;
-	struct flower blue_rose;
-	struct flower *red = &red_rose;
-	struct flower *blue = &blue_rose;
-	//printf("argc:%d, argv:%p, envc:%x, envp:%p", argc, argv, envc, envp);
-	//printf("%p", (unsigned *)0x1 + 4);
-	//int a = insert(red, blue);
-	//printf("%d", a);
+	for(int j = 0x11; j < 100; j++){
+		int a = 0x456;
+		sleep(1);
+		aaa: 
+			printf("hellor :%d\n", j);
+	}
+	#endif
 	return 0;
 }
 

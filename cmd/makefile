@@ -1,6 +1,21 @@
 # 这个makefile供src下的makefile调用。他能更新完dimg的依赖后再调用这儿的make。
 # 所以，如果你在cmd下运行这个make,一定要保证它的依赖都已经解决。
-all:cell _dimg doado
+all:cell _dimg doado ld.so t  foobar.o foobar.so foobar
+
+foobar.o:foobar.c
+	gcc -c foobar.c -o foobar.o  -Wall -fPIC 
+
+foobar:foobar.c
+	#gcc   -o foobar foobar.c
+	#ld -static -o foobar.so foobar.o -ebar
+
+t:t.c
+	gcc -o t t.c -std=c99 -Wl,-I/home/wws/lab/yanqi/cmd/ld.so -Wall
+
+ld.so: ld.c
+	gcc -c ld.c -o ld.o -fno-builtin -std=c99 -g -Wall -fPIC 
+	ld -shared -o ld.so ld.o 
+	#ld -shared  -o ld.so ld.o 
 
 doado: doado.c
 	gcc -c doado.c -fno-builtin -std=c99 -g
@@ -17,6 +32,7 @@ clean:
 	rm cell -f
 	rm _dimg -f
 	rm doado -f
+	rm t ld.so -f
 	rm *.o -f
 	rm *~ -f
 
