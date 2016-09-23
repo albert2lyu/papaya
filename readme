@@ -71,6 +71,13 @@ lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为有
 
 
 【4】
+[2016,9,24] Version 0.609
+==========update===========
+1, Implementaion of vm_area, mm_struct 
+2, execve()		1/2 done 		see fs/exec.c  fs/binfmt_elf.c
+3, fork() 		2/3 done		see kernel/fork.c   mm/memory.c
+4, mmap(), brk()	1/2 done	see mm/mmap.c
+
 [2016,7,27] Version 0.607b
 ==========update===========
 1, TCP implementation. Receive only.  See net/ipv4/tcp.cn
