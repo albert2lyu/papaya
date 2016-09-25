@@ -129,4 +129,44 @@ unsigned long k_brk(unsigned long brk);
 
 #define PGDIR_OF_MM(mm) ( (union pte *)__va(mm->cr3.value & PAGE_MASK) )
 extern struct slab_head *fs_struct_cache, *files_struct_cache;
+
+static inline struct mm *
+get_mm(struct mm *that){
+	that->users++;	
+	return that;
+}
+
+int __release_mm(struct mm *mm);
+/* 下面说错了，可以在非上下文环境被释放的。因为页目录，页表什么的，都在内核里。
+ * 递减count计数，若为０．则释放mm结构体,以及里面的pgdir。
+ * 注意，在调用put_mm之前,你必须调用release_user_space()释放掉用户空间
+ * 因此，所put的mm是一个空壳
+ * TODO unstable. 希望能写出来一个跟exit通用的接口
+ */
+static inline void 
+put_mm(struct mm *that){
+																				 assert(that->vma);
+	that->users--;
+	if(that->users == 0){
+		__release_mm(that);
+	}
+}
+
+
+
 #endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

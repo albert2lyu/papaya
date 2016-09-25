@@ -20,7 +20,8 @@ struct mm{
 	unsigned long start_code, end_code;
 	unsigned long start_data, end_data;
 	unsigned long start_brk, brk;
-	int count;
+	/* int count; */				//暂时不想支持active_mm
+	int users;						//被多少个进程(线程)共享
 };
 
 int kernel_thread(int (*fn)(void *), void *arg, unsigned flags);

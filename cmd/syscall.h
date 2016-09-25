@@ -26,7 +26,7 @@
  * >强制传入6个参数，这有点儿丑，但很节省编程的时间
  * >至于危害，性能低一些，但不存在内存越界的可能。
  */
-#define int80_carry_stack_args_6(name)												\
+#define int80_carry_stack_args_6(name)									\
 ({																		\
 	__asm__ __volatile__("push %%ebx\n\t"								\
 						 "push %%edx\n\t"								\
@@ -62,12 +62,12 @@
 						 );												\
 })
 
-#define int80_carry_stack_args_2(name)												\
+#define int80_carry_stack_args_2(name)									\
 ({																		\
 	__asm__ __volatile__("push %%ebx\n\t"								\
 																		\
 						 "mov 8(%%ebp),  %%ebx\n\t"						\
-						 "mov 12(%%ebp),  %%ecx\n\t"						\
+						 "mov 12(%%ebp),  %%ecx\n\t"					\
 						 "int $0x80\n\t"								\
 																		\
 						 "pop %%ebx\n\t"								\
@@ -76,7 +76,7 @@
 						 );												\
 })
 
-#define int80_carry_stack_args_3(name)												\
+#define int80_carry_stack_args_3(name)									\
 ({																		\
 	__asm__ __volatile__("push %%ebx\n\t"								\
 						 "push %%edx\n\t"								\

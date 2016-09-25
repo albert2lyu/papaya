@@ -1608,6 +1608,7 @@ __pic_get_irq_reg	i8259.c	/^static u16 __pic_get_irq_reg(int ocw3)$/;"	f	file:
 __priv	drivers/net/8139.c	18;"	d	file:
 __register_slab_type	mm/slab.c	/^static inline int __register_slab_type(char *name, int objsize, $/;"	f	file:
 __release_address	mm/memory.c	/^bool __release_address(union pte *pgdir, unsigned long vaddr){$/;"	f
+__release_mm	fs/exec.c	/^int __release_mm(struct mm *mm){$/;"	f
 __resolve_address	mm/memory.c	/^bool __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){$/;"	f
 __rmquene	mmzone.c	/^struct page *__rmquene(zone_t *zone , int order){$/;"	f
 __set_column	lib/printf.c	/^static void __set_column(struct cell *wnd, int col, $/;"	f	file:
@@ -1819,7 +1820,7 @@ cellnum	include/linux/cell.h	/^	int cellnum;$/;"	m	struct:cell_sb_info
 cellnum	include/linux/cell_common.h	/^			int cellnum;$/;"	m	struct:cell_superblock::__anon24::__anon25
 cellsize	include/linux/cell.h	/^	int cellsize;$/;"	m	struct:cell_sb_info
 cellsize	include/linux/cell_common.h	/^			int cellsize;$/;"	m	struct:cell_superblock::__anon24::__anon25
-cflags	makefile	/^cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -g -fno-stack-protector -nostdinc$/;"	m
+cflags	makefile	/^cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nostdinc$/;"	m
 channel_id	drivers/ide/ide.c	/^static int  channel_id(int dev_id){$/;"	f	file:
 chars_to_str	ku_utils.c	/^void chars_to_str(char*str,char*chars){\/\/endflag=\\0,space$/;"	f
 charscmp	ku_utils.c	/^int charscmp(char*pt1,char*pt2,int end_flag){$/;"	f
@@ -1868,7 +1869,6 @@ count	include/linux/blkdev.h	/^	int count;$/;"	m	struct:request
 count	include/linux/dcache.h	/^	int count;$/;"	m	struct:dentry
 count	include/linux/fs.h	/^	int count;$/;"	m	struct:file
 count	include/linux/mount.h	/^	int count;$/;"	m	struct:vfsmount
-count	include/linux/sched.h	/^	int count;$/;"	m	struct:mm
 count	include/old/blk.h	/^	int count;$/;"	m	struct:request
 count	include/old/hd.h	/^	u32 count;\/\/record the sector-num usr wants to r\/w,it will be decreased when a local-loop of r\/w finished,and hs will sleep again when count=0$/;"	m	struct:require
 count	include/old/hs.h	/^	u32 count;\/\/record the sector-num usr wants to r\/w,it will be decreased when a local-loop of r\/w finished,and hs will sleep again when count=0$/;"	m	struct:__anon51
@@ -1968,6 +1968,8 @@ dontcopy	include/linux/mm.h	/^		unsigned dontcopy: 1;$/;"	m	struct:vm_flags::__a
 double_fault	kernel.asm	/^double_fault:$/;"	l
 dput	include/linux/dcache.h	/^static inline void dput(struct dentry *dentry){$/;"	f
 drive	include/linux/ide.h	/^	struct ide_drive drive[MAX_DRIVES];$/;"	m	struct:ide_hwif	typeref:struct:ide_hwif::ide_drive
+drop_fd	fs/exec.c	/^static int drop_fd(struct files_struct *files){$/;"	f	file:
+drop_mm	fs/exec.c	/^static int drop_mm(struct mm *mm){$/;"	f	file:
 drv	include/linux/ide.h	/^	u8 drv: 1;	\/* master:0  or slave:1 *\/$/;"	m	struct:select
 drv	include/old/hd.h	/^	u8 drv: 1;	\/* master:0  or slave:1 *\/$/;"	m	struct:select
 ds	include/old/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:pt_regs
@@ -2214,6 +2216,7 @@ get_free_request	drivers/block/ll_rw_blk.c	/^static struct request *get_free_req
 get_info_ptr	drivers/ide/ide.c	/^static struct ide_drive *get_info_ptr(u16 dev_id){$/;"	f	file:
 get_iptype	net/core/skbuff.c	/^static char *get_iptype(struct iphdr *iphdr){$/;"	f	file:
 get_memory_information	boot.asm	/^	get_memory_information:$/;"	l
+get_mm	include/linux/mm.h	/^get_mm(struct mm *that){$/;"	f
 get_page	include/old/mmzone.h	/^static inline struct page *get_page(struct page *page){$/;"	f
 get_pci_cfg_reg	include/linux/pci.h	/^static inline unsigned get_pci_cfg_reg(int bus, int dev, int func, int reg){$/;"	f	struct:pci_dev
 get_queue	include/linux/blkdev.h	/^	get_queue_fn * get_queue;	\/*access 1*\/$/;"	m	struct:queue_getter
@@ -2859,6 +2862,7 @@ pte_page	include/old/mmzone.h	27;"	d
 pte_pfn	include/old/mmzone.h	25;"	d
 push	kernel.asm	/^push  11931 ;1193180\/100$/;"	l
 push	kernel.asm	/^push 11011000b$/;"	l
+put_mm	include/linux/mm.h	/^put_mm(struct mm *that){$/;"	f
 put_page	include/old/mmzone.h	/^static inline void put_page(struct page *page){$/;"	f
 pwChar	include/old/ntfs.h	/^	WCHAR		pwChar[MAX_PATH];$/;"	m	struct:tag_FILE_NAME
 pwd	include/linux/fs_struct.h	/^	struct dentry *root, *pwd;$/;"	m	struct:fs_struct	typeref:struct:fs_struct::
@@ -2909,6 +2913,8 @@ register_slab_type	mm/slab.c	/^struct slab_head * register_slab_type(char *name,
 regs	include/old/proc.h	/^	stack_frame regs;$/;"	m	struct:pcb
 regs_len	drivers/net/8139.c	/^	unsigned long regs_len;		\/*length of I\/O or MMI\/O region *\/$/;"	m	struct:rtl8139_private	file:
 regs_len	drivers/net/e1000.c	/^	unsigned long regs_len;		\/*length of I\/O or MMI\/O region *\/$/;"	m	struct:e1000_private	file:
+release_user_space	fs/exec.c	/^static int release_user_space(struct mm *mm){$/;"	f	file:
+release_vma_area	fs/exec.c	/^static int  release_vma_area(struct vm_area *vma){$/;"	f	file:
 rep	boot.asm	/^rep stosd$/;"	l
 request	include/linux/blkdev.h	/^struct request{$/;"	s
 request	include/old/blk.h	/^struct request{$/;"	s
@@ -3311,6 +3317,7 @@ usLinkNum	include/old/ntfs.h	/^	u16 usLinkNum;\/\/$/;"	m	struct:tag_MFTHEAD
 usNrDataOffset	include/old/ntfs.h	/^	u16		usNrDataOffset;$/;"	m	struct:tag_NONRESIDATTR
 usRDataOffset	include/old/ntfs.h	/^	u16	usRDataOffset;$/;"	m	struct:tag_RESIDATTR
 user	arch/x86/include/asm/page.h	/^		unsigned user: 1;$/;"	m	struct:pte::__anon58
+users	include/linux/sched.h	/^	int users;						\/\/被多少个进程(线程)共享$/;"	m	struct:mm
 using	kernel/bh.c	/^static unsigned using;		\/* bitmap for allocated\/free bh slot *\/$/;"	v	file:
 usr_func	kernel.asm	/^usr_func:$/;"	l
 usr_func_backup	kernel.c	/^void usr_func_backup(void){$/;"	f

@@ -88,6 +88,7 @@ void free_pages(struct page *page, int order);
  *		做参数，就要面对这一点。
  */
 static inline void __free_pages(void* frame_addr, int order){
+	assert(frame_addr >= (void *)__3G);	
 	unsigned ppg = __pa(frame_addr) >> 12;	
 	free_pages(mem_map + ppg, order);
 }
@@ -133,6 +134,11 @@ static inline struct page *get_page(struct page *page){
 
 static inline void put_page(struct page *page){
 	page->_count--;
+	if(page->_count == 0) free_page(page);
 }
 
+static inline struct page *pte2page_t(union pte pte){
+	assert(pte.value && pte.present);
+	return ( mem_map + (pte).physical );
+}
 #endif

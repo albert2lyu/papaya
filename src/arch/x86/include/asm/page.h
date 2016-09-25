@@ -1,6 +1,8 @@
 #ifndef X86_PAGE_H
 #define X86_PAGE_H
 #include<valType.h>
+#include<linux/assert.h>
+//#include<linux/printf.h>
 
 #define PAGE_SHIFT 12
 #define PAGE_SIZE 0x1000
@@ -25,12 +27,16 @@ static inline void invlpg(void *vaddr){
 										:"r"(0))
 
 /*get page struct by a virtual address*/
-#define __va2page_t(vaddr) (mem_map + (((vaddr) - PAGE_OFFSET) >> 12))
-#define __pa2page_t(paddr) (mem_map + ((paddr) >> 12))
+#define __va2page_t(vaddr) \
+	(mem_map + ((((unsigned long)vaddr) - PAGE_OFFSET) >> 12))
+#define __pa2page_t(paddr) \
+	(mem_map + ((paddr) >> 12))
 
 /* page table/directory entry ==> linear address of target page */
+#if 0
 #define pte2page(pte) ((void *)__va((pte).value & PAGE_MASK))
 #define pte2page_t(pte) ( mem_map + (pte).physical )
+#endif
 
 
 
@@ -100,6 +106,15 @@ union pgerr_code{
 #define PAGE_OFFSET 0XC0000000
 #define __pa(vaddr) ((unsigned)(vaddr) - PAGE_OFFSET)
 #define __va(paddr) ((unsigned)(paddr) + PAGE_OFFSET)
+#define KV __va
+
+
+
+static inline void *pte2page(union pte pte){
+	assert(pte.value && pte.present);
+	return ((void *)__va((pte).value & PAGE_MASK));
+}
+
 static inline union pte *__va2pte(void *vaddr, union pte *pgdir){
 	if(!pgdir) return 0;
 
@@ -108,10 +123,6 @@ static inline union pte *__va2pte(void *vaddr, union pte *pgdir){
 	union pte *table = pte2page( pgdir[laddr.dir_idx] );
 	return table + laddr.tbl_idx;
 }
-#define KV __va
-
-
-
 
 
 #endif

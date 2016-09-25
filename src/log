@@ -1,4 +1,8 @@
 =============log
+Sat Sep 24 22:40:03 CST 2016
+*
+ 可能的话，尽量不支持active_mm。
+
 Sun Sep 18 22:07:55 CST 2016
 *
  sys_xxx()/k_xxx()
