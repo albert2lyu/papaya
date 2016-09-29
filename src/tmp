@@ -1,0 +1,37 @@
+
+	//step +: copy arguments to stack bottom
+	u32 esp = __3G;
+	int argc, envc= 0;
+	char **arg_stkloc = (void *)__alloc_page(0);
+	char **env_stkloc = (void *)__alloc_page(0);
+
+	int i;
+	char **usr_args = binprm.envp;	//arguments vector passed from user space
+	char **loc = env_stkloc;		//记录送上用户堆栈之后，每个参数的地址
+	copy_args_to_user_stack:
+	for(i = 0; usr_args && usr_args[i]; i++){
+		int len = strnlen(usr_args[i], __4K);	if(len == __4K) return -EINVAL;
+		esp -= len + 1;
+		strcpy((char *)esp, usr_args[i]);
+		loc[i] = (char *)esp;
+	}
+	loc[i] = 0;
+	if(usr_args == binprm.envp){
+		envc = i;
+		usr_args = binprm.argv;
+		loc = arg_stkloc;
+		goto copy_args_to_user_stack;
+	}
+	else	argc = i;
+
+	//make argv[],envp[] on user stack
+	esp &= ~3;	//align on 4 byte
+
+	esp -= (envc + 1) * 4;
+	for(i = 0; i <= envc; i++) ((ulong *)esp)[i] = (ulong)env_stkloc[i];
+
+	esp -= (argc + 1) * 4;
+	for(i = 0; i <= argc; i++) ((ulong *)esp)[i] = (ulong)arg_stkloc[i];
+
+	*(u32 *)(esp += 4) = argc;
+	regs->esp = esp;
