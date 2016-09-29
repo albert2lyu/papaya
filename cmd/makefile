@@ -39,7 +39,7 @@ clean:
 
 # 直接clean。 然后把不需要上传的文件挪出"工程目录"
 _git:
-	make tar
+	make 400m.img.tar.bz2 
 	make clean
 	cp ~/.bashrc ./
 	cp ~/.vimrc ./
