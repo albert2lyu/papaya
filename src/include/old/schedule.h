@@ -2,7 +2,6 @@
 #define SCHEDULE_H
 #include<valType.h>
 extern unsigned ticks;
-extern struct pcb *idle;
 /**if a process is prepared for running,we say it's 'active'.all active process
  * are stored in this linked-list in ascendsing order of 'prio'.
  */

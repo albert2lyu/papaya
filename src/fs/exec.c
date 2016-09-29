@@ -6,7 +6,6 @@
 
 char * copy_string(char *str);
 char ** copy_strings(char **strs);
-static int release_user_space(struct mm *mm);
 static int search_binary_handler(struct linux_binprm *binprm, 
 								 struct pt_regs *regs);
 
@@ -74,7 +73,8 @@ int do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs){
 	//暂时不实现drop_mm，分两步走挺好用。
 	if(oldmm){
 		//step+ : 释放用户空间的所有页。以及相应的页表,vma。
-		release_user_space(oldmm);
+		try_release_user_space(oldmm);
+		//try_release_krnl_resource(current);	execve()不释放内核资源!
 		//step+ : it's time to release the old mm_struct totally
 		put_mm(oldmm);
 	}
@@ -87,24 +87,24 @@ int do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs){
 	//step +: copy arguments to stack bottom
 	u32 esp = __3G;
 	int argc, envc= 0;
-	char **stack_argv = (void *)__alloc_page(0);
-	char **stack_envp = (void *)__alloc_page(0);
+	char **stkmark_of_arg = (void *)__alloc_page(0);
+	char **stkmark_of_env = (void *)__alloc_page(0);
 
 	int i;
-	char **usr_args = binprm.envp;	//arguments vector passed from user space
-	char **stack_args = stack_envp;		//记录送上用户堆栈之后，每个参数的地址
+	char **sarr = binprm.envp;	//string array, i.e. argv[], envp[]
+	char **mark = stkmark_of_env;		//记录送上用户堆栈之后，每个参数的地址
 	copy_args_to_user_stack:
-	for(i = 0; usr_args && usr_args[i]; i++){
-		int len = strnlen(usr_args[i], __4K);	if(len == __4K) return -EINVAL;
-		esp -= len;
-		strcpy((char *)esp, usr_args[i]);
-		stack_args[i] = (char *)esp;
+	for(i = 0; sarr && sarr[i]; i++){
+		int len = strnlen(sarr[i], __4K);	if(len == __4K) return -EINVAL;
+		esp -= len + 1;
+		strcpy((char *)esp, sarr[i]);
+		mark[i] = (char *)esp;
 	}
-	stack_args[i] = 0;
-	if(usr_args == binprm.envp){
+	mark[i] = 0;
+	if(sarr == binprm.envp){
 		envc = i;
-		usr_args = binprm.argv;
-		stack_args = stack_argv;
+		sarr = binprm.argv;
+		mark = stkmark_of_arg;
 		goto copy_args_to_user_stack;
 	}
 	else	argc = i;
@@ -113,25 +113,32 @@ int do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs){
 	esp &= ~3;	//align on 4 byte
 
 	esp -= (envc + 1) * 4;
-	for(i = 0; i < envc; i++) ((ulong *)esp)[i] = (ulong)stack_envp[i];
+	envp = (void *)esp;
+	for(i = 0; i <= envc; i++) envp[i] = stkmark_of_env[i];
 
 	esp -= (argc + 1) * 4;
-	for(i = 0; i < argc; i++) ((ulong *)esp)[i] = (ulong)stack_argv[i];
+	argv = (void *)esp;
+	for(i = 0; i <= argc; i++) argv[i] = stkmark_of_arg[i];
 
-	*(u32 *)(esp += 4) = argc;
-	regs->esp = esp;
+	argv[-1] = (void *)argc;
+
+	argv[-2] = 0;	//This is PUSH EIP ! we can't jmp to elf's entry directly,
+					//becase it's a function there.
+					//Otherwise, the entry function will be confused, for he 
+					//can not find the first argument at 8(%ebp)
+	regs->esp = esp - 8;
 	/* Done. 
 	 * arguments on user stack prepared 
 	 * argc argv[0] argv[1] .. argv[argc-1] 0 envp[0] .. envp[x] 0 str-area
 	 */
-												__free_page(stack_argv);
-												__free_page(stack_envp);
+												__free_page(stkmark_of_arg);
+												__free_page(stkmark_of_env);
 												//TODO 释放copy-strings页
 	//step 4: search bin_handler
 	ret = search_binary_handler(&binprm, regs);	assert(ret == 0);
 
 	current->time_slice = current->time_slice_full = 10;
-	strncpy(current->p_name, filepath, P_NAME_MAX);
+	strncpy(current->p_name, binprm.filepath, P_NAME_MAX);
 
 	return ret;
 	//step 5: prepare return routine 这一步交给loader吧
@@ -179,54 +186,6 @@ static int search_binary_handler(struct linux_binprm *binprm,
 	return -ENOEXEC;
 }
 
-/* 释放这个vm_area内的所有用户页和页表。最后释放这个vm_area_struct本身。
- * 注意! 这个函数只能被release_user_space()调用，它能保证是按线性地址的顺序
-   逐个释放vma,否则release_vm_area()里对页表的释放操作是危险的。
- */
-static int  release_vm_area(struct vm_area *vma){
-	union linear_addr vaddr;
-	struct mm *mm;           									
-	union pte *pgdir, *pgtbl;
-	union pte *dirent;
-
-	mm = vma->mm;
-	pgdir = PGDIR_OF_MM(mm);
-
-	vaddr.value = vma->start;
-	pgtbl = pte2page(pgdir[vaddr.dir_idx]); 
-	while(vaddr.value < vma->end){
-		struct page *userpage;
-		int i = vaddr.tbl_idx;	
-
-		if(pgtbl[i].value == 0) goto _continue;
-		userpage = pte2page_t( pgtbl[i] );
-		put_page(userpage);					//释放一个用户页
-
-		_continue:
-		vaddr.value += __4K;
-		if(vaddr.value % __4M){
-			put_page( __va2page_t(pgtbl) );	//释放一个页表
-			dirent = pgdir + vaddr.dir_idx;	
-			pgtbl = pte2page(*dirent);
-		}
-	}
-	kmem_cache_free(vm_area_cache, vma);
-	return 0;
-}
-//释放用户空间的所有页。以及相应的页表,vma。
-static int release_user_space(struct mm *mm){
-	struct vm_area *vma, *next;
-																				assert(mm->vma);
-	//释放用户空间的所有页，页表,vm_area结构体
-	vma = mm->vma;
-	do{
-		next = vma->next;
-		release_vm_area(vma);
-	}while( next != mm->vma && (vma = next));
-
-	return 0;
-}
-
 
 //错，这儿只会关闭某些文件，不会放弃files_struct
 #if 0
@@ -238,22 +197,6 @@ static int drop_fd(struct files_struct *files){
 	return 0;
 }
 #endif
-
-
-/* 释放mm_struct, 以及相应的pgdir
- * only invoked by put_mm
- */
-int __release_mm(struct mm *mm){
-	union pte *	pgdir;															assert(mm != current->mm);
-
-	pgdir = PGDIR_OF_MM(mm);
-	__free_page(pgdir);
-
-	kfree2(mm);
-
-	return 0;	
-}
-
 
 char * copy_string(char *str){
 	char *page = __alloc_page(0);

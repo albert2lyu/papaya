@@ -34,14 +34,15 @@ extern void t(void);
 extern void fs_ext(void);
 extern void mm(void);
 char cpu_string[16];
-void idle_func(void);
+void task0_func(void);
 void func1(void);
 int func2(void *arg);
 void func0(void);
-void func_init(void);
+int func_init(void *v);
 void usr_func(void);
-struct pcb *idle;
 static void probe(void);
+struct pcb *task0;
+struct pcb *task1;
 
 extern void init_display(void);
 #include"../debug/debug.h"
@@ -91,7 +92,6 @@ void kernel_c(){
 	init_time();
 	ide_init();
 	blkdev_layer_init();
-/*	init_fs();*/
 	/*
 	 * 1, 用内核函数生成一个ring1进程没问题，ring1进程的好处是，有大多数系统权限
 	 * 在访问内核空间时（例如它的eip就跑在内核空间的代码区),但它又是作为普通
@@ -112,29 +112,11 @@ void kernel_c(){
 	 * 同时也能提醒内核程序员：你要手动让他sleep，不然别的进程会饿死。
 	 */
 	bigbuf = (void *)__alloc_pages(__GFP_DEFAULT, 8+1);//4k * 256 * 2 = 2M
-	struct pcb *f0 = create_process((u32)func0,9,0xffffffff,"func0");
-	struct pcb *f_init = create_process((u32)func_init,4,0xffffffff,"func_init");
-	//struct pcb *u_f = create_process(0x8048000,9,100,"init",3);
-	//avoid_gcc_complain = (int)f1;
-	avoid_gcc_complain = (int)f0;
-	//avoid_gcc_complain = (int)f2;
-	avoid_gcc_complain = (int)f_init;
-	//avoid_gcc_complain = (int)u_f;
-	//tty 调用的getchar时会sleep,等醒来,再被调度时,已经到了ring1堆栈.
-	//暂时把tty放在ring1,但它是按照一个用户进程编写的.它不会调用内核其它模块的函数.暂时不能放在ring3,是因为跳到ring3后,是因为tty的代码是在ring0.
-/*	create_process((u32)tty,9,5,"tty",1);*/
-	//time_slice = 0x0fffffff,never be expired to avoid bug.
-	//note: give hs a higher prio to let it run firstly, that's necessary
-/*	__ext_pcb = create_process((u32)fs_ext, 9, 0x0fffffff,"ext", 0);*/
-/*	__hs_pcb = create_process((u32)hs, 9, 0x0fffffff,"hs", 0);*/
-
-	idle=(struct pcb*)__alloc_pages(__GFP_DEFAULT,1);
-	init_pcb(idle,(u32)idle_func,10,0xffffffff,"idle");
-	
+	task0=(struct pcb*)__alloc_pages(__GFP_DEFAULT,1);
+	init_pcb(task0,(u32)task0_func,10,0xffffffff,"idle");
 	/**
 	 * 1, 不要用create_process创建idle进程，因为这个函数会把它挂入list_active里。	 * 2, 不要让idle进程休眠，因为sleep_active对它的操作会出错。
 	 */
-	//idle = create_process((u32)idle_func, 10,0xfffffff, "idle",0);
 	/**
 	 * 1, it's necessary to fire a process manually before the first clock
 	 * interruption occures, because clock-handler will call 'do_time()' and
@@ -142,68 +124,30 @@ void kernel_c(){
 	 * (for example,'current'(see in proc.h) will be invalid when esp register
 	 * not in the kernel stack of a process.
 	 */
-	//ramdisk_init(); 
-/*	cell_read("t.c", testbuf);*/
-/*	oprintf("%s", testbuf);*/
-/*	spin("ss");*/
-	fire_thread(f_init);
+	fire_thread(task0);
 	assert(0);
 }
 
 
-#if 0
-void func1(void){
-	oprintf("func1 run..\n");
-	int counter = 0;
-	while(1){
-		oprintf("func1:%u\n", counter++);
-		schedule_timeout(3000);
-	}
-}
-#endif
-void timer_handler(void *data){
-	oprintf("timer handler ");
+
+void sys_bad(struct pt_regs regs);
+void sys_bad(struct pt_regs regs){
+	oprintf("unimplemented syscall :NR =  %u\n", regs.eax);	
+	spin("");
 }
 
-void func0(void){
+int func_init(void *v){
+	task1 = current;
+	oprintf("func init run..\n");
+
+	extern unsigned long func_table[255];
+	for(int i = 0; i < 255; i++){
+		if(func_table[i] == 0) func_table[i] = (unsigned long)sys_bad;
+	}
+
 	extern struct linux_binfmt elf_format;
 	register_binfmt(&elf_format);
-	#if 0
-	__asm__ __volatile__(".intel_syntax prefix\n\t"
-						"int 0x80\n\t"
-						".att_syntax prefix\n\t"
-						:"=a"(x)
-						:"a"(1)
-						);
-	#endif
-	kernel_thread(func2, (void *)123, 0);	
 
-	while(1){
-		//mdelay(30 );
-		oprintf("%s ", "func0 ");
-		//oprintf("%u ", x);
-		schedule_timeout(1000);
-	}
-
-}
-
-int func2(void *arg){
-	oprintf("func2 run..\n");
-	while(1){
-		oprintf(">>>>");
-		schedule_timeout(1000);
-	}
-}
-void func_init(void){
-	#if 0
-	while(1){
-		oprintf("func_init sleep");
-		kp_sleep(0, 0);
-		oprintf("func_init waked up");
-	}
-	#endif
-
-	oprintf("func init run..\n");
 	ide_read_partation(0x3, 0);
 	init_vfs();
 	register_filesystem("cell", cell_read_super);	
@@ -224,12 +168,13 @@ void func_init(void){
 	int rbytes = sys_read(fd, testbuf, 100);
 	avoid_gcc_complain = rbytes = (unsigned)&indir;
 
+	//执行用户用户程序init。进化成一个用户进程。
 	int x = 0;
-	char *argv[] = {"doado", "arg1", 0};
+	char *argv[] = {"init", "arg1", 0};
 	__asm__ __volatile__(
 						"int $0x80\n\t"
 						:"=a"(x)
-						:"a"(NR_execve), "b"("/doado"), "c"(argv), "d"(0)
+						:"a"(NR_execve), "b"("/init"), "c"(argv), "d"(0)
 						);
 	oprintf("execve failed, error code %u ", x);
 	while(1);
@@ -239,11 +184,9 @@ void func_init(void){
 	while(1) schedule_timeout(1000);
 	
 }
-void usr_func_backup(void){
-	while(1);
-}
 
-void idle_func(void){
+void task0_func(void){
+	kernel_thread(func_init, (void *)123, 0);	
 	while(1){
 /*		oprintf("idle..");*/
 		__asm__("hlt");
@@ -336,3 +279,4 @@ static int scan_dirty_machine_words(unsigned start, unsigned end){
 	return count;
 }
 #endif
+

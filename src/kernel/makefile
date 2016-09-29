@@ -1,4 +1,4 @@
-all: clean bh.o timer.o fork.o
+all: clean bh.o timer.o fork.o exit.o
 
 
 %.o:%.c

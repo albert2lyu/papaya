@@ -107,7 +107,8 @@ u32 get_unmapped_area(u32 addr, u32 len);
 struct vm_area *find_vma(struct mm *mm, unsigned long addr);
 void * mmap(ulong addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 offset);
 
-int common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode);
+struct page *
+common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode);
 
 //看看@start_addr和@end_addr这一段区间是否跟某个vma接壤
 static inline struct vm_area *
@@ -121,38 +122,13 @@ find_vma_intersection(struct mm *mm,
 	return 0;
 }
 
-bool __release_address(union pte *pgdir, unsigned long vaddr);
-bool __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot);
+bool  __release_address(union pte *pgdir, unsigned long vaddr);
+struct page* __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot);
 bool vm_area_shrink(struct vm_area *vma, unsigned long new_end);
 bool vm_area_expand(struct vm_area *vma, unsigned long new_end);
 unsigned long k_brk(unsigned long brk);
 
 #define PGDIR_OF_MM(mm) ( (union pte *)__va(mm->cr3.value & PAGE_MASK) )
-extern struct slab_head *fs_struct_cache, *files_struct_cache;
-
-static inline struct mm *
-get_mm(struct mm *that){
-	that->users++;	
-	return that;
-}
-
-int __release_mm(struct mm *mm);
-/* 下面说错了，可以在非上下文环境被释放的。因为页目录，页表什么的，都在内核里。
- * 递减count计数，若为０．则释放mm结构体,以及里面的pgdir。
- * 注意，在调用put_mm之前,你必须调用release_user_space()释放掉用户空间
- * 因此，所put的mm是一个空壳
- * TODO unstable. 希望能写出来一个跟exit通用的接口
- */
-static inline void 
-put_mm(struct mm *that){
-																				 assert(that->vma);
-	that->users--;
-	if(that->users == 0){
-		__release_mm(that);
-	}
-}
-
-
 
 #endif
 

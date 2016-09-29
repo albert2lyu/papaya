@@ -65,7 +65,6 @@ BLOCK_FILE_DIR	include/old/fs_ext.h	9;"	d
 BLOCK_FILE_REGULAR	include/old/fs_ext.h	8;"	d
 BLOCK_SIZE	include/linux/blkdev.h	12;"	d
 BOOT_INFO_H	include/old/bootinfo.h	2;"	d
-BOUND	disp.c	17;"	d	file:
 BUF_PG_ORDER	lib/printf.c	24;"	d	file:
 BYTEORDER_GENERIC_H	include/linux/byteorder/generic.h	2;"	d
 BYTES_PER_WORD	include/linux/slab.h	10;"	d
@@ -168,12 +167,11 @@ EBADF	include/asm-generic/errno-base.h	12;"	d
 EBUSY	include/asm-generic/errno-base.h	19;"	d
 ECHILD	include/asm-generic/errno-base.h	13;"	d
 ECTRL_SLU	drivers/net/e1000.c	41;"	d	file:
-EDI_ENTER	disp.c	10;"	d	file:
 EDOM	include/asm-generic/errno-base.h	36;"	d
 EEXIST	include/asm-generic/errno-base.h	20;"	d
 EFAULT	include/asm-generic/errno-base.h	17;"	d
 EFBIG	include/asm-generic/errno-base.h	30;"	d
-EFLAGS_STACK_LEN	include/old/proc.h	73;"	d
+EFLAGS_STACK_LEN	include/old/proc.h	74;"	d
 EINTR	include/asm-generic/errno-base.h	7;"	d
 EINVAL	include/asm-generic/errno-base.h	25;"	d
 EIO	include/asm-generic/errno-base.h	8;"	d
@@ -219,7 +217,7 @@ Elf32_Phdr	include/old/elf.h	/^} Elf32_Phdr;$/;"	t	typeref:struct:__anon55
 Elf32_Word	include/old/valType.h	/^typedef unsigned Elf32_Word;$/;"	t
 FIFOTMS	drivers/net/8139.c	/^	FIFOTMS		= 0x70,	 \/* FIFO Control and test. *\/$/;"	e	enum:RTL8139_registers	file:
 FILE_NAME	include/old/ntfs.h	/^} FILE_NAME, *LPFILENAME;$/;"	t	typeref:struct:tag_FILE_NAME
-FLUSH_TLB	arch/x86/include/asm/page.h	22;"	d
+FLUSH_TLB	arch/x86/include/asm/page.h	24;"	d
 FMODE_READ	include/linux/fs.h	11;"	d
 FMODE_SEEK	include/linux/fs.h	15;"	d
 FMODE_WRITE	include/linux/fs.h	13;"	d
@@ -328,7 +326,7 @@ INDXATTR	include/old/ntfs.h	/^} INDXATTR, *LPINDXATTR;$/;"	t	typeref:struct:tag_
 INDXENTRY	include/old/ntfs.h	/^} INDXENTRY, *LPINDXENTRY;$/;"	t	typeref:struct:tag_INDXENTRY
 INDXHEAD	include/old/ntfs.h	/^} INDXHEAD, *LPINDXHEAD;$/;"	t	typeref:struct:tag_INDXHEAD
 INDXROOT	include/old/ntfs.h	/^} INDXROOT, *LPINDXROOT;$/;"	t	typeref:struct:tag_INDXROOT
-INIT_LIST_HEAD	include/old/list.h	11;"	d
+INIT_LIST_HEAD	include/old/list.h	15;"	d
 INODE	include/old/fs_ext.h	/^}INODE;$/;"	t	typeref:struct:__anon39
 INODE_COMMON_SIZE	include/linux/fs.h	44;"	d
 INODE_FILE_DIR	include/old/fs_ext.h	6;"	d
@@ -351,7 +349,7 @@ IntrStatusBits	drivers/net/8139.c	/^enum IntrStatusBits {$/;"	g	file:
 KU_MM_H	include/old/ku_mm.h	2;"	d
 KU_PROC_H	include/old/ku_proc.h	3;"	d
 KU_UTILS_H	include/old/ku_utils.h	2;"	d
-KV	arch/x86/include/asm/page.h	111;"	d
+KV	arch/x86/include/asm/page.h	109;"	d
 KV	include/old/bootinfo.h	22;"	d
 L1_CACHLINE_SIZE	include/linux/slab.h	9;"	d
 LATCH	kernel.asm	/^LATCH equ 1193180\/100$/;"	d
@@ -364,7 +362,7 @@ LINUX_SCHED_H	include/linux/sched.h	2;"	d
 LINUX_STRING_H	include/linux/string.h	2;"	d
 LINUX_TIMER_H	include/linux/timer.h	2;"	d
 LINUX_UDP_H	include/linux/udp.h	2;"	d
-LIST_FIND2	include/old/list.h	70;"	d
+LIST_FIND2	include/old/list.h	74;"	d
 LIST_H	include/old/list.h	2;"	d
 LL2_A	include/linux/mylist.h	27;"	d
 LL2_DEL	include/linux/mylist.h	44;"	d
@@ -384,7 +382,6 @@ LL_SCAN_ON_KEY	include/linux/mylist.h	229;"	d
 LL_SCAN_ON_KEY_S	include/linux/mylist.h	251;"	d
 LL_SCAN_ON_kEY_B	include/linux/mylist.h	242;"	d
 LOOKUP_DIR	fs/namei.c	9;"	d	file:
-LOOP	disp.c	26;"	d	file:
 LPFILENAME	include/old/ntfs.h	/^} FILE_NAME, *LPFILENAME;$/;"	t	typeref:struct:tag_FILE_NAME
 LPINDX	include/old/ntfs.h	/^} INDX, *LPINDX;$/;"	t	typeref:struct:tag_INDX
 LPINDXATTR	include/old/ntfs.h	/^} INDXATTR, *LPINDXATTR;$/;"	t	typeref:struct:tag_INDXATTR
@@ -396,7 +393,6 @@ LPMFTATTR	include/old/ntfs.h	/^} MFTATTR, *LPMFTATTR;$/;"	t	typeref:struct:tag_M
 LPNONRESIDATTR	include/old/ntfs.h	/^} NONRESIDATTR, *LPNONRESIDATTR;$/;"	t	typeref:struct:tag_NONRESIDATTR
 LPRESIDATTR	include/old/ntfs.h	/^} RESIDATTR, *LPRESIDATTR;$/;"	t	typeref:struct:tag_RESIDATTR
 LSTA_TU	drivers/net/e1000.c	95;"	d	file:
-L_SIZE	disp.c	15;"	d	file:
 MAC0	drivers/net/8139.c	/^	MAC0		= 0,	 \/* Ethernet hardware address. *\/$/;"	e	enum:RTL8139_registers	file:
 MAJOR	include/linux/blkdev.h	8;"	d
 MAKE_IP	include/old/utils.h	230;"	d
@@ -412,7 +408,6 @@ MASK_BSY	include/old/hd.h	23;"	d
 MASK_BSY	include/old/hs.h	26;"	d
 MASK_H	arch/x86/include/asm/bit.h	51;"	d
 MASK_L	arch/x86/include/asm/bit.h	60;"	d
-MASK_L_NR	disp.c	14;"	d	file:
 MAX	include/old/ku_utils.h	5;"	d
 MAX_BLKDEV	include/linux/blkdev.h	9;"	d
 MAX_DRIVES	include/linux/ide.h	9;"	d
@@ -420,7 +415,7 @@ MAX_HWIFS	drivers/ide/ide.c	17;"	d	file:
 MAX_ORDER	include/old/mmzone.h	32;"	d
 MAX_PATH	include/old/ntfs.h	13;"	d
 MAX_REQUEST	include/linux/blkdev.h	10;"	d
-MB2STRU	include/old/list.h	87;"	d
+MB2STRU	include/old/list.h	93;"	d
 MC_CTRL_L	include/old/kbd_drv.h	21;"	d
 MC_SHIFT_L	include/old/kbd_drv.h	19;"	d
 MC_SHIFT_R	include/old/kbd_drv.h	20;"	d
@@ -454,7 +449,7 @@ NONRESIDATTR	include/old/ntfs.h	/^} NONRESIDATTR, *LPNONRESIDATTR;$/;"	t	typeref
 NR_ICMP_TYPES	include/net/icmp.h	20;"	d
 NR_ICMP_UNREACH	include/net/icmp.h	40;"	d
 NR_IRQS	include/old/irq.h	7;"	d
-NR_OPEN_DEFAULT	include/old/proc.h	43;"	d
+NR_OPEN_DEFAULT	include/old/proc.h	44;"	d
 NR_PAGES	lib/printf.c	30;"	d	file:
 NR_SCAN_CODES	include/old/kbd_drv.h	5;"	d
 NR_SYSCALL_H	include/linux/NR_syscall.h	2;"	d
@@ -486,12 +481,10 @@ O_RDWR	include/asm-generic/fcntl.h	6;"	d
 O_SCAN_UNTIL_MEET_LARGER	include/linux/mylist.h	341;"	d
 O_WRONLY	include/asm-generic/fcntl.h	5;"	d
 PAGE_H	lib/printf.c	26;"	d	file:
-PAGE_MASK	arch/x86/include/asm/page.h	7;"	d
-PAGE_OFFSET	arch/x86/include/asm/page.h	100;"	d
-PAGE_SHIFT	arch/x86/include/asm/page.h	5;"	d
-PAGE_SIZE	arch/x86/include/asm/page.h	6;"	d
-PAGE_SIZE	disp.c	12;"	d	file:
-PAGE_SIZE	disp.c	13;"	d	file:
+PAGE_MASK	arch/x86/include/asm/page.h	9;"	d
+PAGE_OFFSET	arch/x86/include/asm/page.h	106;"	d
+PAGE_SHIFT	arch/x86/include/asm/page.h	7;"	d
+PAGE_SIZE	arch/x86/include/asm/page.h	8;"	d
 PAGE_SIZE	lib/printf.c	28;"	d	file:
 PAGE_SIZE	lib/printf.c	29;"	d	file:
 PAGE_W	lib/printf.c	25;"	d	file:
@@ -499,7 +492,7 @@ PARA78	drivers/net/8139.c	/^	PARA78		= 0x78,$/;"	e	enum:RTL8139_registers	file:
 PARA7c	drivers/net/8139.c	/^	PARA7c		= 0x7c,	 \/* Magic transceiver parameter register. *\/$/;"	e	enum:RTL8139_registers	file:
 PATTRIBUTE_TYPE	include/old/ntfs.h	/^} ATTRIBUTE_TYPE, *PATTRIBUTE_TYPE;$/;"	t	typeref:enum:__anon46
 PCB_MAGIC_NUMBER	proc.c	7;"	d	file:
-PCB_SIZE	include/old/proc.h	78;"	d
+PCB_SIZE	include/old/proc.h	79;"	d
 PCD	arch/x86/include/asm/page.h	/^		unsigned PCD: 1;$/;"	m	struct:pte::__anon58
 PCIErr	drivers/net/8139.c	/^	PCIErr		= 0x8000,$/;"	e	enum:IntrStatusBits	file:
 PCI_AF_CAP	include/linux/pci_regs.h	324;"	d
@@ -1159,11 +1152,11 @@ PF_R	include/old/elf.h	35;"	d
 PF_W	include/old/elf.h	36;"	d
 PF_X	include/old/elf.h	37;"	d
 PGDIR_OF_MM	include/linux/mm.h	130;"	d
-PG_H10	arch/x86/include/asm/page.h	15;"	d
-PG_L10	arch/x86/include/asm/page.h	16;"	d
-PG_P	arch/x86/include/asm/page.h	11;"	d
-PG_RWW	arch/x86/include/asm/page.h	13;"	d
-PG_USU	arch/x86/include/asm/page.h	12;"	d
+PG_H10	arch/x86/include/asm/page.h	17;"	d
+PG_L10	arch/x86/include/asm/page.h	18;"	d
+PG_P	arch/x86/include/asm/page.h	13;"	d
+PG_RWW	arch/x86/include/asm/page.h	15;"	d
+PG_USU	arch/x86/include/asm/page.h	14;"	d
 PG_highmem	include/old/mmzone.h	/^	int PG_highmem:1;$/;"	m	struct:page
 PG_private	include/old/mmzone.h	/^	int PG_private:1;$/;"	m	struct:page
 PG_zid	include/old/mmzone.h	/^	unsigned PG_zid:2;$/;"	m	struct:page
@@ -1206,7 +1199,7 @@ PT_PHDR	include/old/elf.h	46;"	d
 PT_SHLIB	include/old/elf.h	45;"	d
 PT_TLS	include/old/elf.h	47;"	d
 PWT	arch/x86/include/asm/page.h	/^		unsigned PWT: 1;$/;"	m	struct:pte::__anon58
-P_NAME_MAX	include/old/proc.h	9;"	d
+P_NAME_MAX	include/old/proc.h	10;"	d
 PciClassCodeTable	drivers/pci/pci_vendor.c	/^PCI_CLASSCODETABLE PciClassCodeTable [] =$/;"	v
 PciClassCodeTable	include/linux/pci_vendor_full.h	/^PCI_CLASSCODETABLE PciClassCodeTable [] =$/;"	v
 PciClassTbl_Get	drivers/pci/pci_vendor.c	/^struct pci_class_entry *PciClassTbl_Get(u8 class, u8 sub, u8 prog){$/;"	f
@@ -1373,7 +1366,7 @@ SB_COMMON	fs/cell/namei.c	8;"	d	file:
 SCHEDULE_H	include/old/schedule.h	2;"	d
 SECTOR_THROUGHPUT	include/old/hd.h	37;"	d
 SECTOR_THROUGHPUT	include/old/hs.h	40;"	d
-SET_PID_EAX	include/old/proc.h	141;"	d
+SET_PID_EAX	include/old/proc.h	146;"	d
 SHIFT_L	include/old/kbd_drv.h	11;"	d
 SHIFT_R	include/old/kbd_drv.h	12;"	d
 SIDE_EDGE_WIDTH	lib/printf.c	151;"	d	file:
@@ -1454,7 +1447,7 @@ TCTL_EN	drivers/net/e1000.c	85;"	d	file:
 TCTL_PSP	drivers/net/e1000.c	86;"	d	file:
 TCTL_RTLC	drivers/net/e1000.c	90;"	d	file:
 TCTL_SWXOFF	drivers/net/e1000.c	89;"	d	file:
-THREAD_SIZE	include/old/proc.h	79;"	d
+THREAD_SIZE	include/old/proc.h	80;"	d
 TIMER_RUNNING	include/linux/timer.h	/^	TIMER_RUNNING$/;"	e	enum:__anon26
 TIMER_STOPPED	include/linux/timer.h	/^	TIMER_STOPPED,$/;"	e	enum:__anon26
 TIME_H	include/old/time.h	2;"	d
@@ -1560,7 +1553,7 @@ __GFP_ZERO	include/old/mmzone.h	35;"	d
 __NTFS_H__	include/old/ntfs.h	2;"	d
 __RDTSC	include/old/utils.h	/^static inline unsigned __RDTSC(void){$/;"	f
 __RDTSC_U	include/old/utils.h	/^static inline unsigned __RDTSC_U(void){$/;"	f
-__SAVE	include/old/schedule.h	19;"	d
+__SAVE	include/old/schedule.h	18;"	d
 __all_your_nic	net/core/dev.c	/^static struct net_device *__all_your_nic[YOUR_NIC_CNT];$/;"	v	typeref:struct:net_device	file:
 __alloc_page	include/old/mmzone.h	/^static inline void * __alloc_page(u32 gfp)$/;"	f
 __alloc_pages	include/old/mmzone.h	/^static inline void * __alloc_pages(u32 gfp_mask, int order){$/;"	f
@@ -1588,7 +1581,7 @@ __free_page	include/old/mmzone.h	/^static inline void __free_page(void * frame_a
 __free_pages	include/old/mmzone.h	/^static inline void __free_pages(void* frame_addr, int order){$/;"	f
 __free_pages_bulk	mmzone.c	/^void __free_pages_bulk(struct page *page, zone_t *zone, int order){$/;"	f
 __fsh	include/old/proc.h	/^	unsigned short fs, __fsh;$/;"	m	struct:tss
-__fstack	include/old/proc.h	161;"	d
+__fstack	include/old/proc.h	166;"	d
 __gsh	include/old/proc.h	/^	unsigned short gs, __gsh;$/;"	m	struct:tss
 __hs_pcb	include/old/proc.h	/^struct pcb *__hs_pcb;$/;"	v	typeref:struct:pcb
 __ip_down	net/ipv4/ip.c	/^static int __ip_down(struct sk_buff *skb, u8 me_protocol, u8 ttl){$/;"	f	file:
@@ -1602,13 +1595,13 @@ __list_add	include/old/list.h	/^static inline void __list_add(list_head_t *new, 
 __list_del	include/old/list.h	/^static inline void __list_del(list_head_t *prev, list_head_t *next){$/;"	f
 __local_ip	net/ipv4/arp.c	/^u32 __local_ip = MAKE_IP(192, 168, 0, 9);	\/*TODO one for each nic *\/$/;"	v
 __mac_broadcast	net/ipv4/arp.c	/^static u8 __mac_broadcast[6] = {0xff, 0xff, 0xff, 0xff, 0xff, 0xff};$/;"	v	file:
-__pa	arch/x86/include/asm/page.h	101;"	d
-__pa2page_t	arch/x86/include/asm/page.h	29;"	d
+__pa	arch/x86/include/asm/page.h	107;"	d
+__pa2page_t	arch/x86/include/asm/page.h	32;"	d
 __pic_get_irq_reg	i8259.c	/^static u16 __pic_get_irq_reg(int ocw3)$/;"	f	file:
 __priv	drivers/net/8139.c	18;"	d	file:
 __register_slab_type	mm/slab.c	/^static inline int __register_slab_type(char *name, int objsize, $/;"	f	file:
 __release_address	mm/memory.c	/^bool __release_address(union pte *pgdir, unsigned long vaddr){$/;"	f
-__release_mm	fs/exec.c	/^int __release_mm(struct mm *mm){$/;"	f
+__release_mm	proc.c	/^int __release_mm(struct mm *mm){$/;"	f
 __resolve_address	mm/memory.c	/^bool __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){$/;"	f
 __rmquene	mmzone.c	/^struct page *__rmquene(zone_t *zone , int order){$/;"	f
 __set_column	lib/printf.c	/^static void __set_column(struct cell *wnd, int col, $/;"	f	file:
@@ -1624,8 +1617,8 @@ __u16	include/old/valType.h	/^typedef unsigned short __u16;$/;"	t
 __u32	include/old/valType.h	/^typedef unsigned __u32;$/;"	t
 __u8	include/old/valType.h	/^typedef unsigned char __u8;$/;"	t
 __usr_psp	include/old/ku_mm.h	13;"	d
-__va	arch/x86/include/asm/page.h	102;"	d
-__va2page_t	arch/x86/include/asm/page.h	28;"	d
+__va	arch/x86/include/asm/page.h	108;"	d
+__va2page_t	arch/x86/include/asm/page.h	30;"	d
 __va2pte	arch/x86/include/asm/page.h	/^static inline union pte *__va2pte(void *vaddr, union pte *pgdir){$/;"	f
 __zones	include/old/mmzone.h	/^zone_t *__zones[3];$/;"	v
 __zones	mmzone.c	/^zone_t *__zones[3] = {&zone_dma, &zone_normal, &zone_highmem};$/;"	v
@@ -1658,6 +1651,7 @@ al	include/old/utils.h	/^struct __eax { u8 al; u8 ah; u8 AL; u8 AH;};$/;"	m	stru
 alloc_bh	kernel/bh.c	/^int alloc_bh(bh_fn routine, void *data){$/;"	f
 alloc_page	include/old/mmzone.h	/^static inline struct page *alloc_page(u32 gfp)$/;"	f
 alloc_pages	mmzone.c	/^struct page *alloc_pages(u32 gfp_mask, int order){$/;"	f
+alloc_pid	proc.c	/^int alloc_pid(int pid){$/;"	f
 allocs	include/old/mmzone.h	/^	int allocs,frees;	\/\/counts for allocate\/free operation. For Debug$/;"	m	struct:zone_struct
 allocs	include/old/mmzone.h	/^	int frees,allocs;$/;"	m	struct:free_area_struct
 always	include/linux/pci.h	/^	int always:2 ;		\/* 0 ~ 1 *\/$/;"	m	struct:pci_config_addr
@@ -1677,7 +1671,6 @@ arphdr	include/net/arp.h	/^	struct arphdr arphdr;$/;"	m	struct:arp_packet	typere
 arphdr	include/net/arp.h	/^struct arphdr{$/;"	s
 arptbl	net/ipv4/arp.c	/^static struct arp_record **arptbl;$/;"	v	typeref:struct:arp_record	file:
 ascii	lib/printf.c	/^			char ascii;$/;"	m	struct:cell::__anon3::__anon4	file:
-asciis_buffer	disp.c	/^static char asciis_buffer[buffer_len];$/;"	v	file:
 asker	include/linux/blkdev.h	/^	struct pcb *asker;$/;"	m	struct:request	typeref:struct:request::pcb
 asker	include/old/hs.h	/^	struct pcb * asker;$/;"	m	struct:__anon51	typeref:struct:__anon51::pcb
 assert	include/linux/assert.h	6;"	d
@@ -1781,7 +1774,6 @@ buf	include/old/hd.h	/^	char*buf;$/;"	m	struct:require
 buf	include/old/hs.h	/^	char*buf;$/;"	m	struct:__anon51
 buf2	fs/cell/namei.c	/^struct buf2{$/;"	s	file:
 buffer	include/old/blk.h	/^	char *buffer;	$/;"	m	struct:request
-buffer_len	disp.c	9;"	d	file:
 bufsize	include/linux/skbuff.h	/^		int bufsize;		\/* buffer size *\/$/;"	m	union:sk_buff::__anon15
 build_equal_map	garbage.c	7;"	d	file:
 bus	include/linux/pci.h	/^			unsigned bus: 8;	\/* 16 ~ 23 *\/$/;"	m	struct:pci_config_addr::__anon11::__anon12
@@ -1829,6 +1821,7 @@ checksum	include/net/icmp.h	/^	u16 checksum;$/;"	m	struct:icmphdr
 chgpg	kernel/fork.c	/^void chgpg(u32*dir,int vpg,int rw){$/;"	f
 chgtime	include/linux/cell_common.h	/^	unsigned chgtime;$/;"	m	struct:cell
 chgtime	include/linux/fs.h	/^	u32 chgtime;$/;"	m	struct:inode
+children	include/old/proc.h	/^			struct list_head children;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::list_head
 chksum	include/net/ip.h	/^	u16 chksum;$/;"	m	struct:iphdr
 chksum	include/net/tcp.h	/^	u16 chksum;$/;"	m	struct:tcphdr
 chksum	include/net/udp.h	/^	u16 chksum;$/;"	m	struct:udphdr
@@ -1842,6 +1835,7 @@ cli	kernel.asm	/^cli$/;"	l
 cli_already	include/old/utils.h	/^static inline bool cli_already(void){$/;"	f
 cli_ex	include/old/utils.h	/^static inline bool cli_ex(void){$/;"	f
 cli_push	include/old/proc.h	/^static inline void cli_push(void){$/;"	f
+clone_mm	kernel/fork.c	/^static int clone_mm(struct pcb *child){$/;"	f	file:
 clone_vma	kernel/fork.c	/^static struct vm_area * clone_vma(struct vm_area *me, struct mm *hismm){$/;"	f	file:
 close	include/linux/mm.h	/^	void (*close)(struct vm_area *area);$/;"	m	struct:vm_operations
 cmd	include/linux/blkdev.h	/^	int cmd;$/;"	m	struct:request
@@ -1859,12 +1853,14 @@ compare	include/linux/dcache.h	/^	int (*compare) (struct qstr *, struct qstr *);
 connect	net/ipv4/tcp.cc	/^struct connect{$/;"	s	file:
 connection_create	net/ipv4/tcp.cc	/^connection_create(struct sk_buff *comer){$/;"	f	file:
 connection_lookup	net/ipv4/tcp.cc	/^static struct connect * connection_lookup(struct sk_buff * comer){$/;"	f	file:
+container_of	include/old/list.h	98;"	d
 copr_error	kernel.asm	/^copr_error:$/;"	l
 copr_not_avialable	kernel.asm	/^copr_not_avialable:$/;"	l
 copr_seg_overrun	kernel.asm	/^copr_seg_overrun:$/;"	l
 copy_fd	kernel/fork.c	/^static int copy_fd( struct pcb *child){$/;"	f	file:
 copy_fs	kernel/fork.c	/^static int copy_fs(struct pcb *child){$/;"	f	file:
-copy_mm	kernel/fork.c	/^static int copy_mm(struct pcb *child){$/;"	f	file:
+copy_string	fs/exec.c	/^char * copy_string(char *str){$/;"	f
+copy_strings	fs/exec.c	/^char ** copy_strings(char **array){$/;"	f
 count	include/linux/blkdev.h	/^	int count;$/;"	m	struct:request
 count	include/linux/dcache.h	/^	int count;$/;"	m	struct:dentry
 count	include/linux/fs.h	/^	int count;$/;"	m	struct:file
@@ -1895,7 +1891,7 @@ ctor	mm/slab.c	/^	void (*ctor)(void *, struct slab_head *, unsigned);	\/* constr
 cur	include/asm/resource.h	/^	unsigned cur;	\/* soft limit *\/$/;"	m	struct:rlimit
 cur_idx	mm/slab.c	/^int cur_idx;$/;"	v
 cur_rq	include/linux/ide.h	/^	struct request *cur_rq;		\/*current request*\/$/;"	m	struct:ide_hwif	typeref:struct:ide_hwif::request
-current	include/old/proc.h	109;"	d
+current	include/old/proc.h	114;"	d
 cursor	lib/printf.c	/^int cursor;$/;"	v
 cursor_r	drivers/net/8139.c	/^	unsigned cursor_r;		\/* points to the first byte behind the package we $/;"	m	struct:rtl8139_private	file:
 cySegment	boot.asm	/^cySegment:$/;"	l
@@ -1955,6 +1951,7 @@ do_bh	kernel/bh.c	/^void do_bh(void){$/;"	f
 do_breakpoint_fault	arch/x86/mm/fault.c	/^int do_breakpoint_fault(struct pt_regs *regs){$/;"	f
 do_brk	mm/mmap.c	/^static unsigned long do_brk(struct mm *mm, unsigned long brk){$/;"	f	file:
 do_execve	fs/exec.c	/^int do_execve(char *filepath, char *argv[], char *envp[], struct pt_regs *regs){$/;"	f
+do_exit	kernel/exit.c	/^void do_exit(long code){$/;"	f
 do_fork	kernel/fork.c	/^int do_fork(unsigned long clone_flags, unsigned long stack_start,$/;"	f
 do_lseek	fs/read_write.c	/^static int do_lseek(struct file *file, int offset, unsigned origin){$/;"	f	file:
 do_mmap	mm/mmap.c	/^void * do_mmap(u32 addr, u32 len, int vm_flags, int map_flags, struct file *file, u32 pgoff){$/;"	f
@@ -1968,8 +1965,6 @@ dontcopy	include/linux/mm.h	/^		unsigned dontcopy: 1;$/;"	m	struct:vm_flags::__a
 double_fault	kernel.asm	/^double_fault:$/;"	l
 dput	include/linux/dcache.h	/^static inline void dput(struct dentry *dentry){$/;"	f
 drive	include/linux/ide.h	/^	struct ide_drive drive[MAX_DRIVES];$/;"	m	struct:ide_hwif	typeref:struct:ide_hwif::ide_drive
-drop_fd	fs/exec.c	/^static int drop_fd(struct files_struct *files){$/;"	f	file:
-drop_mm	fs/exec.c	/^static int drop_mm(struct mm *mm){$/;"	f	file:
 drv	include/linux/ide.h	/^	u8 drv: 1;	\/* master:0  or slave:1 *\/$/;"	m	struct:select
 drv	include/old/hd.h	/^	u8 drv: 1;	\/* master:0  or slave:1 *\/$/;"	m	struct:select
 ds	include/old/proc.h	/^	u32 ds,es,gs,fs;$/;"	m	struct:pt_regs
@@ -2033,7 +2028,6 @@ ebx	include/old/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pas
 ebx	include/old/proc.h	/^	unsigned long eax,ecx,edx,ebx;$/;"	m	struct:tss
 ecx	include/old/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:pt_regs
 ecx	include/old/proc.h	/^	unsigned long eax,ecx,edx,ebx;$/;"	m	struct:tss
-edi	disp.c	/^unsigned edi;$/;"	v
 edi	include/old/proc.h	/^	u32 edi,ebp,eax;$/;"	m	struct:pt_regs
 edii	include/old/proc.h	/^	unsigned long edii;$/;"	m	struct:tss
 edx	include/old/proc.h	/^	u32 ebx,ecx,edx,esi;		\/**we use four registers to pass syscall args*\/$/;"	m	struct:pt_regs
@@ -2183,14 +2177,12 @@ fs_types	fs/super.c	/^static  struct file_system_type *fs_types;$/;"	v	typeref:s
 fstack	include/old/proc.h	/^			struct eflags_stack fstack;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::eflags_stack
 func	include/linux/pci.h	/^			unsigned func: 3;	\/* 8 ~ 10 *\/$/;"	m	struct:pci_config_addr::__anon11::__anon12
 func	include/old/irq.h	/^	void (*func) (int irq, void *dev, struct pt_regs *regs);$/;"	m	struct:irqaction
-func0	kernel.c	/^void func0(void){$/;"	f
-func2	kernel.c	/^int func2(void *arg){$/;"	f
-func_init	kernel.c	/^void func_init(void){$/;"	f
+func_init	kernel.c	/^int func_init(void *v){$/;"	f
 func_table	func_table.c	/^unsigned long func_table[255] =$/;"	v
 g_array	t.c	/^static char g_array[10] = {1, 2, 3, 4, 5, 6};$/;"	v	file:
 g_memseg_info	include/old/bootinfo.h	34;"	d
 g_memseg_num	include/old/bootinfo.h	31;"	d
-g_tss	include/old/proc.h	12;"	d
+g_tss	include/old/proc.h	13;"	d
 gaotuizhe_baoliuzhenting	net/ipv4/tcp.cc	/^	 gaotuizhe_baoliuzhenting$/;"	e	enum:__anon57	file:
 gaotuizhe_dengdaiqueren	net/ipv4/tcp.cc	/^	 gaotuizhe_dengdaiqueren,$/;"	e	enum:__anon57	file:
 gateway_ip	drivers/net/8139.c	/^	u32 gateway_ip;$/;"	m	struct:ipconfig	file:
@@ -2212,11 +2204,13 @@ gequ	bootinfo.asm	/^gequ realmod_info, 0x6000$/;"	l
 get_current	proc.c	/^struct pcb *get_current(void){$/;"	f
 get_eflags	include/old/utils.h	/^static inline unsigned get_eflags(void){$/;"	f
 get_file	include/linux/fs.h	122;"	d
+get_files	include/old/proc.h	/^struct files_struct *get_files(struct files_struct *files){$/;"	f
 get_free_request	drivers/block/ll_rw_blk.c	/^static struct request *get_free_request(void){$/;"	f	file:
+get_fs	include/old/proc.h	/^struct fs_struct *get_fs(struct fs_struct *fs){$/;"	f
 get_info_ptr	drivers/ide/ide.c	/^static struct ide_drive *get_info_ptr(u16 dev_id){$/;"	f	file:
 get_iptype	net/core/skbuff.c	/^static char *get_iptype(struct iphdr *iphdr){$/;"	f	file:
 get_memory_information	boot.asm	/^	get_memory_information:$/;"	l
-get_mm	include/linux/mm.h	/^get_mm(struct mm *that){$/;"	f
+get_mm	include/old/proc.h	/^get_mm(struct mm *that){$/;"	f
 get_page	include/old/mmzone.h	/^static inline struct page *get_page(struct page *page){$/;"	f
 get_pci_cfg_reg	include/linux/pci.h	/^static inline unsigned get_pci_cfg_reg(int bus, int dev, int func, int reg){$/;"	f	struct:pci_dev
 get_queue	include/linux/blkdev.h	/^	get_queue_fn * get_queue;	\/*access 1*\/$/;"	m	struct:queue_getter
@@ -2344,8 +2338,6 @@ ide_hwifs	drivers/ide/ide.c	/^static struct ide_hwif ide_hwifs[MAX_HWIFS] = {$/;
 ide_init	drivers/ide/ide.c	/^void ide_init(void){$/;"	f
 ide_intr	drivers/ide/ide.c	/^static void ide_intr(int irq, void *_hwif, struct pt_regs *reg){$/;"	f	file:
 ide_read_partation	drivers/ide/ide.c	/^void ide_read_partation(int major, int drive){$/;"	f
-idle	kernel.c	/^struct pcb *idle;$/;"	v	typeref:struct:pcb
-idle_func	kernel.c	/^void idle_func(void){$/;"	f
 idt	kernel.asm	/^idt:$/;"	l
 idtPtr	kernel.asm	/^idtPtr:$/;"	l
 iget	fs/inode.c	/^struct inode *iget(struct super_block *sb, unsigned ino){$/;"	f
@@ -2370,7 +2362,6 @@ init8259A	utils.asm	/^init8259A:$/;"	l
 init_8259A	i8259.c	/^void init_8259A(int x){$/;"	f
 init_ISA_irqs	i8259.c	/^void init_ISA_irqs(void){$/;"	f
 init_arp_msg	net/ipv4/arp.c	/^static void init_arp_msg(struct sk_buff *arpmsg,  int operation){$/;"	f	file:
-init_asciis_buffer	disp.c	/^void init_asciis_buffer(void){$/;"	f
 init_connect_with_syn	net/ipv4/tcp.cc	/^static void init_connect_with_syn(struct connect *connect, struct sk_buff *comer){$/;"	f	file:
 init_display	lib/printf.c	/^void init_display(void){$/;"	f
 init_free_area	mmzone.c	/^void init_free_area(int zone_id, int start_idx){$/;"	f
@@ -2435,14 +2426,9 @@ jmp	kernel.asm	/^jmp _reallystart$/;"	l
 jmp	kernel.asm	/^jmp kernel_c;$/;"	l
 jmp	kernel.asm	/^jmp selector_plain_c0:newcs ;update cs$/;"	l
 k_brk	mm/mmap.c	/^unsigned long k_brk(unsigned long brk){$/;"	f
-k_checkbound	disp.c	/^void k_checkbound(void){$/;"	f
 k_open	fs/read_write.c	/^struct file * k_open(char *path, ulong flags, ulong mode){$/;"	f
 k_read	fs/read_write.c	/^int k_read(struct file *file, char *buf, unsigned size){$/;"	f
-k_screen_reset	disp.c	/^void k_screen_reset(void){$/;"	f
-k_scroll	disp.c	/^void k_scroll(void){$/;"	f
 k_seek	fs/read_write.c	/^int k_seek(struct file *file, int offset, unsigned origin){$/;"	f
-k_show_chars	disp.c	/^void k_show_chars(char*pt_head,u32 end_flag){$/;"	f
-k_show_var	disp.c	/^void k_show_var(unsigned x,int val_type){$/;"	f
 kernel_c	kernel.c	/^void kernel_c(){$/;"	f
 kernel_esp	kernel.asm	/^kernel_esp:$/;"	l
 kernel_image_start_sector	include/old/bootinfo.h	26;"	d
@@ -2527,6 +2513,7 @@ list_del	include/old/list.h	/^static inline void list_del(list_head_t *entry){$/
 list_del_init	include/old/list.h	/^static inline void list_del_init(list_head_t *entry){$/;"	f
 list_empty	include/old/list.h	/^static inline int list_empty(list_head_t *entry){$/;"	f
 list_expire	include/old/schedule.h	/^struct pcb *list_expire;$/;"	v	typeref:struct:pcb
+list_for_each_safe	include/old/list.h	104;"	d
 list_head	include/old/list.h	/^typedef struct list_head{$/;"	s
 list_head_t	include/old/list.h	/^}list_head_t;$/;"	t	typeref:struct:list_head
 list_meet_tail	include/old/list.h	/^static inline int list_meet_tail(list_head_t *first, list_head_t *entry){$/;"	f
@@ -2610,6 +2597,8 @@ mode	lib/printf.c	/^			struct colormod mode;$/;"	m	struct:cell::__anon3::__anon4
 mode	lib/printf.c	/^	struct colormod mode;$/;"	m	struct:bar_desc	typeref:struct:bar_desc::colormod	file:
 model	kernel.c	/^	u32 model:4;$/;"	m	struct:cpuid_family	file:
 model_extend	kernel.c	/^	u32 model_extend:4;$/;"	m	struct:cpuid_family	file:
+monitor	include/old/proc.h	/^			struct pcb *monitor;				\/\/who adopt me?$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::pcb
+mother	include/old/proc.h	/^			struct pcb *mother;					\/\/who fork me?$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::pcb
 mountpoint	include/linux/mount.h	/^	struct dentry *mountpoint;	$/;"	m	struct:vfsmount	typeref:struct:vfsmount::dentry
 mov	boot.asm	/^mov al, 'X'$/;"	l
 mov	boot.asm	/^mov ax, selector_plain_d0$/;"	l
@@ -2706,11 +2695,7 @@ num	include/old/proc.h	/^	int num;$/;"	m	struct:__anon48
 objnum	mm/slab.c	/^	u16 objnum;	\/* per slab *\/$/;"	m	struct:slab_head	file:
 objs	mm/slab.c	/^	void * objs;$/;"	m	struct:slab	file:
 objsize	mm/slab.c	/^	unsigned objsize;	\/* type 'u16' is not enough *\/$/;"	m	struct:slab_head	file:
-obuffer_init	proc.c	/^void obuffer_init(OBUFFER* pt_obuffer){$/;"	f
-obuffer_push	proc.c	/^void obuffer_push(OBUFFER* pt_obuffer,char c){$/;"	f
-obuffer_shift	proc.c	/^unsigned char obuffer_shift(OBUFFER* pt_obuffer){$/;"	f
 offset	arch/x86/include/asm/page.h	/^		unsigned offset: 12;$/;"	m	struct:linear_addr::__anon60
-oldeflags	disp.c	/^u32 oldeflags;$/;"	v
 on_intr	drivers/net/8139.c	/^static void on_intr(int irq, void *dev, struct pt_regs *regs){$/;"	f	file:
 on_intr	drivers/net/e1000.c	/^static void on_intr(int irq, void *dev, void *regs){$/;"	f	file:
 on_protection_error	arch/x86/mm/fault.c	/^static int on_protection_error(unsigned long err_addr, $/;"	f	file:
@@ -2732,7 +2717,6 @@ operation	include/net/arp.h	/^	u16 operation;$/;"	m	struct:arphdr
 operations	include/linux/dcache.h	/^	struct dentry_operations *operations;$/;"	m	struct:dentry	typeref:struct:dentry::dentry_operations
 operations	include/linux/fs.h	/^	struct inode_operations *operations;$/;"	m	struct:inode	typeref:struct:inode::inode_operations
 operations	include/linux/fs.h	/^	struct super_operations *operations;$/;"	m	struct:super_block	typeref:struct:super_block::super_operations
-oprintf	disp.c	/^void oprintf(char*format,...){$/;"	f
 oprintf	lib/printf.c	/^int oprintf(char *format, ...){$/;"	f
 ops	include/linux/mm.h	/^	struct vm_operations *ops;$/;"	m	struct:vm_area	typeref:struct:vm_area::vm_operations
 opt_area	include/net/tcp.h	/^	struct tcp_opt opt_area[0];$/;"	m	struct:tcphdr	typeref:struct:tcphdr::tcp_opt
@@ -2754,9 +2738,9 @@ p_offset	include/old/elf.h	/^  Elf32_Off	p_offset;		\/* Segment file offset *\/$
 p_paddr	include/old/elf.h	/^  Elf32_Addr	p_paddr;		\/* Segment physical address *\/$/;"	m	struct:__anon55
 p_type	include/old/elf.h	/^  Elf32_Word	p_type;			\/* Segment type *\/$/;"	m	struct:__anon55
 p_vaddr	include/old/elf.h	/^  Elf32_Addr	p_vaddr;		\/* Segment virtual address *\/$/;"	m	struct:__anon55
-pa_idx	arch/x86/include/asm/page.h	8;"	d
+pa_idx	arch/x86/include/asm/page.h	10;"	d
 pa_of_zone	mmzone.c	/^static unsigned pa_of_zone[3] = {ZONE_DMA_PA, ZONE_NORMAL_PA, ZONE_HIGHMEM_PA};$/;"	v	file:
-pa_pg	arch/x86/include/asm/page.h	9;"	d
+pa_pg	arch/x86/include/asm/page.h	11;"	d
 padden	include/old/hd.h	/^			u8 padden;$/;"	m	struct:require::__anon41::__anon42
 padden	include/old/hs.h	/^			u8 padden;$/;"	m	struct:__anon51::__anon52::__anon53
 padden	include/old/mmzone.h	/^	int padden:20;$/;"	m	struct:page
@@ -2854,15 +2838,16 @@ pt_curr	include/old/hs.h	/^	char*pt_curr;\/\/不被用户进程制定，由hs内
 pt_next	include/old/heap.h	/^	struct header_heapCell* pt_next;$/;"	m	struct:header_heapCell	typeref:struct:header_heapCell::header_heapCell
 pt_prev	include/old/heap.h	/^	struct header_heapCell* pt_prev;$/;"	m	struct:header_heapCell	typeref:struct:header_heapCell::header_heapCell
 pt_regs	include/old/proc.h	/^typedef struct pt_regs{$/;"	s
-pt_video	disp.c	/^static char* pt_video=(char*)0xc00b8000;$/;"	v	file:
 pte	arch/x86/include/asm/page.h	/^union pte{$/;"	u
-pte2page	arch/x86/include/asm/page.h	32;"	d
-pte2page_t	arch/x86/include/asm/page.h	33;"	d
+pte2page	arch/x86/include/asm/page.h	/^static inline void *pte2page(union pte pte){$/;"	f
+pte2page_t	include/old/mmzone.h	/^static inline struct page *pte2page_t(union pte pte){$/;"	f
 pte_page	include/old/mmzone.h	27;"	d
 pte_pfn	include/old/mmzone.h	25;"	d
 push	kernel.asm	/^push  11931 ;1193180\/100$/;"	l
 push	kernel.asm	/^push 11011000b$/;"	l
-put_mm	include/linux/mm.h	/^put_mm(struct mm *that){$/;"	f
+put_files	proc.c	/^void put_files(struct files_struct *files){$/;"	f
+put_fs	proc.c	/^void put_fs(struct fs_struct *fs){$/;"	f
+put_mm	include/old/proc.h	/^put_mm(struct mm *that){$/;"	f
 put_page	include/old/mmzone.h	/^static inline void put_page(struct page *page){$/;"	f
 pwChar	include/old/ntfs.h	/^	WCHAR		pwChar[MAX_PATH];$/;"	m	struct:tag_FILE_NAME
 pwd	include/linux/fs_struct.h	/^	struct dentry *root, *pwd;$/;"	m	struct:fs_struct	typeref:struct:fs_struct::
@@ -2913,8 +2898,7 @@ register_slab_type	mm/slab.c	/^struct slab_head * register_slab_type(char *name,
 regs	include/old/proc.h	/^	stack_frame regs;$/;"	m	struct:pcb
 regs_len	drivers/net/8139.c	/^	unsigned long regs_len;		\/*length of I\/O or MMI\/O region *\/$/;"	m	struct:rtl8139_private	file:
 regs_len	drivers/net/e1000.c	/^	unsigned long regs_len;		\/*length of I\/O or MMI\/O region *\/$/;"	m	struct:e1000_private	file:
-release_user_space	fs/exec.c	/^static int release_user_space(struct mm *mm){$/;"	f	file:
-release_vma_area	fs/exec.c	/^static int  release_vma_area(struct vm_area *vma){$/;"	f	file:
+release_vm_area	proc.c	/^static int  release_vm_area(struct vm_area *vma){$/;"	f	file:
 rep	boot.asm	/^rep stosd$/;"	l
 request	include/linux/blkdev.h	/^struct request{$/;"	s
 request	include/old/blk.h	/^struct request{$/;"	s
@@ -3070,11 +3054,12 @@ sequence	include/net/icmp.h	/^			u16 sequence;$/;"	m	struct:icmphdr::__anon29::_
 set	elf.c	/^static int set(char *img){$/;"	f	file:
 set_cursor	video_drv.c	/^void set_cursor(unsigned pos){$/;"	f
 set_pci_cfg_reg	include/linux/pci.h	/^static inline void set_pci_cfg_reg(int bus, int dev, int func, int reg, unsigned value){$/;"	f	struct:pci_dev
+set_pid	proc.c	/^void set_pid(int pid, struct pcb *p){$/;"	f
 set_start	video_drv.c	/^void set_start(u32 pos){$/;"	f
 setup_irq	irq.c	/^int setup_irq(int irq, struct irqaction *new){$/;"	f
 shared	include/linux/mm.h	/^		unsigned shared: 1;$/;"	m	struct:vm_flags::__anon8
-show_asciis_buffer	disp.c	/^void show_asciis_buffer(void){$/;"	f
 show_elf	boot.asm	/^show_elf:$/;"	l
+sibling	include/old/proc.h	/^			struct list_head sibling;$/;"	m	struct:pcb::__anon49::__anon50	typeref:struct:pcb::__anon49::__anon50::list_head
 signal_return	kernel.asm	/^signal_return:$/;"	l
 sigpending	include/old/proc.h	/^			int sigpending;$/;"	m	struct:pcb::__anon49::__anon50
 single_step	kernel.asm	/^single_step:$/;"	l
@@ -3088,7 +3073,7 @@ size	mm/slab.c	/^	int size;$/;"	m	struct:cache_size	file:
 size	net/ipv4/tcp.cc	/^	u16 size;				\/* tcphdr->wndsize *\/$/;"	m	struct:recv_wnd	file:
 size	net/ipv4/tcp.cc	/^	u16 size;$/;"	m	struct:send_wnd	file:
 size2pages	include/linux/mm.h	/^static inline int size2pages(int size){$/;"	f
-size_buffer	include/old/proc.h	22;"	d
+size_buffer	include/old/proc.h	23;"	d
 size_of_zone	include/old/mmzone.h	/^unsigned size_of_zone[3];$/;"	v
 size_t	include/old/valType.h	/^typedef unsigned size_t;$/;"	t
 sk_buff	include/linux/skbuff.h	/^struct sk_buff{$/;"	s
@@ -3126,7 +3111,6 @@ start_code	include/linux/sched.h	/^	unsigned long start_code, end_code;$/;"	m	st
 start_cylender	include/linux/blkdev.h	/^	char start_cylender;$/;"	m	struct:partition
 start_data	include/linux/sched.h	/^	unsigned long start_data, end_data;$/;"	m	struct:mm
 start_head	include/linux/blkdev.h	/^	char start_head;$/;"	m	struct:partition
-start_line	disp.c	/^static int start_line=0;$/;"	v	file:
 start_mytimer	kernel/timer.c	/^void start_mytimer(struct timer *timer){$/;"	f
 start_of_vseg	drivers/pci/pci_vendor.c	/^static unsigned short start_of_vseg[255];$/;"	v	file:
 start_sector	include/linux/blkdev.h	/^	unsigned start_sector;$/;"	m	struct:blk_unit
@@ -3168,6 +3152,7 @@ switch_proMode	boot.asm	/^switch_proMode:$/;"	l
 sys_brk	mm/mmap.c	/^unsigned long sys_brk(unsigned long brk){$/;"	f
 sys_close	fs/read_write.c	/^int sys_close(unsigned fd){$/;"	f
 sys_execve	arch/x86/kernel/process.c	/^int sys_execve(struct pt_regs regs){$/;"	f
+sys_exit	kernel/exit.c	/^long sys_exit(int errcode){$/;"	f
 sys_fork	kernel/fork.c	/^int sys_fork(stack_frame regs){$/;"	f
 sys_id	include/linux/blkdev.h	/^	char sys_id;\/\/means the fs type ID.$/;"	m	struct:partition
 sys_lseek	fs/read_write.c	/^int sys_lseek(unsigned fd, int offset, unsigned origin){$/;"	f
@@ -3191,6 +3176,9 @@ tag_NTFS_header	include/old/ntfs.h	/^typedef struct	tag_NTFS_header{$/;"	s
 tag_RESIDATTR	include/old/ntfs.h	/^typedef struct tag_RESIDATTR {$/;"	s
 tail	include/linux/netdevice.h	/^	struct sk_buff *tail;$/;"	m	struct:skb_queue	typeref:struct:skb_queue::sk_buff
 tail	include/old/proc.h	/^	int tail;$/;"	m	struct:__anon48
+task0	kernel.c	/^struct pcb *task0;$/;"	v	typeref:struct:pcb
+task0_func	kernel.c	/^void task0_func(void){$/;"	f
+task1	kernel.c	/^struct pcb *task1;$/;"	v	typeref:struct:pcb
 task_available	lib/printf.c	/^bool task_available = false;$/;"	v
 taste_decimal	lib/vsprintf.c	/^static u32 taste_decimal(char *ptr, int *charnum){$/;"	f	file:
 tbl_idx	arch/x86/include/asm/page.h	/^		unsigned tbl_idx: 10;$/;"	m	struct:linear_addr::__anon60
@@ -3223,7 +3211,6 @@ time_slice	include/old/proc.h	/^			u32 time_slice,time_slice_full;$/;"	m	struct:
 time_slice_full	include/old/proc.h	/^			u32 time_slice,time_slice_full;$/;"	m	struct:pcb::__anon49::__anon50
 timer	include/linux/timer.h	/^struct timer{$/;"	s
 timer	net/ipv4/tcp.cc	/^	struct timer *timer;	\/*delay for issue acknowledgement*\/$/;"	m	struct:recv_wnd	typeref:struct:recv_wnd::timer	file:
-timer_handler	kernel.c	/^void timer_handler(void *data){$/;"	f
 timer_interrupt	time.c	/^static void timer_interrupt(int irq, void *dev, struct pt_regs *pregs){$/;"	f	file:
 times	boot.asm	/^times 512-($-$$) db 0$/;"	l
 times	boot.asm	/^times 512-($-mbr_extend) db 0$/;"	l
@@ -3238,6 +3225,8 @@ touse_desc	drivers/net/8139.c	/^	unsigned touse_desc;$/;"	m	struct:rtl8139_priva
 trace	include/old/proc.h	/^	unsigned short trace, bitmap;$/;"	m	struct:tss
 trigger_mytimer	kernel/timer.c	/^void trigger_mytimer(struct timer *timer){$/;"	f
 true	include/old/valType.h	7;"	d
+try_release_krnl_resource	proc.c	/^int try_release_krnl_resource(struct pcb *p){$/;"	f
+try_release_user_space	proc.c	/^int try_release_user_space(struct mm *mm){$/;"	f
 tss	include/old/proc.h	/^struct tss{$/;"	s
 tss	kernel.asm	/^tss:$/;"	l
 tstamp_permit	net/ipv4/tcp.cc	/^	bool tstamp_permit;	\/\/bencilianjiezhichitime stampma.yifangbuzhichi,jiushuangfangguanbi.$/;"	m	struct:connect	file:
@@ -3320,7 +3309,6 @@ user	arch/x86/include/asm/page.h	/^		unsigned user: 1;$/;"	m	struct:pte::__anon5
 users	include/linux/sched.h	/^	int users;						\/\/被多少个进程(线程)共享$/;"	m	struct:mm
 using	kernel/bh.c	/^static unsigned using;		\/* bitmap for allocated\/free bh slot *\/$/;"	v	file:
 usr_func	kernel.asm	/^usr_func:$/;"	l
-usr_func_backup	kernel.c	/^void usr_func_backup(void){$/;"	f
 usr_psp_struct	include/old/ku_mm.h	/^struct usr_psp_struct{$/;"	s
 value	arch/x86/include/asm/page.h	/^	int value; 		$/;"	m	union:cr3
 value	arch/x86/include/asm/page.h	/^	int value; 		$/;"	m	union:pte
@@ -3384,14 +3372,12 @@ waiting_for_transmit	net/core/dev.c	/^void waiting_for_transmit(struct sk_buff *
 wake_up	schedule.c	/^void wake_up(struct pcb *p){$/;"	f
 wcbSize	include/old/ntfs.h	/^	short		wcbSize;$/;"	m	struct:tag_INDXATTR
 who_am_i	net/core/dev.c	/^struct net_device * who_am_i(u8 *mac){$/;"	f
-width	disp.c	/^static int width=-1;$/;"	v	file:
 win_result	drivers/ide/ide.c	/^static int win_result(struct ide_hwif *hwif){$/;"	f	file:
 wnd_adopt_one	net/ipv4/tcp.cc	/^static int wnd_adopt_one(struct connect *connect, struct sk_buff *one){$/;"	f	file:
 wndsize	include/net/tcp.h	/^	u16 wndsize;$/;"	m	struct:tcphdr
 word	include/net/tcp.h	/^		u16 word[0];$/;"	m	union:tcp_opt::__anon33
 writable	arch/x86/include/asm/page.h	/^		unsigned writable: 1;$/;"	m	struct:pte::__anon58
 writable	include/linux/mm.h	/^		unsigned writable: 1;$/;"	m	struct:vm_flags::__anon8
-write_asciis_buffer	disp.c	/^void write_asciis_buffer(unsigned x,unsigned val_type){$/;"	f
 write_bar	lib/printf.c	/^void write_bar(int x, int y, char *title, char *content){$/;"	f
 write_chars	lib/vsprintf.c	/^static int write_chars(char *dest, char *src,  char *endflags, int width){$/;"	f	file:
 write_imr_bit	i8259.c	/^static void write_imr_bit(bool master, int bit_offset, int value){$/;"	f	file:

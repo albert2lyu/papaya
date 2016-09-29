@@ -84,20 +84,23 @@ static int on_protection_error(unsigned long err_addr,
 			void * new_page;
 
 			that_page = (void *)(err_addr & PAGE_MASK);
-			that_page_t = __va2page_t(err_addr);
 			that_pte = __va2pte((void *)err_addr, PGDIR_OF_MM(current->mm));
+			that_page_t = pte2page_t(*that_pte);
 
 			that_pte->writable = true;
 			if(that_page_t->_count == 1){
+				oprintf("COW, single user, just unwp\n");
 				goto done;
 			}
+			else if(that_page_t->_count <= 0) spin("that_page_t->count == 0!");
+			else oprintf("%u, COW, alloc new page. \n", that_page_t->_count);
 
 			//copy on write
 			new_page = __alloc_page(0);
 			memcpy(new_page, that_page, PAGE_SIZE);
 
 			put_page(that_page_t);
-			that_pte->value |= __pa(new_page);
+			that_pte->physical = __pa(new_page) >> 12;
 
 			done:
 			invlpg((void *)err_addr);
@@ -115,6 +118,13 @@ int do_breakpoint_fault(struct pt_regs *regs){
 }
 
 
+int do_general_protect_fault(struct pt_regs *regs, unsigned errcode){
+	oprintf("general protection error!\n");
+	oprintf("error code:%x", errcode);
+	oprintf("from %s, eip=%x\n", (regs->cs & 3) ? "user" : "kernel", regs->eip);
+	spin("");
+	return 0;
+}
 
 
 

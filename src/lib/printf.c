@@ -213,12 +213,14 @@ void write_bar(int x, int y, char *title, char *content){
 
 void init_status_window(void){
 	struct cell blue_cell = { ascii:0, mode: {bg:RGB_BLUE} };
+	struct cell top_cell = {ascii:205, mode:{bg:RGB_BLUE} };
 	statwnd_setcol(0, blue_cell);
 	statwnd_setcol(1, blue_cell);
 	statwnd_setcol(PAGE_W - 1, blue_cell);
 	statwnd_setcol(PAGE_W - 2, blue_cell);
 
-	statwnd_setline(0, blue_cell);
+	//statwnd_setline(0, blue_cell);
+	statwnd_setline(0, top_cell);
 
 	for(int i = 0; i < BAR_V_NR; i++){
 		for(int j = 0; j < BAR_H_NR; j++){

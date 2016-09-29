@@ -1,0 +1,112 @@
+make
+make -C drivers/block/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/drivers/block'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/drivers/block'
+make -C drivers/ide/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/drivers/ide'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/drivers/ide'
+make -C fs/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/fs'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/fs'
+make -C fs/cell/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/fs/cell'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/fs/cell'
+make -C mm/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/mm'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/mm'
+make -C drivers/pci/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/drivers/pci'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/drivers/pci'
+make -C drivers/net/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/drivers/net'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/drivers/net'
+make -C net/core
+make[1]: Entering directory '/home/wws/lab/yanqi/src/net/core'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/net/core'
+make -C kernel
+make[1]: Entering directory '/home/wws/lab/yanqi/src/kernel'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/kernel'
+make -C net/ipv4
+make[1]: Entering directory '/home/wws/lab/yanqi/src/net/ipv4'
+argument: tcp.cn
+gcc -x c -c -o tcp.o tcp.cc -I/home/wws/lab/yanqi/src/include/ -I/home/wws/lab/yanqi/include/ -I/home/wws/lab/yanqi/src/arch/x86/include/ -I/home/wws/lab/yanqi/src/arch/x86/include/asm/ -I/home/wws/lab/yanqi/src/include/old/ -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nostdinc
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/net/ipv4'
+make -C lib/
+make[1]: Entering directory '/home/wws/lab/yanqi/src/lib'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/lib'
+make -C arch/x86/kernel
+make[1]: Entering directory '/home/wws/lab/yanqi/src/arch/x86/kernel'
+make[1]: Leaving directory '/home/wws/lab/yanqi/src/arch/x86/kernel'
+make -f makefile2
+make[1]: Entering directory '/home/wws/lab/yanqi/src'
+mkdir -p ../lib/ ../bin/
+gcc -c -o ../lib/../src/fs/open.o ../src/fs/open.c -I../include/ 	-I./include/ -I./arch/x86/include/ -I./arch/x86/include/asm/ -I./include/old/ -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nostdinc 
+gcc -c -o ../lib/../src/fs/read_write.o ../src/fs/read_write.c -I../include/ 	-I./include/ -I./arch/x86/include/ -I./arch/x86/include/asm/ -I./include/old/ -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nostdinc 
+gcc -c -o ../lib/../src/fs/binfmt_elf.o ../src/fs/binfmt_elf.c -I../include/ 	-I./include/ -I./arch/x86/include/ -I./arch/x86/include/asm/ -I./include/old/ -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nostdinc 
+cd ../lib/;\
+ld -m elf_i386 -s -Ttext 0xc0010400 -o ../bin/kernel.elf kernel.asmo utils.asmo bootinfo.asmo  kernel.o   utils.o proc.o  video_drv.o schedule.o ku_utils.o mm.o func_table.o pmm.o mmzone.o irq.o time.o i8259.o elf.o 	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o  ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o ../src/net/core/dev.o ../src/net/core/skbuff.o  ../src/kernel/bh.o ../src/net/ipv4/arp.o ../src/net/ipv4/ip.o ../src/net/core/testnet.o  ../src/net/ipv4/icmp.o ../src/net/ipv4/udp.o ../src/lib/vsprintf.o ../src/lib/printf.o ../src/net/ipv4/tcp.o ../src/kernel/timer.o ../src/arch/x86/kernel/process.o ../src/fs/exec.o ../src/mm/mmap.o ../src/mm/memory.o ../src/lib/string.o ../src/fs/binfmt_elf.o ../src/arch/x86/mm/fault.o ../src/kernel/fork.o ../src/kernel/exit.o;\
+ld -m elf_i386 -Ttext 0xc0010400 -o ../bin/g_kernel.elf kernel.asmo utils.asmo bootinfo.asmo  kernel.o   utils.o proc.o  video_drv.o schedule.o ku_utils.o mm.o func_table.o pmm.o mmzone.o irq.o time.o i8259.o elf.o 	../src/drivers/block/ll_rw_blk.o ../src/drivers/ide/ide.o  ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o ../src/net/core/dev.o ../src/net/core/skbuff.o  ../src/kernel/bh.o ../src/net/ipv4/arp.o ../src/net/ipv4/ip.o ../src/net/core/testnet.o  ../src/net/ipv4/icmp.o ../src/net/ipv4/udp.o ../src/lib/vsprintf.o ../src/lib/printf.o ../src/net/ipv4/tcp.o ../src/kernel/timer.o ../src/arch/x86/kernel/process.o ../src/fs/exec.o ../src/mm/mmap.o ../src/mm/memory.o ../src/lib/string.o ../src/fs/binfmt_elf.o ../src/arch/x86/mm/fault.o ../src/kernel/fork.o ../src/kernel/exit.o 
+make[1]: Leaving directory '/home/wws/lab/yanqi/src'
+#make -C ../cmd/
+./dimg
+287+1 records in
+287+1 records out
+147328 bytes (147 kB) copied, 0.000641068 s, 230 MB/s
+1+0 records in
+1+0 records out
+512 bytes (512 B) copied, 0.000109119 s, 4.7 MB/s
+2+0 records in
+2+0 records out
+1024 bytes (1.0 kB) copied, 0.000113375 s, 9.0 MB/s
+source elf size:147328
+target device :../cmd/400m.img
+>>>>>>>>>>>>>>>>>>>>>>>>288 sectors colored
+dd if=../bin/kernel.elf of=../cmd/400m.img bs=512 conv=notrunc seek=4
+dd if=./fix.img of=../cmd/400m.img bs=512 conv=notrunc seek=3
+dimg done.../bo
+00000000000i[      ] LTDL_LIBRARY_PATH not set. using compile time default '/usr/local/lib/bochs/plugins'
+00000000000i[      ] BXSHARE not set. using compile time default '/usr/local/share/bochs'
+00000000000i[      ] lt_dlhandle is 0xa970000
+00000000000i[PLUGIN] loaded plugin libbx_unmapped.so
+00000000000i[      ] lt_dlhandle is 0xa970678
+00000000000i[PLUGIN] loaded plugin libbx_biosdev.so
+00000000000i[      ] lt_dlhandle is 0xa9717a0
+00000000000i[PLUGIN] loaded plugin libbx_speaker.so
+00000000000i[      ] lt_dlhandle is 0xa972060
+00000000000i[PLUGIN] loaded plugin libbx_extfpuirq.so
+00000000000i[      ] lt_dlhandle is 0xa972558
+00000000000i[PLUGIN] loaded plugin libbx_parallel.so
+00000000000i[      ] lt_dlhandle is 0xa9739e0
+00000000000i[PLUGIN] loaded plugin libbx_serial.so
+00000000000i[      ] reading configuration from .bochsrc
+00000000000e[      ] .bochsrc:502: ataX-master/slave CHS set to 0/0/0 - autodetection enabled
+00000000000e[      ] .bochsrc:503: ataX-master/slave CHS set to 0/0/0 - autodetection enabled
+00000000000i[      ] lt_dlhandle is 0xa976fb8
+00000000000i[PLUGIN] loaded plugin libbx_e1000.so
+00000000000i[      ] Enabled gdbstub
+========================================================================
+                       Bochs x86 Emulator 2.6.8
+                Built from SVN snapshot on May 3, 2015
+                  Compiled on Sep 17 2016 at 16:14:39
+========================================================================
+------------------------------
+Bochs Configuration: Main Menu
+------------------------------
+
+This is the Bochs Configuration Interface, where you can describe the
+machine that you want to simulate.  Bochs has already searched for a
+configuration file (typically called bochsrc.txt) and loaded it if it
+could be found.  When you are satisfied with the configuration, go
+ahead and start the simulation.
+
+You can also start bochs with the -q option to skip these menus.
+
+1. Restore factory default configuration
+2. Read options from...
+3. Edit options
+4. Save options to...
+5. Restore the Bochs state from...
+6. Begin simulation
+7. Quit now
+
+Please choose one: [6] 

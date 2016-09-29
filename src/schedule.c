@@ -5,7 +5,10 @@
 #include<linux/printf.h>
 /**account clock interrupt. this variable is the base of system soft-clock*/
 unsigned ticks;
+extern struct pcb *task0;
 
+static char sched_bar_title[] = {'<', '<', 0};
+static char sched_bar_body[16];
 
 /**if a process halts and wand waits for a certain message,we move it to this list*/
 static struct pcb *list_sleep;
@@ -51,24 +54,23 @@ void sleep_expire(struct pcb *p){
 	if(IF) sti();
 }
 void do_timer(struct pt_regs *pregs){
+	char title[16] = { 148,' ', 0};
 	char barbuf[16];
 
 	ticks++;
 	if(ticks % 100 == 0){
-		char title[16] = { 148,' ', 0};
 		sprintf(barbuf, "%u", ticks/100);
 		write_bar(0, 0, title, barbuf);
 	}
 	if(ticks % 300 == 0) oprintf("^");
 
 	//memset(barbuf, 0, sizeof(barbuf));
-	sprintf(barbuf, "%*x", 12, current->time_slice);
-	write_bar(0, 1, "#", barbuf);
+	sprintf(sched_bar_body, " %*x %*s", 4, current->time_slice, 8, current->p_name);
+	write_bar(0, 1, sched_bar_title, sched_bar_body);
 
 	if(pregs->cs & 3) {	//发生在内核态的石英晶片中断不递减时间片
 		assert(current->time_slice > 0);
 		if(--current->time_slice == 0){
-			oprintf("switch");
 			active_expire(current);
 			current->need_resched = 1;
 		}
@@ -126,11 +128,12 @@ void schedule(void){
 			p=p->next;
 		}
 		EXCHG_PTR(list_active,list_expire);
+		//switch ascii icon : << >>
+		sched_bar_title[1] = sched_bar_title[0] ^= 2;
 	}
 
 	if (list_active) next = list_active;
-	/**none process available now, run idle*/
-	else next = idle;
+	else next = task0;		//run idle
 /*	oprintf("schedule get next:%s\n", next->p_name);*/
 	if(next == current){
 		//oprintf("next==current:%s\n", current->p_name);

@@ -2,7 +2,11 @@
 #define LIST_H
 /*the host structures will be organised into a circle link-list */
 
+#ifndef __USER
 #include<linux/assert.h>
+#else
+#include<assert.h>
+#endif
 typedef struct list_head{
 	struct list_head *prev;
 	struct list_head *next;
@@ -84,9 +88,36 @@ static inline void hashtable_add(list_head_t *hashtable, int hash, list_head_t *
 	list_add(new, hashtable + hash)	;
 }
 
+//这个宏的参数顺序不好
+//Member To his mother Structure
 #define MB2STRU(stru_type, mb_addr, mb_name)\
-			(stru_type *)( (u32)(mb_addr)-  (u32)&((stru_type *)0)->mb_name )	
+			(stru_type *)( (unsigned long)(mb_addr)-  (unsigned long)&((stru_type *)0)->mb_name )	
 #endif
+
+
+#define container_of(head, stru, member) MB2STRU(stru, head, member)
+
+/* 跟linux不一样!
+ * 这就相当于linux的for_each_entry !
+ * 这个宏通过了gcc的O2测试
+ */
+#define list_for_each_safe(root, container, mbname)						\
+	for(																\
+		struct	list_head *node = (root)->next, *next = node->next;		\
+		((container = container_of(node, __typeof__(*container), mbname)) || 1)\
+		&& node != root;												\
+		node = next, next = next->next									\
+		)
+
+
+
+
+//遍历操作，但不包括指定的这个节点。
+//#define list_for_each_entry_but_this()
+
+
+
+
 
 
 

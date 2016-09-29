@@ -25,3 +25,5 @@ gdb在启动的时候，会在当前目录下查找".gdbinit"这个文件，并�
 2）gdb运行期间
 可以使用 source script-file 来解释gdb命令脚本script-file
 
+*
+add-auto-load-safe-path /home/wws/lab/yanqi/cmd/.gdbinit

@@ -195,19 +195,21 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	pcb2pcb = (unsigned long)child - (unsigned long)current;
     float_regs = (void *)((unsigned long)regs + pcb2pcb);
 	child->thread.esp = (unsigned long)float_regs;
-	float_regs->eax = 123;
+	float_regs->eax = 0;
 	if(!(regs->cs & 3)){
 		float_regs->ebp += pcb2pcb;
 	}
 	child->thread.eip = (unsigned long)ret_from_sys_call;
-	
 
 	sprintf(child->p_name, "mirror:%s", current->p_name);	//TODO danger !
-	child->pid = 1;
+	child->pid = alloc_pid(-1);
+	child->mother = child->monitor = current;
+	INIT_LIST_HEAD(&child->children);				//必须初始化,think why
+	list_add(&child->sibling, &current->children);
 	//current->pid = 0;
 	LL_I_INCRE(list_active, child, prio);
 
-	return 12345;
+	return child->pid;
 }
 int sys_fork(stack_frame regs){
 	return do_fork(
@@ -215,5 +217,5 @@ int sys_fork(stack_frame regs){
 				   	0, 
 				   	&regs, 
 				   	0
-				   );
+				 );
 }

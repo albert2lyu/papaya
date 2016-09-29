@@ -19,16 +19,19 @@ void vm_update_pgprot(struct vm_area *vma){
  * @flags  新的页表项的低12位。
  *		   因为每个vm_area	都有自己的pgprot模板。这个参数正是因此才有的。
  */
-bool __resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){
+struct page *
+__resolve_address(union pte *pgdir, u32 vaddr, u32 pgprot){
+	struct page *newpage;
 	union linear_addr laddr = {value:vaddr};
 	union pte *dirent = pgdir + laddr.dir_idx;
 	if(dirent->present == 0){
 		dirent->value = __pa(__alloc_page(__GFP_ZERO)) | PG_USU | PG_RWW | PG_P;
 	}
 	union pte *pgtbl = (void *)__va(dirent->value & PAGE_MASK);	
-	pgtbl[laddr.tbl_idx].value = (ulong)__pa(__alloc_page(0)) | pgprot;
+	newpage = __alloc_page(0);
+	pgtbl[laddr.tbl_idx].value = (ulong)__pa(newpage) | pgprot;
 	FLUSH_TLB;
-	return true;
+	return newpage;
 }
 
 /* @vaddr　我们把这个vaddr作4K对齐，然后解除这个页的映射。
@@ -53,13 +56,16 @@ bool __release_address(union pte *pgdir, unsigned long vaddr){
 
 /* just map it to a physical page 
  */
-int common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode){
+struct page*
+common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode){
+	struct page *newpage;
 	if(errcode.on_write && vma->empty_pte.writable == false)	
 			spin("attempt to write a read-only vma");
 
+	newpage = 
 	__resolve_address((void *)__va(vma->mm->cr3.value & PAGE_MASK),
 					err_addr,	vma->empty_pte.value);	
-	return 0;
+	return newpage;
 }
 
 

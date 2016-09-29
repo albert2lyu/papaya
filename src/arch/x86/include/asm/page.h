@@ -26,11 +26,6 @@ static inline void invlpg(void *vaddr){
 										:\
 										:"r"(0))
 
-/*get page struct by a virtual address*/
-#define __va2page_t(vaddr) \
-	(mem_map + ((((unsigned long)vaddr) - PAGE_OFFSET) >> 12))
-#define __pa2page_t(paddr) \
-	(mem_map + ((paddr) >> 12))
 
 /* page table/directory entry ==> linear address of target page */
 #if 0

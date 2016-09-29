@@ -24,19 +24,23 @@ static bool __cache_file_page(struct file* file, u32 page_addr, u32 file_off){
 
 
 
-int common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode);
+struct page*
+common_no_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode);
 /*
  * 1, 虽然文件偏移是以页为单位的，但目前文件系统还不支持64位offset, 所以这儿
  *    暂时不用long long算byte offset
  */
 struct page * 
 cache_file_page(struct vm_area *vma, u32 err_addr, union pgerr_code errcode){
+	struct page *newpage;
 	u32 linear_addr = err_addr & PAGE_MASK;
 	u32 pgoff = vma->pgoff	+ ((err_addr - vma->start) >> PAGE_SHIFT);
 	u32 offset = pgoff << PAGE_SHIFT;
+	newpage = 
 	common_no_page(vma, linear_addr, errcode);	//先映射给它物理页	
 	__cache_file_page(vma->file, linear_addr, offset);
-	return __va2page_t(linear_addr);
+	return newpage;
+	//return __va2page_t(linear_addr);	错的!
 }
 
 struct vm_operations mmap_area_ops = 

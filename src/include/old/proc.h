@@ -5,12 +5,14 @@
 #include<ku_proc.h>
 #include<mm.h>
 #include<asm/resource.h>
+#include<linux/mm.h>
 
 #define P_NAME_MAX 16
 
 extern struct tss base_tss;
 #define g_tss (&base_tss)
 
+extern struct pcb *task0, *task1;
 
 /**some important process's pcb is fixed under papaya*/
 struct pcb *__hs_pcb;
@@ -84,6 +86,8 @@ struct pcb{
 		struct{
 			int need_resched;
 			int sigpending;
+			int state;
+			int exit_status;
 			struct pcb *prev;
 			struct pcb *next;
 			u32 pid;
@@ -98,6 +102,10 @@ struct pcb{
 			struct rlimit rlimits[RLIMIT_MAX];
 			struct eflags_stack fstack;
 			u32 magic;		/*for debug*/
+			struct list_head children;
+			struct list_head sibling;
+			struct pcb *mother;					//who fork me?
+			struct pcb *monitor;				//who adopt me?
 			u32 __task_struct_end;
 		};
 		char padden[PCB_SIZE-sizeof(stack_frame)];
@@ -192,6 +200,52 @@ static inline void flagi_pop(void){
 }
 void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name);
 void fire_thread(struct pcb *p);
+
+
+int alloc_pid(int pid);
+
+static inline 
+struct files_struct *get_files(struct files_struct *files){
+	files->count++;
+	return files;
+}
+void put_files(struct files_struct *files);
+
+
+void put_fs(struct fs_struct *fs);
+static inline 
+struct fs_struct *get_fs(struct fs_struct *fs){
+	fs->count++;
+	return fs;
+}
+
+int try_release_krnl_resource(struct pcb *p);
+int try_release_user_space(struct mm *mm);
+int __release_mm(struct mm *mm);
+
+/* 释放mm分两步走，put_mm是第二步。第一步是 try_release_user_space.
+ * 递减count计数，若为０．则释放mm结构体,以及里面的pgdir。
+ * 注意，在调用put_mm之前,你必须调用release_user_space()释放掉用户空间,
+ * 因此，所put的mm是一个空壳
+ * 为什么要分两步走呢？因为，像比在exit进程时，只是释放用户空间，但页目录
+   并不销毁，把put_mm的工作，交给父进程。
+ */
+static inline void 
+put_mm(struct mm *that){
+	that->users--;
+	if(that->users == 0){
+		__release_mm(that);
+	}
+}
+
+static inline struct mm *
+get_mm(struct mm *that){
+	that->users++;	
+	return that;
+}
+
+extern struct slab_head *fs_struct_cache, *files_struct_cache;
+
 #endif
 
 

@@ -27,7 +27,7 @@ all:
 	make -C lib/
 	make -C arch/x86/kernel
 	make -f makefile2
-	make -C ../cmd/
+	#make -C ../cmd/
 
 #整个项目总的clean
 #但是不清除lsh目录，它跟papaya内核保持一定的独立性。make时也没有它

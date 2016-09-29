@@ -4,6 +4,13 @@ struct pt_regs;
 #include<valType.h>
 #include<asm/page.h>
 
+#define TASK_RUNNING		0
+#define TASK_INTERRUPTIBLE	1
+#define TASK_UNINTERRUPTIBLE	2
+#define TASK_STOPPED		4
+#define TASK_TRACED		8
+#define TASK_ZOMBIE		16
+
 /* cloning flags:
  * 低8位用作信号遮罩。
  */

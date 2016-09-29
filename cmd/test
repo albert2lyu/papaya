@@ -1,0 +1,5 @@
+#!/bin/bash
+screen -S cmd -X stuff "./mm ^M"
+sleep 0.5
+screen -S cmd -X stuff "^M"
+gdb -x g

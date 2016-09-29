@@ -14,7 +14,7 @@ extern oprintf
 extern spin
 
 global ret_from_sys_call
-global page_fault,usr_func
+global page_fault
 global restore_all
 global selector_room_plain
 global selector_video
@@ -26,7 +26,7 @@ global p3
 global outofproc
 global base_tss
 extern func_table
-extern wake_hs,do_page_fault, do_breakpoint_fault
+extern wake_hs,do_page_fault, do_breakpoint_fault, do_general_protect_fault
 extern no_reenter
 extern dump_sys
 extern key_handler
@@ -245,8 +245,8 @@ len_stack_error equ $ - stack_error
 ;	When set, the exception originated externally to the processor.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 general_protection:
-	push 13
-	jmp exception_handler_step1
+	push do_general_protect_fault
+	jmp error_code;
 len_general_protection equ $ - general_protection
 
 copr_error:
@@ -421,10 +421,6 @@ reschedule:
 signal_return:
 	jmp restore_all
 		
-usr_func:
-	;push 1
-	;mov eax,[esp]
-	jmp usr_func
 
 [section .data]
 sec_data:
@@ -436,19 +432,6 @@ sec_data:
 .IDE0: db 'IDE IRQ 2f' , 0
 msg:db 'spin',0
 
-;sys_call table,store address of function
-;func_table:
-;    dd _k_show_chars ;0 _k_show_chars
-;    dd sys_fork	;1
-;    dd sys_execve ;2		
-;    dd 0 ;3		_k_show_var
-;    ;dd k_open ;4		k_open
-;    ;dd k_read ;5		k_read
-;    ;dd k_write ;6		k_write
-;    ;dd k_close ;7		k_close
-;    dd 0 ;8		k_watch
-;    ;dd k_seek ;9		k_seek
-;	dd k_getchar	;10
 outofproc:
     dd 1
 kernel_esp:

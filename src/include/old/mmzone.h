@@ -124,17 +124,26 @@ static inline void * __alloc_page(u32 gfp)
 
 
 
+/*get page struct by a virtual address*/
+static inline struct page *__va2page_t(unsigned long vaddr){
+	assert(vaddr > __3G);
+	return (mem_map + ((vaddr - PAGE_OFFSET) >> 12));
+}
 
 
 //get/put page
 static inline struct page *get_page(struct page *page){
+	assert(page->_count >= 1);
 	page->_count++;
 	return page;
 }
 
 static inline void put_page(struct page *page){
-	page->_count--;
-	if(page->_count == 0) free_page(page);
+	assert(page->_count >= 1);
+	if(page->_count == 1){		//buddy system回收一个页时，要求count必须大于0
+		free_page(page);
+	}
+	else page->_count--;
 }
 
 static inline struct page *pte2page_t(union pte pte){

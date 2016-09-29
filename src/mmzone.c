@@ -172,6 +172,7 @@ void cleave(free_area_t *free_area, int order){
 
 //TODO here we have bug...	zone_t *__zones[3];
 void free_pages(page_t *page, int order){
+	assert(page->_count >= 1);
 	int IF = cli_ex();
 
 	zone_t *zone = __zones[page->PG_zid];
@@ -210,6 +211,7 @@ struct page *alloc_pages(u32 gfp_mask, int order){
 		char *vaddr = (char *)KV(ppg << 12);
 		memset(vaddr, 0, 4096<<order);
 	}
+	page->_count = 1;	//BUG? 只有最开头的page被标记为1
 	return page;
 }
 

@@ -1,6 +1,7 @@
 #ifndef PAPAYA_SYSCALL_H
 #define PAPAYA_SYSCALL_H
 #include "../src/include/linux/NR_syscall.h"
+#include "../src/include/linux/resource.h"
 
 /*
         +------------+
@@ -53,10 +54,43 @@
 						 );												\
 })
 
+#define int80_carry_stack_args_4(name)									\
+({																		\
+	__asm__ __volatile__("push %%ebx\n\t"								\
+						 "push %%edx\n\t"								\
+						 "push %%esi\n\t"								\
+																		\
+						 "mov 8(%%ebp),  %%ebx\n\t"						\
+						 "mov 12(%%ebp), %%ecx\n\t"						\
+						 "mov 16(%%ebp), %%edx\n\t"						\
+						 "mov 20(%%ebp), %%esi\n\t"						\
+																		\
+						 "int $0x80\n\t"								\
+																		\
+						 "pop %%esi\n\t"								\
+						 "pop %%edx\n\t"								\
+						 "pop %%ebx\n\t"								\
+						 :												\
+						 :"a"(NR_##name)								\
+						 );												\
+})
 #define int80_carry_stack_args_0(name)									\
 ({																		\
 	__asm__ __volatile__(												\
 						 "int $0x80\n\t"								\
+						 :												\
+						 :"a"(NR_##name)								\
+						 );												\
+})
+
+#define int80_carry_stack_args_1(name)									\
+({																		\
+	__asm__ __volatile__("push %%ebx\n\t"								\
+																		\
+						 "mov 8(%%ebp),  %%ebx\n\t"						\
+						 "int $0x80\n\t"								\
+						 												\
+						 "pop %%ebx\n\t"								\
 						 :												\
 						 :"a"(NR_##name)								\
 						 );												\
@@ -106,7 +140,13 @@ static inline int fork(void){
 	int80_carry_stack_args_0(fork);
 }
 
+static inline void exit(int status){
+	int80_carry_stack_args_1(exit);	
+}
 
+static inline int wait4(int pid, int *status, int option, struct rusage *ru){
+	int80_carry_stack_args_4(wait4);
+}
 
 
 

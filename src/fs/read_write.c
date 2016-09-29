@@ -29,17 +29,7 @@ int sys_lseek(unsigned fd, int offset, unsigned origin){
 	return offset;
 }
 
-/* mainly do two jobs:
- * 1, set correspoding slot in current->filep[] to 0
- * 2, decrement the 'count' field of corresponding 'file' structure 
- */
-int sys_close(unsigned fd){
-	if(current->files->max_fds <= fd) return -EINVAL;
-	if( current->files->filep[fd] == 0) return -EINVAL;	/* attempt to close a file not 
-														 * opened yet */
-
-	struct file *file = current->files->filep[fd];
-	current->files->filep[fd] = 0;		/* close, step 1 */
+static int do_close(struct file *file){
 	
 	struct file_operations *fops = file->dentry->inode->file_ops;
 	if(fops->onclose) fops->onclose(file);
@@ -48,6 +38,21 @@ int sys_close(unsigned fd){
 		kfree(file);	
 	}
 	return 0;
+}
+/* mainly do two jobs:
+ * 1, set correspoding slot in current->filep[] to 0
+ * 2, decrement the 'count' field of corresponding 'file' structure 
+ */
+int sys_close(unsigned fd){
+	int ret;
+	if(current->files->max_fds <= fd) return -EINVAL;
+	if( current->files->filep[fd] == 0) return -EINVAL;	/* attempt to close a file not 
+														 * opened yet */
+
+	struct file *file = current->files->filep[fd];
+	ret = do_close(file);
+	current->files->filep[fd] = 0;
+	return ret;
 }
 
 
@@ -87,5 +92,9 @@ int k_read(struct file *file, char *buf, unsigned size){
 
 int k_seek(struct file *file, int offset, unsigned origin){
 	return do_lseek(file, offset, origin);	
+}
+
+int k_close(struct file*file){
+	return do_close(file);
 }
 

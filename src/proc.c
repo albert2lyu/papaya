@@ -5,7 +5,6 @@
 #include<utils.h>
 #include<schedule.h>
 #define PCB_MAGIC_NUMBER 0xaabbccdd
-/**process only run at ring0,ring1,ring3*/
 static int selector_plain_d[4]={(int)&selector_plain_d0,(int)&selector_plain_d1,0,(int)&selector_plain_d3};
 static int selector_plain_c[4]={(int)&selector_plain_c0,(int)&selector_plain_c1,0,(int)&selector_plain_c3};
 int __eflags=0x1200;//IOPL=1,STI	__prefix, 避免gdb犯晕:p eflags
@@ -28,7 +27,7 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name){
 	baby->need_resched = 0;
 	baby->sigpending = 0;
 	baby->prio=prio;
-	baby->pid=0;
+	baby->pid = alloc_pid(0);
 	baby->time_slice=baby->time_slice_full=time_slice;
 	strncpy(baby->p_name, p_name, P_NAME_MAX);
 
@@ -43,15 +42,9 @@ void init_pcb(struct pcb *baby,u32 addr,int prio,int time_slice,char*p_name){
 	baby->fstack.esp = -1;
 	baby->magic = PCB_MAGIC_NUMBER;
 	baby->mm = 0;
-	//第一个内核进程启动时，不需要设置cr3。因为内核此时就用着内核页表。
-	//baby->cr3=(u32*)0x100000;	/**use kernel page directory*/
-	#if 0
-	if(ring){
-		baby->cr3=(u32*)((alloc_pages(__GFP_DEFAULT,1) - mem_map) <<12);	/**note!cr3 use real physical address*/
-		memcpy((char*)(baby->cr3+256*3)+0xc0000000,(char*)0xc0100c00,224*4);
-	}
-	else baby->cr3=(u32*)0x100000;	/**use kernel page directory*/
-	#endif
+	INIT_LIST_HEAD(&baby->sibling);
+	INIT_LIST_HEAD(&baby->children);
+	baby->mother = baby->monitor = 0;
 }
 
 struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name){
@@ -63,35 +56,6 @@ struct pcb * create_process(u32 addr,int prio,int time_slice,char*p_name){
 /*	oprintf("created a process..\n");*/
 	return baby;
 }
-
-
-/**the following are so-called circular arr operations. */
-void obuffer_init(OBUFFER* pt_obuffer){
-	for(int i=0;i<size_buffer;i++) pt_obuffer->c[i]=0;
-	pt_obuffer->head=0;
-	pt_obuffer->tail=size_buffer-1;
-	pt_obuffer->num=0;
-}
-
-void obuffer_push(OBUFFER* pt_obuffer,char c){
-	assert(pt_obuffer->num<size_buffer);
-	int next=(pt_obuffer->tail+1)%size_buffer;
-	pt_obuffer->c[next]=c;
-	
-	pt_obuffer->num++;
-	pt_obuffer->tail=next;
-}
-
-unsigned char obuffer_shift(OBUFFER* pt_obuffer){
-	if(pt_obuffer->num==0) return 0;
-	int head=pt_obuffer->head;
-	int c=pt_obuffer->c[head];
-
-	pt_obuffer->head=(head+1)%size_buffer;
-	pt_obuffer->num--;
-	return c;
-}
-
 
 struct pcb *get_current(void){
 	struct pcb *p;
@@ -112,47 +76,6 @@ void pcb_info(struct pcb *p){
 //	oprintf("%s","asdf");
 	oprintf("p_name:%s entry:%x prio:%u time_slice:%u\n",p->p_name,p->regs.eip,p->prio,p->time_slice);
 }
-
-
-
-/**following two functions can only be called out-of-proc,then,process recently
- * trapped into kernel will be fired immediately.
- * it return a value and errno to the process who just does a 'syscall'.set 
- * return_errno -1 when the syscall done successfully.
- */
-/**
-void syscall_ret_to(struct pcb *pcb,int return_val,int return_errno){
-	if(return_errno!=-1) errno = return_errno;
-	pcb->regs.eax = return_val;
-	//BUG 进程陷入内核就一定是休眠状态吗,为什么要sleep_acive呢.
-	fire(pcb);
-}
- */
-
-/**
-void syscall_ret(int return_val,int return_errno){
-	syscall_ret_to(current, return_val, return_errno);		
-}
- */
-
-
-/*following function can only be called within proc,like fs_ext,the difference 
- * is that they will not call 'fire(pcb)' immediately,so we call it 'soft'.In m
- * ost case,a kernel-process will surrender it's timeslice after finishing jobs,
- * we trust it and never use 'fire(pcb)' to snatch it's timeslice.*/
-/**
-void syscall_soft_ret_to(struct pcb *pcb,int return_val,int return_errno){
-	if(return_errno!=-1) errno = return_errno;
-	pcb->regs.eax = return_val;
-	sleep_active(pcb);
-}
- */
-
-
-
-
-
-#if 1
 void fire_thread(struct pcb *p){
 	assert(p->mm == 0);		//it should be a kernel thread
 	extern bool task_available;
@@ -164,30 +87,132 @@ void fire_thread(struct pcb *p){
 		:
 		:"r"(&p->regs)
 	);
-	#if 0
-	__asm__ __volatile__(
-		"movl %0,%%esp\n\t"
-		"popl %%ebx\n\t"
-		"popl %%ecx\n\t"
-		"popl %%edx\n\t"
-		"popl %%esi\n\t"
-		"popl %%edi\n\t"
-		"popl %%ebp\n\t"
-		"popl %%eax\n\t"
-		"popl %%ds\n\t"
-		"popl %%es\n\t"
-		"popl %%gs\n\t"
-		"popl %%fs\n\t"
-		"addl $4,%%esp\n\t"
-		"iretl\n\t"
-		:
-		:"r"(&p->regs)
-	);
-	#endif
 }
 
-#endif
+/* @pid = -1 			random allocation
+		>= 0			try allocate this number
+ * @return 
+ 		>= 0			on success
+		= -1			on failure
+ * 为了调试方便，目前是0,1,2,3逐个分配的..
+ */
+int alloc_pid(int pid){
+	static int pid_fresh = 0;
+	if(pid >= 0 && pid != pid_fresh) spin("bad @pid");
+	return pid_fresh++;
+}
 
+void set_pid(int pid, struct pcb *p){
+	p->pid = pid;
+	/* TODO insert into hashtable */
+}
+
+void put_files(struct files_struct *files){
+	files->count--;
+	if(files->count > 0) return;
+
+	//释放fd数组
+	if(files->filep != files->origin_filep) 
+		kfree2(files->filep);
+
+	//尝试关闭文件
+	for(int i = 0; i < files->max_fds; i++){
+		struct file *file = files->filep[i];
+		if(file) k_close(file);
+	}
+
+	kmem_cache_free(files_struct_cache, files);
+}
+
+void put_fs(struct fs_struct *fs){
+	fs->count--;
+	if(fs->count > 0) return;
+
+	mntput(fs->pwdmnt);	
+	mntput(fs->rootmnt);	
+	dput(fs->pwd);
+	dput(fs->root);
+
+	kmem_cache_free(fs_struct_cache, fs);
+}
+
+/* 释放这个vm_area内的所有用户页和页表。最后释放这个vm_area_struct本身。
+ * 注意! 这个函数只能被release_user_space()调用，它能保证是按线性地址的顺序
+   逐个释放vma,否则release_vm_area()里对页表的释放操作是危险的。
+ */
+static int  release_vm_area(struct vm_area *vma){
+	union linear_addr vaddr;
+	struct mm *mm;           									
+	union pte *pgdir, *pgtbl;
+	union pte *dirent;
+
+	mm = vma->mm;
+	pgdir = PGDIR_OF_MM(mm);
+
+	vaddr.value = vma->start;
+	pgtbl = pte2page(pgdir[vaddr.dir_idx]); 
+	while(vaddr.value < vma->end){
+		struct page *userpage;
+		int i = vaddr.tbl_idx;	
+
+		if(pgtbl[i].value == 0) goto _continue;
+		userpage = pte2page_t( pgtbl[i] );
+		put_page(userpage);					//释放一个用户页
+
+		_continue:
+		vaddr.value += __4K;
+		if((vaddr.value % __4M) == 0){
+			union pte prev = pgdir[vaddr.dir_idx - 1];
+			put_page( pte2page_t(prev) );	//释放一个页表
+			dirent = pgdir + vaddr.dir_idx;		//TODO 代码可简化
+			pgtbl = pte2page(*dirent);
+		}
+	}
+	kmem_cache_free(vm_area_cache, vma);
+	return 0;
+}
+
+
+//释放用户空间的所有页。以及相应的页表,vma。
+int try_release_user_space(struct mm *mm){
+	struct vm_area *vma, *next;
+																				assert(mm->vma);
+	if(mm->users > 1) return 0;
+	//释放用户空间的所有页，页表,vm_area结构体
+	vma = mm->vma;
+	do{
+		next = vma->next;
+		release_vm_area(vma);
+	}while( next != mm->vma && (vma = next));
+
+	mm->vma = 0;
+	return 0;
+}
+
+int try_release_krnl_resource(struct pcb *p){
+
+	put_files(p->files);
+	put_fs(p->fs);
+
+	p->files = 0;
+	p->fs = 0;
+	return 0;
+}
+
+/* 释放mm_struct, 以及相应的pgdir
+ * only invoked by put_mm
+ */
+int __release_mm(struct mm *mm){
+	union pte *	pgdir;															assert(mm != current->mm);
+
+	pgdir = PGDIR_OF_MM(mm);
+	__free_page(pgdir);
+
+	mm->cr3.value = 0;
+	kfree2(mm);
+
+	return 0;	
+}
 
 
 

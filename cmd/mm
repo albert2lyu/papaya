@@ -1,14 +1,17 @@
-#!/bin/bash 
-echo make 
-cd ../src/
-make
-cd ../cmd/
-echo ./dimg 
-./dimg 
-echo ./bo 
-if [ "$1" == "q" ] ;then
-    ./qemu
-else
-    ./bo
-fi
-exit 
+#!/bin/lsh
+
+lfs.chdir("../src")
+`make
+if errno ~= 0 then 
+	print("make failed!")
+	return
+end
+
+lfs.chdir("../cmd")
+`./dimg 
+if errno ~= 0 then
+	print("dimg failed")
+	return
+end
+
+`./bo
