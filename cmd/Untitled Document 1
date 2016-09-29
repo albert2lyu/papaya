@@ -1,8 +1,0 @@
-task1时间片用完，task2第一次被调度，restore_all前夕:
-
-(gdb) p/x task1->regs
-$2 = {ebx = 0x2, ecx = 0xbfffffc4, edx = 0x1, esi = 0x0, edi = 0x0, 
-  ebp = 0xbfffffa0, eax = 0x0, ds = 0xc0010033, es = 0xc0010033, gs = 0x0, 
-  fs = 0x0, err_code = 0xffffff20, eip = 0x80480fa, cs = 0x2b, 
-  eflags = 0x1246, esp = 0xbfffff94, ss = 0x33}
-
