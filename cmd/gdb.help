@@ -6,6 +6,8 @@ br *0x7c00 if $ax > 256
 
 x/2i $pc				反汇编接下来两条指令
 
+info proc map
+
 
 
 watch

@@ -1,7 +1,7 @@
 #include<linux/string.h>
 
 //有更好的写法，但这样更易读
-ulong strnlen(char *str, ulong n){
+unsigned long strnlen(char *str, ulong n){
 	for(int i = 0; i < n; i++){
 		if(str[i] == 0) return i;
 	}

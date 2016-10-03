@@ -13,10 +13,9 @@ init:init.c
 t:t.c
 	gcc -o t t.c -std=c99 -Wl,-I/home/wws/lab/yanqi/cmd/ld.so -Wall
 
-ld.so: ld.c
-	gcc -c ld.c -o ld.o -fno-builtin -std=c99 -g -Wall -fPIC 
-	ld -shared -o ld.so ld.o 
-	#ld -shared  -o ld.so ld.o 
+ld.so: ld.c ld.h 
+	gcc -c ld.c -o ld.o -std=c99 -g -Wall -fPIC -fno-builtin  -I../src/include -fno-stack-protector
+	ld -shared -o ld.so ld.o -e__start
 
 cat:cat.c
 	gcc -c cat.c $(user_program_cflags)

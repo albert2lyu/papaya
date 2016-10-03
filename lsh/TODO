@@ -1,3 +1,4 @@
+*　程序失败了，不会输出segment fault(core dumped)这样的信息。bash就可以。这个信息在工作时很重要。
 *　要支持ls *.txt .*.txt 此类的通配符
 
 1, lsh的正则表达式先按正常的来，以后有机会用

@@ -1,0 +1,82 @@
+**************??????????
+[0xb8000000地址下面是vdso]
+好奇怪，打印的eheader是0xb7fff000，但info proc map出来的结果，这个地方是vdso。
+应该是ld.so才对呀。
+另外，从这个vaddr下手，最终能改变0x8000000处的映射的页吗。它们通过mmap映射到的是统一个物理页吗。
+对mmap()的机理还不熟悉。
+Papaya的mmap()可能还要为此修改。
+先写着。
+
+又
+　直接运行ld.so，内核加载它的位置不固定。有时是0x80000000,有时是堆栈附近。
+　但是在gdb下运行，就没有这个错误。
+又
+　如果两个模块里都定义了全局变量：
+　int x;
+　那动态连接器应该要动真格的吧，直接报错。extern不能省略。
+
+
+convention：
+	[ld.so] 指代我们自己编写的动态链接器。
+	[ld.linux.so] 指代系统配带的动态链接器。
+
+【为什么static类型的变量也要放入got】
+
+【x86上的ebx被用作got指针】
+EBX pointsto the Global Offset Table.
+所以可以叫他GOT register.
+
+
+*
+  直接敲
+  ./ld.so
+  来运行它。内核在加载它之后，会把控制权直接交给它。还是为它寻找ld.linux.so呢。
+  
+  --会直接把控制权交给它。
+  --因为它没有.interp这个段。这是内核判断的依据。
+
+
+*
+  .rel.dyn和.rel.plt所指导的重定位，其实是对该模块"数据地址表"和“函数地址表”的填写。
+  因为ELf32_Rel有offset这个成员，所以，直接能指定修改虚存的哪个(或相对)位置。
+  所以重定位的时候，不需要知道.got和.got.plt在哪儿。但确实是在填写他们。
+
+*
+  一个so对象会被映射到多个进程的虚存空间。
+  指令区是共享一个屋里页面就够了。数据区却是每个进程有自己的拷贝。
+  我猜mmap()时，是分别采用了MAP_SHARE和MAP_PRIVATE.
+
+
+*
+要考虑，内核给你的
+
+
+*
+[.strtab不会被装载]
+  .strtab在链接时不会被装载。就是说，内核交给动态连接器的eheader里的shnum是比真正文件里的要小的。非常奇怪！！ 我用readelf看的是19，是有.strtab段的，但是真正ld.so被加载后，strcmp(".strtab")是匹配不到的，但.dynstr就匹配得到。
+  下面，左侧是readelf ld.so的输出(有裁剪)，右侧是ld.so运行后自检的输出。
+
+Name              Type         Size  	| .hash			
+                  NULL         000000	| .dynsym
+.hash             HASH         00003c	| .dynstr
+.dynsym           DYNSYM       0000a0	| .gnu.version
+.dynstr           STRTAB       00004c	| .gnu.version_d
+.text             PROGBITS     0004ea	| .dynamic
+.rodata           PROGBITS     00006a	| .rodata
+.eh_frame         PROGBITS     0001b4	| .note
+.dynamic          DYNAMIC      000058	| .eh_frame_hdr
+.got.plt          PROGBITS     00000c	| .eh_frame
+.data             PROGBITS     00000c	| .text
+.bss              NOBITS       000004	| .altinstructions
+.comment          PROGBITS     000025	| .altinstr_replac
+.debug_aranges    PROGBITS     000020	| .comment
+.debug_info       PROGBITS     000742	| .shstrtab
+.debug_abbrev     PROGBITS     000193	| section num: 16
+.debug_line       PROGBITS     000155	| 
+.debug_str        PROGBITS     00033e	| 
+.shstrtab         STRTAB       0000af	| 
+.symtab           SYMTAB       000290	| 
+.strtab           STRTAB       0000c8	| 
+
+
+
