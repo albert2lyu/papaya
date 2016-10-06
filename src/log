@@ -1,4 +1,10 @@
 =============log
+
+Thu Oct  6 21:16:29 CST 2016
+*
+ 动态链接器基本完成．支持显示(直接从命令行调用)和隐式的
+ 运行(由内核加载)．
+
 Sun Sep 25 22:50:22 CST 2016
 *
  用户进程的execve()初步调通了。
@@ -335,5 +341,8 @@ Sun Sep 11 09:41:22 CST 2016)
 　像fork, exec这种，它需要修改regs。所以必须传递给它。
   但是大多数不需要，因为这些寄存器value就躺在参数位置上，直接用再自然不过了。
 
-  
+*
+  glibc封装的系统调用和raw int0x80的行为可能有差异．
+  像brk(0)的行为，glibc返回０，裸的syscall返回边界值．
+  在man手册的NOTES里的C library/kernel ABI differences讲的有．
 

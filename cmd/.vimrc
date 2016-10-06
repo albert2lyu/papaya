@@ -1,4 +1,5 @@
-set colorcolumn=81
+set colorcolumn=60
+hi colorcolumn ctermfg=white  ctermbg=yellow
 set cscopequickfix=s-,c-,d-,i-,t-,e-,g- 
 map <F5> :colorscheme evening
 source ~/.vim/macros/gdb_mappings.vim

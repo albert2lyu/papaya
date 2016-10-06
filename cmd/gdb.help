@@ -29,3 +29,27 @@ gdb在启动的时候，会在当前目录下查找".gdbinit"这个文件，并�
 
 *
 add-auto-load-safe-path /home/wws/lab/yanqi/cmd/.gdbinit
+
+*
+add-symbol-file xx.so address
+这有儿像3D建模里的贴图．因为.so被加载到内存的地址不稳定，
+所以gdb手里光有调试信息（符号表）是不够的．
+它还要知道这个文件被加载到哪儿，它才能把你要的＂行断点/符号断点"
+转化成"地址断点"．
+这个address是 LOAD_BASE + [.text].sh_addr
+这样操作：
+1, gdb 里输入info proc map
+   找到xx.so的加载地址LOAD_BASE
+
+2, readelf -S xx.so
+   找到xx.so的.text段的Addr.
+
+3, 口算出address. 
+   address = LOAD_BASE + Addr
+
+4, 输入add-symbol-file xx.so address
+
+
+
+
+

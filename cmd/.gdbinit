@@ -51,6 +51,30 @@ define child
 end
 
 
+define addsyms
+	set $i = right
+	while $i >= 0
+		set $so = mmap_of_so[$i]
+		set $filename = $so->filename
+		set $address = (unsigned)$so->text
+		eval "add-symbol-file %s 0x%x", $filename, $address
+		set $i--
+	end
+end
+
+define infosym
+	
+end
+
+define origin
+	set $mmap = $arg0.mmap
+	set $dynsym = $arg0.symbol
+	printf "%s: %s (0x%x)\n", $mmap->filename ,$mmap->dynstr + $dynsym->st_name, (unsigned)$mmap->eheader + $dynsym->st_value
+end
+
+
+
+
 
 
 

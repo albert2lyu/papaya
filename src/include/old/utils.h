@@ -6,6 +6,7 @@
 #include<linux/assert.h>
 #include<linux/byteorder/generic.h>
 #include<linux/string.h>
+#include<linux/kit.h>
 //杂凑值是一个0 -> 2^32-1 区间的一个无符号整数
 static inline unsigned str_hash(const char *str, int len){
     unsigned seed = 131; // 31 131 1313 13131 131313 etc..
@@ -13,30 +14,6 @@ static inline unsigned str_hash(const char *str, int len){
 	for (int i = 0; i < len; i++) 	hash = hash * seed + str[i];
 	//hash = hash & 0x7FFFFFFF; 
 	return hash;
-}
-/* @desc  round x to 2^n
- * e.g. Given 65, got 128. Given 63, got 64.
- */
-static inline unsigned ceil2n(int x){
-	int highest;
-	__asm__ __volatile__("bsr %1, %0"
-						 :"=r"(highest)
-						 :"r"(x)
-						 );
-	int mask = (1 << highest) - 1;
-	return (x + mask) & ~mask;
-}
-
-/* e.g.  ceil_div(10, 3) = 4, ceil_div(10, 4) = 3, ceil_div(10, 5) = 2 */
-static inline unsigned ceil_div(unsigned a, unsigned b){
-	unsigned quotient;
-	__asm__ __volatile__("xor %%edx, %%edx\n\t"
-						 "div %%ebx\n\t"
-						 "add $-1, %%edx\n\t"
-						 "adc $0, %%eax\n\t"
-						:"=a"(quotient)
-						:"a"(a), "b"(b));
-	return quotient;
 }
 
 static inline unsigned __BSR(unsigned x){
@@ -48,15 +25,6 @@ static inline unsigned __BSR(unsigned x){
 	return highest;
 }
 
-static inline ulong ceil_align(ulong x, ulong granularity){
-	ulong mask = granularity - 1;
-	return (x + mask) & ~mask;
-}
-
-static inline ulong floor_align(ulong x, ulong align){
-	ulong mask = align - 1;
-	return x & ~mask;
-}
 #include<mm.h>
 /**the following two macros aim at beautify code.
  * and,can you write a 'break_say'?
@@ -123,11 +91,6 @@ void memcpy(void*dest,void*src,int bytes);
 dispStr(str,0x400);\
 dispInt(i);
 
-//留着以后测吧
-#define POINTER_SHIFT(pt,type,len) (type*)((u32)pt+len) 
-#define EXCHG_U32(a,b) do{unsigned c=a;a=b;b=c;} while(0)
-#define EXCHG_PTR(a, b) do { void *tmp = a; a = b; b = tmp; } while(0)
-#define EXCHG_U16(a,b) do{ u16 tmp = a; a = b; b = tmp; } while(0)
 boolean strmatch(char*seg,char*whole);
 void info_heap(void);
 /* 0, 这一组函数不会在critical area用,所以cli_already默认是初始是false

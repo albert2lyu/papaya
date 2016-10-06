@@ -3,6 +3,20 @@
 #include "../src/include/linux/NR_syscall.h"
 #include "../src/include/linux/resource.h"
 
+#define PROT_READ	0x1		/* page can be read */
+#define PROT_WRITE	0x2		/* page can be written */
+#define PROT_EXEC	0x4		/* page can be executed */
+#define PROT_SEM	0x8		/* page may be used for atomic ops */
+#define PROT_NONE	0x0		/* page can not be accessed */
+#define PROT_GROWSDOWN	0x01000000	/* mprotect flag: extend change to start of growsdown vma */
+#define PROT_GROWSUP	0x02000000	/* mprotect flag: extend change to end of growsup vma */
+
+#define MAP_SHARED	0x01		/* Share changes */
+#define MAP_PRIVATE	0x02		/* Changes are private */
+#define MAP_TYPE	0x0f		/* Mask for type of mapping (OSF/1 is _wrong_) */
+#define MAP_FIXED	0x100		/* Interpret addr exactly */
+#define MAP_ANONYMOUS	0x10		/* don't use a file */
+
 /*
         +------------+
         |            |
@@ -88,29 +102,35 @@
 
 #define int80_carry_stack_args_1(name)									\
 ({																		\
+	int ret;															\
 	__asm__ __volatile__("push %%ebx\n\t"								\
 																		\
 						 "mov 8(%%ebp),  %%ebx\n\t"						\
 						 "int $0x80\n\t"								\
+						 "mov %%eax, %0\n\t"							\
 						 												\
 						 "pop %%ebx\n\t"								\
-						 :												\
+						 :"=m"(ret)										\
 						 :"a"(NR_##name)								\
 						 );												\
+	ret;																\
 })
 
 #define int80_carry_stack_args_2(name)									\
 ({																		\
+	int ret;															\
 	__asm__ __volatile__("push %%ebx\n\t"								\
 																		\
 						 "mov 8(%%ebp),  %%ebx\n\t"						\
 						 "mov 12(%%ebp),  %%ecx\n\t"					\
 						 "int $0x80\n\t"								\
+						 "mov %%eax, %0\n\t"							\
 																		\
 						 "pop %%ebx\n\t"								\
-						 :												\
-						 :"a"(NR_##name),								\
+						 :"=m"(ret)										\
+						 :"a"(NR_##name)								\
 						 );												\
+	ret;																\
 })
 
 #define int80_carry_stack_args_3(name)									\
@@ -161,10 +181,21 @@ static inline void * mmap2(void *addr, int length, int prot,
 	return (void *)int80_carry_stack_args_6(mmap2);
 }
 
+static inline void * munmap(void *addr, int length){
+	return (void *)int80_carry_stack_args_2(munmap);
+}
+
 static inline int open(char *filepath, int flags, int mode){
 	return int80_carry_stack_args_3(open);
 }
 
+static inline unsigned long brk(unsigned long brk){
+	return int80_carry_stack_args_1(brk);
+}
+
+static inline unsigned long lseek(int fd, int offset, int origin){
+	return int80_carry_stack_args_3(lseek);
+}
 
 
 

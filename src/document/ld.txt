@@ -79,4 +79,24 @@ Name              Type         Size  	| .hash
 .strtab           STRTAB       0000c8	| 
 
 
+*
+  so1要使用so2导出的符号．它只需要包含so2的头文件．
+  事实上，包含头文件也只是为了消除警告．甚至可以连头文件都不包含．
+  结果生成的so1并不知道它依赖于so2．
+  so1里引用的那些符号，so1自己是不知道它们真身在哪儿的．
+  能不能手动添加这种依赖关系呢．
+  ---能．像这样 gcc -o lib1.so lib1.c lib3.so lib4.so
+     这样就把lib3.so和lib4.so这两个字符串打到lib1.so的tags里去了．
 
+
+*
+  ld可以加fPIC选项，它不报错，但是生成的代码不是PIC的。本来就不可挽回了。只是它为什么不报错?
+
+*
+  gcc在x86的imlement上,采用了ebx作为GOT指针．
+  每个模块都有自己的got，这意味着，eip每进入一个模块，相应的
+  ebx就要切换．
+  而eip在模块之前的跳转是因为函数调用．所以-PIC生成的汇编码，
+  在函数开头的push ebp; mov ebp, esp之后，紧接着就是push ebx
+  而函数尾leave之前也有一句mov ebx, [ebp-4]
+  所以在汇编指令里用jmp乱跳时，要留心这一点． 

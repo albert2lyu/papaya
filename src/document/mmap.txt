@@ -102,6 +102,26 @@ mmap()最后一个参数offset要求4K对齐。
 
 
 
+［若length为０，则失败］
+       SUSv3  specifies  that  mmap() should fail if length is 0.  However, in
+       kernels before 2.6.12, mmap() succeeded in this case:  no  mapping  was
+       created  and the call returned addr.  Since kernel 2.6.12, mmap() fails
+       with the error EINVAL for this case.
+［文件映射区之后的部分了］
+
+       POSIX specifies that the system shall always zero fill any partial page
+       at the end of the object and that system will never write any modifica‐
+       tion of the object beyond its end.  On Linux, when you  write  data  to
+       such  partial  page  after the end of the object, the data stays in the
+       page cache even after the file is closed and unmapped and  even  though
+       the  data  is never written to the file itself, subsequent mappings may
+       see the modified content.  In some cases, this could be fixed by  call‐
+       ing  msync(2)  before the unmap takes place; however, this doesn't work
+       on tmpfs (for example, when using POSIX shared memory  interface  docu‐
+       mented in shm_overview(7)).
+
+*
+  若不启用MAP_PRIVATE标志，会得到16号errno.　设备忙？
 
 
 

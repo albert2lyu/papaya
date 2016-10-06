@@ -1,8 +1,7 @@
-#include<stdio.h>
+#include<unistd.h>
 void a(void){
-	printf("hellow world");
+	//printf("hellow world");
 }
 int main(void){
-	a();
 	return 0;
 }
