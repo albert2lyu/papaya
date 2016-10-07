@@ -8,7 +8,7 @@
  * 记得测试bss区，data区交界的地方
  * 像malloc,memset这样的函数，ld.so里有导出，如果它的正经库里也导出
    那重定位时，可能会出错？
- * parse_mmap解析可执行文件是要出bug的
+ * 共享模块(和可执行文件中)的重复全局变量的问题
  */
 
 #include"ld.h"
@@ -36,6 +36,7 @@ static int fdsize(int fd){
 	return size;
 }
 
+//此处实现一个小的malloc
 unsigned heap_bottom;	//总是等于brk(0)，是真正的"底线"+1
 unsigned goodarea;		//一旦碰到heap_bottom，就要继续brk
 void init_heap(void){
@@ -700,5 +701,5 @@ void __start(char *arg0){
 						:
 						: "r"(exec_mmap->eheader->e_entry)
 						);
-	spin("I am back");
+	spin("you should see me");
 }

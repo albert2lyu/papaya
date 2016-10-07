@@ -15,9 +15,10 @@ papaya内核是我学习linux的一个习作。
 papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 只能在x86下运行。为了减少调试的工作量，也没有支持多核。
 目前完成的部分有：
-	>内存管理:
+	>内存模块:
 			* buddy system			<mmzone.c>
 			* slab allocator		<mm/slab.c>
+			* mmap(),brk()			<mm/mmap.c>
 			+ slab分配器是不带color的。
 
 	>网络：
@@ -43,23 +44,29 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 			* 块设备层		<drivers/block/ll_rw_blk.c>
 			+ 块设备层是不带buffer的。
 
-	>基础：
-			* fork()			<fork.c>
+	>进程:
 			* schedule()		<schedule.c>
+			* fork()			<fork.c>
+			* exec()			<fs/exec.c>
+			* exit(),wait4()	<kernel/exit.c>
+			+ papaya os的进程调度算法几乎没有。
+			
+	>基础：
 			* kmalloc()		<pmm.c>
 			* bottom half		<kernel/bh.c>
 			* printf()		<lib/printf.c>
-			+ papaya os的进程调度算法几乎没有。
 			+ 基于slab的kmalloc叫做kmalloc2(),　因为papaya还保留着一个早期的
 			   堆，是链表实现的。
 			+ papaya的bh.c实现的很简单，跟linux不太一样。
+
+	>系统库:
+			* 动态链接器		<../cmd/ld.c>
+			+ 只在linux下测试通过，尚未移植到papaya
 
 	>几个入口文件：
 			boot.asm	==>		kernel.asm		==>		kernel.c
 
 计划12月前完成的模块有:
-	> 进程  fork() exec() exit() wait() 
-	> 动态连接器
 	> ext2文件系统
 	> 键盘driver, 字符设备层，以及vfs层的完善
 	> 进程通信 signal() pipe()
@@ -67,11 +74,18 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 
 【3】
 src/ 下面是源码
-cmd/ 调试时用到的小工具。包括刻录到虚拟img，刻录到usb等等。
-lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为有还在完善中，工作时遇到bug随手改过来，所以也一并上传。
+cmd/ 调试时用到的小工具，以及papaya的用户态程序。包括刻录到
+	 虚拟img，刻录到usb等等。
+lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为还
+	 在完善中，工作时遇到bug随手改过来，所以也一并上传。
 
 
 【4】
+[2016,10,7] Version 0.609a
+==========update===========
+1, dynamic linker,works under linux only, not papaya.
+								see ../cmd/ld.c
+
 [2016,9,24] Version 0.609
 ==========update===========
 1, Implementaion of vm_area, mm_struct 
