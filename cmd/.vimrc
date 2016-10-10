@@ -58,4 +58,5 @@ function! Pinyin()
 	:luafile /home/wws/lab/yanqi/cmd/han2pinyin.lua
 endfunction
 
+source /home/wws/lab/yanqi/cmd/cc2cn.vim
 

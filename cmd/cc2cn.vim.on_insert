@@ -1,0 +1,59 @@
+" [0]
+" 这个文件已经废弃. 因为有了更简单的方法, BufEnter触发redirect
+" [1]
+"切换到.cn之后, 会进入insert模式, 这是无法避免的
+"这个"插入"动作,似乎发生在BufEnter这些事件之后,所以怎样退出插入, 还是会被"后来覆盖".
+" [2]
+"注意,echo不太好用. 因为有时候输出被vim自己的输出覆盖了. 像他在底栏提示进入插入模式...
+" [3]
+"我们在.cc文件里按'i', 会触发InsertEnter事件; 这个'i'最后转移到.cn, 造成它进入插入模式.
+"但是不会触发.cn的InsertEnter事件. 
+
+let s:switching = 0
+function! Goto_cn()
+	let s:switching = 1
+	let l:cnpath = expand("%:p:r")
+	let l:cnpath = l:cnpath . ".cn"
+	if bufwinnr(l:cnpath) > 0
+		execute "buffer " . l:cnpath
+	else
+		execute "e " . l:cnpath
+	endif
+endfunction
+
+function! Redirect()
+	let l:cnpath = expand("%:p:r")
+	let l:cnpath = l:cnpath . ".cn"
+	execute "e" . l:cnpath
+endfunction
+
+"响应InsertCharPrev事件, 第一次按键本来是在insert模式下, we let it behave like in normal mode
+"注意,响应InsertEnter事件是不行的,这个事件发生太早了
+function! On_InsertCharPre()
+	if s:switching == 1 
+		call feedkeys("\<C-\>\<C-n>")
+		call feedkeys(v:char)	"补偿这次动作
+		let v:char = ''			"销毁这一次插入
+		let s:switching = 0		"关闭switching状态
+	endif
+endfunction
+
+"切过去之后, 无论按什么, 都要把switching状态清除
+"这个函数作废了,因为InsertLeave不被Ctrl-C触发
+function! On_InsertLeave()
+	if s:switching == 1
+		let s:switching = 0
+	endif
+endfunction
+
+"每次在.cn文件里进入插入模式, 就清除switching状态
+function! On_InsertEnter()
+	let s:switching = 0
+endfunction
+
+au! InsertEnter *.cc  call Goto_cn()
+au! InsertCharPre *.cn call On_InsertCharPre()
+au! InsertEnter *.cn call On_InsertEnter()
+"au! InsertLeave *.cn call On_InsertLeave()
+au! BufEnter *.cc call Redirect()
+

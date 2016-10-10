@@ -1,6 +1,8 @@
 /* TODO 
  * 1, hash的计算是不是统一调用一个接口呢? 为了一点优化, 要冒风险
       hash不一致的bug不好调.
+ * 2, wordnum这个参数不那么必要了, 因为utf8字符串里也不会出现0.
+      常规的字符串函数都能用.
  */
 //#define _GNU_SOURCE
 #define _BSD_SOURCE
@@ -40,7 +42,7 @@ find_interp_item(char *words, int wordnum, u32 hash){			assert(hash < UTF8_HASHT
 	for(int i = 0; i < UTF8_HASHTBL_LEN2; i++){
 		int index = collision[i];	//哈希表存的是interp的索引
 		item = &interp[index];
-		if(memcmp(words, item->chinese, wordnum * 3) == 0) 
+		if(strcmp(words, item->chinese) == 0) 
 			return item;
 	}
 	return 0;	

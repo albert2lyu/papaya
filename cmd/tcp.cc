@@ -145,3 +145,11 @@ connection_create(struct sk_buff *comer){
 void init_tcp(void){
 	lianjiebiao = static_alloc( sizeof(void *), lianjiebiaochang);
 }
+
+
+
+
+
+
+
+
