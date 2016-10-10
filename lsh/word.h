@@ -1,3 +1,18 @@
+struct interp_item{
+	char *chinese;
+	char *english;
+};
+const struct interp_item interp[] ={
+	{ "指针推移", "ptr_forward" },
+	{"连接不存在", "connect_null"},
+};
+#define INTERP_TBL_LEN (sizeof(interp) / sizeof(struct interp_item))
+
+//utf8字符串的哈希值作为主索引
+#define UTF8_HASHTBL_LEN 1024
+#define UTF8_HASHTBL_LEN2 16
+int utf8_hashtbl[ UTF8_HASHTBL_LEN ][ UTF8_HASHTBL_LEN2 ];
+
 const char *pinyin_of[] = { 
 	//[0xff0c]    ="douhao"，
 	[0x3400]    ="qiu",
@@ -25548,3 +25563,5 @@ const char *pinyin_of[] = {
 	[0x2b6f6]   ="chi",
 	[0x2b6f8]   ="ti",
 };
+
+#define PINYIN_TBL_LEN (sizeof(pinyin_of) / sizeof(char *))

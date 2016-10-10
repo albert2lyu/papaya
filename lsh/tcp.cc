@@ -6,15 +6,15 @@
 
 static void print_tcpmsg(struct sk_buff *skb);
 
-寻找最小
+xunzhaozuixiao
 enum{
-	 连接不存在,
-	 发起者_等待确认,
-	 应答者_等待确认,
-	 连接已建立,
-	 告退者_等待确认,
-	 后退者_等待确认,
-	 告退者_保留侦听
+	 connect_null,
+	 faqizhe_dengdaiqueren,
+	 yingdazhe_dengdaiqueren,
+	 lianjieyijianli,
+	 gaotuizhe_dengdaiqueren,
+	 houtuizhe_dengdaiqueren,
+	 gaotuizhe_baoliuzhenting
 };
  
 
@@ -28,8 +28,8 @@ struct connect{
 	u32 next_ack;
 };
 
-#define 连接表长 1024
-static connect *连接表;
+#define lianjiebiaochang 1024
+static connect *lianjiebiao;
 
 static struct connect *
 _connection_lookup(u32 hisip, u16 hisport, u32 myip, u16 myport);
@@ -45,16 +45,16 @@ void tcp_layer_recv(struct sk_buff *comer){
 		connect = connection_create();
 		if(tcphdr->flags == TCP_FLAG_SYN){
 			/*XXX 发送这个询问包*/
-			connect->state = 发起者_等待确认;
+			connect->state = faqizhe_dengdaiqueren;
 			return;
 		}
 		else goto ignore;
 	}
 
-	if(connect->state == 连接不存在){	// the initial state by default
+	if(connect->state == connect_null){	// the initial state by default
 		goto ignore;	
 	}
-	else if(connect->state == 发起者_等待确认){	//在等待第二次握手
+	else if(connect->state == faqizhe_dengdaiqueren){	//zaidengdaidierciwoshou
 		if(tcphdr->ack == connect->next_seq && 
 				tcphdr->flags == TCP_FLAG_SYN | TCP_FLAG_ACK ){
 
@@ -64,46 +64,46 @@ void tcp_layer_recv(struct sk_buff *comer){
 			/* 注意,发出去的这个ACK可能丢失, server收不到的话,它会再发一次
 			 * ACK+SYN包.那时,我们已经是STAT_ESTLBSHED状态了.
 			 */
-			connect->state = 连接已建立;
+			connect->state = lianjieyijianli;
 		}
 		else goto ignore;
 	}
-	else if(connect->state == 应答者_等待确认){
+	else if(connect->state == yingdazhe_dengdaiqueren){
 		if(tcphdr->flags = TCP_FLAG_ACK && connect->next_seq == tcphdr->ack){
-			connect->state = 连接已建立;	
+			connect->state = lianjieyijianli;	
 		}
 		else goto ignore;
 	}
-	else if(connect->state == 连接已建立){
-		assert(tcphdr->flag_ack);		//TODO 这个断言似乎是错的
-		if(tcphdr->flags == TCP_FLAG_FIN){	//对方要断开了
+	else if(connect->state == lianjieyijianli){
+		assert(tcphdr->flag_ack);		//TODO zhegeduanyansihushicuode
+		if(tcphdr->flags == TCP_FLAG_FIN){	//duifangyaoduankaile
 			//send ack and fin		
-			connect->state = 后退者_等待确认;
+			connect->state = houtuizhe_dengdaiqueren;
 		}
 		else goto ignore;
 	}
-	else if(connect->state == 告退者_等待确认){
+	else if(connect->state == gaotuizhe_dengdaiqueren){
 		if(tcphdr->flag_ack){
-			connect->state = 告退者_保留侦听;
+			connect->state = gaotuizhe_baoliuzhenting;
 			if(tcphdr->flag_fin){
 				//send ack	
-				connect->state = 连接不存在;
+				connect->state = connect_null;
 			}
 		}
 		else goto ignore;
 	}
 
-	else if(connect->state == 告退者_保留侦听){
+	else if(connect->state == gaotuizhe_baoliuzhenting){
 		if(tcphdr->flag_syn){
 			//send ack
-			connect->state = 连接不存在;
+			connect->state = connect_null;
 		}
 		else goto ignore;
 	}
 
-	else if(connect->state == 后退者_等待确认){
+	else if(connect->state == houtuizhe_dengdaiqueren){
 		if(tcphdr->flags == TCP_FLAG_ACK){
-			connect->state = 连接不存在;		
+			connect->state = connect_null;		
 		}
 		else goto ignore;
 	}
@@ -144,5 +144,5 @@ connection_create(struct sk_buff *comer){
 }
 
 void init_tcp(void){
-	连接表 = static_alloc( sizeof(void *), 连接表长);
+	lianjiebiao = static_alloc( sizeof(void *), lianjiebiaochang);
 }

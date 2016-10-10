@@ -6,6 +6,10 @@
  * 2, No, '\n' is necessary, otherwise, the performance of 'move' operation is
  * intolerable. An end flag is really needed.
  */
+ /*Tips
+  * 1,如果一个行被删空了, 那curr停在line[0]上, 此处也是'\n'.
+  *   所以CURR_LEN有时是大于CURRL_LEN的.
+  */
 /*把这个解释器编译进lua虚拟机如何,问题还是你如何调用它*/
 /*conventions:
  * @state see 'VI_SET_STATE, VI_CLEAR_STATE..' in vi.h, they operate on a local 
@@ -1039,10 +1043,12 @@ void vi_del_within(struct vi *vi){
 	vi->len_of_lines[vi->currl] = len;
 
 	vi->curr = vi->v_head;
-	assert(VI_CURRL_LEN(vi) >= VI_CURR_OFFSET(vi));
-	if(VI_CURRL_LEN(vi) == VI_CURR_OFFSET(vi)){
+	int currl_len = VI_CURRL_LEN(vi);
+	assert(currl_len >= VI_CURR_OFFSET(vi));
+	if(currl_len && currl_len == VI_CURR_OFFSET(vi) ){	
 		vi->curr--;
 	}
+	//如果这行被删空了, 那curr就停在line[0], 此处也是'\n'
 }
 
 /*delete across lines*/

@@ -14,7 +14,7 @@
 #define TCP_PAYLOAD_LEN(skb)	(IP_PAYLOAD_LEN((skb)->iphdr) - (skb)->tcphdr->len * 4)
 #define ETHHDR_LEN 14		//TODO remove it
 
-#define zhizhentuiyi(ptr, bytes) ptr = (void *)((unsigned)(ptr) + bytes)
+#define ptr_forward(ptr, bytes) ptr = (void *)((unsigned)(ptr) + bytes)
 #define pianweixuhao(skb) ((skb)->tcphdr->seq + TCP_PAYLOAD_LEN(skb) - 1)
 enum{
 	TCP_OPT_EOL,
@@ -60,7 +60,7 @@ static inline int zhizhenjianju(void *ptr1, void *ptr2){
 static u32 MY_WND_SIZE = 0x100000;
 static u16 MY_MSS = 1460;
 enum{
-	 lianjiebucunzai,
+	 connect_null,
 	 faqizhe_dengdaiqueren,
 	 yingdazhe_dengdaiqueren,
 	 lianjieyijianli,
@@ -210,7 +210,7 @@ void tcp_layer_recv(struct sk_buff *comer){
 		else goto ignore;
 	}
 
-	if(connect->state == lianjiebucunzai){	// the initial state by default
+	if(connect->state == connect_null){	// the initial state by default
 		goto ignore;	
 	}
 	else if(connect->state == faqizhe_dengdaiqueren){	//zaidengdaidierciwoshou
@@ -279,7 +279,7 @@ void tcp_layer_recv(struct sk_buff *comer){
 			connect->state = gaotuizhe_baoliuzhenting;
 			if(tcphdr->flag_fin){
 				//send ack	
-				connect->state = lianjiebucunzai;
+				connect->state = connect_null;
 			}
 		}
 		else goto ignore;
@@ -288,14 +288,14 @@ void tcp_layer_recv(struct sk_buff *comer){
 	else if(connect->state == gaotuizhe_baoliuzhenting){
 		if(tcphdr->flag_syn){
 			//send ack
-			connect->state = lianjiebucunzai;
+			connect->state = connect_null;
 		}
 		else goto ignore;
 	}
 
 	else if(connect->state == houtuizhe_dengdaiqueren){
 		if(tcphdr->flags == TCP_FLAG_ACK){
-			connect->state = lianjiebucunzai;		
+			connect->state = connect_null;		
 		}
 		else goto ignore;
 	}
@@ -341,7 +341,7 @@ __connection_create(u32 hisip, u16 hisport, u32 myip, u16 myport){
 		connect->hisport = hisport;
 		connect->myport = myport;
 
-		connect->state = lianjiebucunzai;
+		connect->state = connect_null;
 
 		/* receive window是创建连接时就可以初始化的 */
 		struct recv_wnd *recv_wnd = &connect->recv_wnd; 
@@ -542,16 +542,16 @@ prepare_acksyn(struct connect * connect, struct sk_buff *comer){
 	opt->kind = TCP_OPT_MSS;
 	opt->len = 4;
 	opt->data.word[0] = htons(connect->max_seg_size);
-	zhizhentuiyi(opt, opt->len);
+	ptr_forward(opt, opt->len);
 
 	opt->kind = TCP_OPT_WNDSCL;
 	opt->len = 3;
 	opt->data.byte[0] = connect->recv_wnd.scale;
-	zhizhentuiyi(opt, opt->len);
+	ptr_forward(opt, opt->len);
 	
 	opt->kind = TCP_OPT_SACK_PERMIT;
 	opt->len = 2;
-	zhizhentuiyi(opt, opt->len);
+	ptr_forward(opt, opt->len);
 
 	int end = zhizhenjianju(tcphdr->opt_area, opt);
 	int opt_area_len = ceil_align(end, 4);
@@ -612,7 +612,7 @@ static void init_connect_with_syn(struct connect *connect, struct sk_buff *comer
 		}
 		connect->send_wnd.realsize = connect->send_wnd.size <<
 									  connect->send_wnd.scale;
-		zhizhentuiyi(opt, len);
+		ptr_forward(opt, len);
 	}
 }
 

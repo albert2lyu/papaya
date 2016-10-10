@@ -1,3 +1,7 @@
+/* TODO 
+ * 1, hash的计算是不是统一调用一个接口呢? 为了一点优化, 要冒风险
+      hash不一致的bug不好调.
+ */
 //#define _GNU_SOURCE
 #define _BSD_SOURCE
 #include<stdlib.h>
@@ -19,40 +23,116 @@ static bool is_utf8_leader(char c){
 	bool is_leader = (c >> 4) == 0b1110 ;
 	return is_leader;
 }
-static void convert_seg(void){
-	assert( 	VI_CURR_LENR(vim)  >= 3   &&
-				is_utf8_leader(vim->curr[0]) );
 
-	while(is_utf8_leader(vim->curr[0]) && VI_CURR_LENR(vim) >= 3){
-		u32 high = vim->curr[0];
-		u32 mid = vim->curr[1];
-		u32 low = vim->curr[2];
-		assert( (mid >> 6) == 0b10 && (low >> 6) == 0b10);
+/* 随便杂凑, 不知道会有多低效 */
+static inline u32 hash_one(u32 hash, u8 c){
+	return hash +  c;
+}
+
+/* @hash 调用者提前计算好hash,　通常这样更能允许一些优化.
+		 hash值实际上是二维数组words_hashtbl的主索引
+ * @word 汉字
+ */
+static inline const struct interp_item * 
+find_interp_item(char *words, int wordnum, u32 hash){			assert(hash < UTF8_HASHTBL_LEN);
+	const struct interp_item *item;
+	int *collision = utf8_hashtbl[hash];
+	for(int i = 0; i < UTF8_HASHTBL_LEN2; i++){
+		int index = collision[i];	//哈希表存的是interp的索引
+		item = &interp[index];
+		if(memcmp(words, item->chinese, wordnum * 3) == 0) 
+			return item;
+	}
+	return 0;	
+}
+
+static void words2unicodes(u32 *uarray, char *words, int wordnum){
+	int i;
+	for( i = 0; i < wordnum; i++){
+		char *utf8 = words + i * 3;
+		u32 high = utf8[0];
+		u32 mid = utf8[1];
+		u32 low = utf8[2];									assert( (mid >> 6) == 0b10 
+																&& (low >> 6) == 0b10);
+
 		u32 unicode = (low & 0b00111111) + 
 					  ((mid & 0b00111111) << 6) +
 					  ((high & 0b00001111) << 12);
-		char *pinyin = (char *)pinyin_of[unicode];
-		assert(pinyin && "can not find a word in dictionary");
-
-		/* 删除一个汉字，并插入相应的拼音 */
-		vim_v();
-		vim_l();
-		vim_l();
-		bool meet_tail = VI_CURR_LENr(vim) == 0 ;
-		vim_x();	/*abc小明s\n		==>		abcS\n
-					 *abc小明\n			==>		abC\n
-					 *小心上面两种情况。 curr落到末尾，可能是被约束回来的，
-					 * 也可能不是，像比case 1。
-					 */
-		if(meet_tail){
-			vim_a(pinyin);
-		}
-		else{
-			vim_i(pinyin);
-		}
-		vim_l();
-
+		uarray[i] = unicode;								
 	}
+	uarray[i] = 0;	//MUST
+}
+
+/* 依赖于uarray以0结尾 
+ */
+static bool mk_pinyin(char pinyin[], u32 *uarray){
+	char *fresh = pinyin;
+	u32 unicode;
+	for(int i = 0; (unicode = uarray[i]); i++){
+		const char *pystr = pinyin_of[unicode];					asrt(pystr);	
+		fresh = stpcpy(fresh, pystr);		
+	}
+	return true;
+}
+
+static void convert_seg(void){								assert( VI_CURR_LENR(vim)  >= 3   &&
+																	is_utf8_leader(vim->curr[0]) );
+	bool ok;
+	const struct interp_item *item;
+	char *insrted;
+	u32 hash = 0;
+	char *words = vim->curr;		/* 字. 指向这段汉字*/
+	int wordnum = 0;;				/* 几个字*/
+	bool meet_tail = false;
+
+	#define UARRAY_LEN 32	//unicode array
+	u32 uarray[UARRAY_LEN];								
+	#define PINYIN_LEN (UARRAY_LEN * 16) //一个字最长16个拼音字母
+	char pinyin[PINYIN_LEN];
+
+	vim_v();
+	while(is_utf8_leader(vim->curr[0]) ){					asrt(VI_CURR_LENR(vim) >= 3);
+		hash = hash_one(hash, vim->curr[0]);
+		hash = hash_one(hash, vim->curr[1]);
+		hash = hash_one(hash, vim->curr[2]);
+
+		wordnum++;
+
+		vim_l(); vim_l(); 	//我们停在这个utf8的尾字节上了,不要急着挪到下一个字
+		if(VI_CURR_LENr(vim) == 0){	//看看是行尾了吗? 
+			meet_tail = true;
+			break;
+		}
+		vim_l();			//挪到下一个字
+	}
+
+	hash %= UTF8_HASHTBL_LEN;
+	/* try translating into english first */
+	item = find_interp_item(words, wordnum, hash);
+	if(item){
+		insrted = item->english;
+	}
+	//词典里找不到, 那就用拼音字典逐字翻译
+	else{													asrt(wordnum < UARRAY_LEN);
+		words2unicodes(uarray, words, wordnum);
+		ok = mk_pinyin(pinyin, uarray);						if(!ok) exit(1);
+		insrted = pinyin;
+	}
+	
+	if(!meet_tail) vim_h();		//确保我们站在这串utf8的最尾字节
+								//否则接下来的x操作会多删
+	vim_x();	//strong order
+	/* 小心上面两种情况。 curr落到末尾，可能是被约束回来的，也可能不是.
+	 * abc小明s\n		==>		abcS\n
+	 * abc小明\n			==>		abC\n
+	 */
+	 if(meet_tail){
+		vim_a(insrted);
+	 }
+	 else{
+		vim_i(insrted);
+	 }
+	vim_l();	//插入后, cursor停在新增内容的尾部. 要把它往右挪一下.
 }
 
 /* 不接受任何参数，用的是全局的vim,总是转换当前行*/
@@ -67,7 +147,11 @@ static void convert_line(void){
 		else vim_l();
 	}while( VI_CURR_LENr(vim) != 0);
 }
+
+static void init_utf8_hashtbl(void);
 int main(int argc, char *argv[]){
+	init_utf8_hashtbl();
+
 	static bool in_comment = false;
 	vi_library_init();
 	char *cnfile = argv[1];
@@ -122,3 +206,55 @@ int main(int argc, char *argv[]){
 	assert( chmod(cc_path, 0555) == 0);
 	return 0;
 }
+
+
+/* 计算一个utf8字符串的哈希值 
+ * 只要遇到非utf8 leader,就认为结束了
+ */
+u32 hashutf8(char *words){									assert( is_utf8_leader( words[0]) );
+	char *word = words;
+	u32 hash = 0;
+	while( is_utf8_leader(word[0] ) ){						
+		hash = hash_one(hash, word[0]);	
+		hash = hash_one(hash, word[1]);	
+		hash = hash_one(hash, word[2]);	
+
+		word += 3;
+	}
+	return hash % UTF8_HASHTBL_LEN;							
+}
+
+//存的是interp 表的索引
+static bool utf8_hashtbl_store(int value, int hash){
+	int *similar = utf8_hashtbl[hash];
+	int i;
+	for(i = 0; i < UTF8_HASHTBL_LEN2; i++){
+		if(similar[i]) continue;
+		similar[i] = value;
+		return true;
+	}
+	return false;
+}
+
+static void init_utf8_hashtbl(void){
+	bool ok;
+	const struct interp_item *item;
+	for(int i = 0; i < INTERP_TBL_LEN; i++){
+		item = &interp[i];
+		u32 hash = hashutf8( item->chinese );
+		ok = utf8_hashtbl_store( i, hash);					asrt(ok);
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

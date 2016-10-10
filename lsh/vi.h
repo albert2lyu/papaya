@@ -6,7 +6,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include"utils.h"
-
+#define asrt assert		//TODO 以后把asrt改成个assert功能一样,但是在运行期依旧有效的宏
 enum{
 	E_meetn = 1,
 	E_curr,
@@ -314,8 +314,10 @@ static inline int vi_i(struct vi*vi, char *content){
 //唯一要提防的是，在空行插入的时候
 //TODO 往行尾追加呢?
 static inline int vi_a(struct vi *vi, char *content){
-	assert(VI_CURR_LEN(vi) <= VI_CURRL_LEN(vi));
-	if( VI_CURRL_LEN(vi) != 0 )	vi->curr++;	
+	if( VI_CURRL_LEN(vi) != 0 ){							asrt(VI_CURR_LEN(vi) <= VI_CURRL_LEN(vi));
+		vi->curr++;	
+	}														
+	else asrt( VI_CURR_OFFSET(vi) == 0);	//如果是空行, 必须停在line[0]
 	return vi_i(vi, content);
 }
 static inline void vi_$0(struct vi *vi){

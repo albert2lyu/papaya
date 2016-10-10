@@ -317,6 +317,22 @@ Thu Jul  2 02:04:55 PDT 2015
 
 
 ===========tips
+*
+  一直听别人说实际上磁盘IO用的是DMA，而非PIO．
+  今天才知道，此DMA非彼DMA．
+  早期的ISA DMA是很慢的，实际速度大概400KB每秒．PIO才是
+  The first interface type used between devices 
+  (mainly hard disks) and the computer.
+  后来是UDMA取代了PIO．
+  (中间还出现过一个WDMA,似乎是慢DMA的加强版,linux0.12上用的
+  似乎是PIO) 
+  另外，软盘用的是DMA没错．
+  那就是说，
+  最早期的时候有ISA DMA和PIO，但ISA DMA不够快，所以linux用了PIO．
+  后来出现了WDMA.
+  再后来出现了UDMA，它的优势已经很明显了，所以PIO被淘汰．
+  对吗．
+
 * x86 cpu在32位模式下，必须通过PAE才能利用NX位。
 　软件模拟的方法有多种，但都不完美。要么不够接近，要么overhead较大。最直观的是把代码段的limit设置短一些，仅仅覆盖线性地址空间的靠前部分，因为通常程序的代码都放在前面，数据在后，堆栈更是在3G之遥。
   好在2008年起，很多一般的发布的linux版本都默认使用启用了PAE的内核。
