@@ -31,7 +31,9 @@ _git:
 	-mv $(luasrc)/*.so ~/Documents/tmplua_for_git/
 	cp ~/lsh/init.lua .
 	-mv tags ~/Documents/tmplsh_for_git/
+	-mv *.out ~/Documents/tmpsrc_for_git/
 
 _tig:
 	-mv ~/Documents/tmplua_for_git/* $(luasrc)
 	-mv ~/Documents/tmplsh_for_git/tags ./
+	-mv ~/Documents/tmplsh_for_git/*.out ./
