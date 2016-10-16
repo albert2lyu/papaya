@@ -12,5 +12,6 @@ all: clean ll_rw_blk.o buffer.o
 
 clean:
 	@rm  -f *.o;
+	@rm  -f buffer.cc;
 
 .PHONY:all
