@@ -215,21 +215,29 @@ int schedule_timeout(unsigned msec){
  * 2, can also be called by the context of a ring3 process trapped into kernel
  */
 void kp_sleep(u32 msg_type,u32 msg_bind){
+	//必须关中断, 如果队列移交后, schedule()发生前,发生了时钟或信号, 那就糟糕了
+	int IF = cli_ex();
 	active_sleep(current,msg_type,msg_bind);
 	schedule();
-
-	/**
-	__asm__ __volatile__(
-			"int $0x80\n\t"
-			:
-			:"a"(1),"d"(msg_type),"c"(msg_bind)
-	);
-	 */
+	if(IF) sti();
 }
 
-void wake_up(struct pcb *p){
-	sleep_active(p);
+void wake_up(struct list_head *root){
+	struct pcb *tsk;
+	list_for_each_safe(root, tsk, sleep){
+		sleep_active(tsk);	/* 唤醒每个等待者 */
+	}
+	INIT_LIST_HEAD(root);	/* 清空睡眠队列 */
 }
+
+/* deep sleep 
+ * 非常简单, 我们有进程睡眠的k-API, 只要把这个进程扔到"等候队列"里就行了.
+ */
+void sleep_on(struct list_head *root){
+	list_add(&current->sleep, root);
+	kp_sleep(0, MSGTYPE_DEEP);		
+}
+
 void kthread_sleep(u32 msg_type, u32 msg_bind){
 	active_sleep(current, msg_type, msg_bind);	
 	__asm__ __volatile__ ("int $0x81");
@@ -249,7 +257,6 @@ void kthread_sleep(u32 msg_type, u32 msg_bind){
 		oprintf("i want to expire process:%s",current->p_name);
 		active_expire(current);
  */
-
 
 
 

@@ -3,13 +3,26 @@
 #include <valType.h>
 #include <list.h>
 #include<proc.h>
+#include<linux/buffer_head.h>
 #define READ 0
 #define WRITE 1
 #define MAJOR(dev_id)  ((dev_id) >> 8)
+#define MINOR(dev_id) ((dev_id) & 0xff)
+/* 下面这个宏是为了以后扩大minor, 255个可能会不够用 */
+#define MKDEV(major, minor) ( ((major) << 8) + minor )	
+
+/* a dangerous macro, take care */
+#define BLK_UNIT(dev_id) (blk_devs[ MAJOR(dev_id) ].units[MINOR(dev_id)])
+
 #define MAX_BLKDEV 200
 #define MAX_REQUEST 32
-#define MINOR(dev_id) ((dev_id) & 0xff)
-#define BLOCK_SIZE 1024
+#define BLOCK_SIZE 1024		/* 读写块设备的基本单位是4K.主要原因是:
+							> 1k的话, 无法保证在一个物理页内的连续.不利于mmap()
+							> 况且, 现代的硬盘设备, 不在乎多读几个扇区
+							> 唯一可能就是对小文件不太友好. 因为文件系统通常
+							  是把块设备的block size作为自己的block size, 但真
+							  要硬着头皮, 也能做出来适合小文件的1K粒度的文件系统
+							*/
 
 #define SYSID_EXTEND 0X5
 #define SYSID_LINUX 0X83
@@ -36,10 +49,11 @@ struct request{
 	struct list_head tentacle;
 	u16 dev_id;
 	int cmd;
-	unsigned start;
-	int count;
+	unsigned start;		//start block id
+	int count;			//block count
 	char *buf;
 	struct pcb *asker;
+	struct buffer_head *bh;
 };
 /* block unit: a dev-major owns many block units, for example, an IDE channel 
  * can have two hard disks, and this is not the end --- each disk has several
@@ -50,8 +64,14 @@ struct blk_unit {
 	 * we don't want to touch the concept of 'sector' in block layer, but 
 	 * there's no way, a disk-partation is not promised aligned on BLOCK_SIZE
 	 */
-	unsigned start_sector;
+	unsigned start_sector;		/*这儿将来改成start_block, 不考虑非4K情况*/
 	unsigned total_sectors;
+	struct list_head *hotable;	/*热表 或 缓冲块表 */
+	int hotable_len;			/* 热表长 或 缓冲块表长 注意! 单位是element, 不是byte */
+	#define HOTABLE_LEN2 64		/*碰撞调解链的长度上限. 太长了会慢
+								8K的哈希表映射256M, 8M能映射256G的缓冲块
+								很够了, 内存也没那么大*/
+	u32 dev_id;
 };
 struct blk_dev{
 	/*@dev_id we need it to acknowledge the device-major, because, for example,
@@ -60,7 +80,16 @@ struct blk_dev{
 	void (*do_request)(u16 dev_id);			
 	void (*add_request)(struct request *rq);
 
+	/* 像8号major, SCSI硬盘, 容纳16个硬盘, 每个硬盘16个分区(0号其实不是)
+	   那它的unitmax就是255, units_per就是16.
+	   像3号major, IDE硬盘, 容纳两个硬盘, 每个硬盘64个分区
+	   那它的unitmax就是128, units_per就是64.
+	   之所以存放的是unitmax, 而不是physical_max,(上例中分别是16和2)
+	   是因为unitmax使用的更频繁, 而physical_max(即物理设备)用得不多
+	 */
 	struct blk_unit **units;
+	int unitmax;		//并不总是255,像IDE,最多64个分区
+	int units_per;		//每个物理设备
 };
 struct blk_dev blk_devs[MAX_BLKDEV];
 struct request_queue{
@@ -96,7 +125,22 @@ struct queue_getter{
 
 struct request_queue * blk_get_queue(u16 dev_id);
 
-int ll_rw_block2(u16 dev_id, int rw, unsigned start, int count, char *buf);
-int ll_rw_block(u16 dev_id, int rw, unsigned start, int count, char *buf);
+int ll_rw_blocks(u32 dev_id, int rw, ulong start, ulong count, void *buf);
+//int ll_rw_block(u16 dev_id, int rw, unsigned start, int count, char *buf);
+int ll_rw_block(int rw, struct buffer_head *bufferhead);
 void register_queue_getter(int major, get_queue_fn *get_queue, void *data);
+
+void register_blkunit(struct blk_unit *unit, u32 dev);
+void register_blkdev(int major);
+struct buffer_head *mmap_disk(u32 dev, ulong block);
+void munmap_disk(struct buffer_head *block);
+
+void init_blklayer_basic(void);
+void init_blklayer(void);
+
+
+void generic_mk_request(int rw, struct buffer_head *bh);
+
+
+
 #endif

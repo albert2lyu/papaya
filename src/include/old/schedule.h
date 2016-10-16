@@ -1,6 +1,7 @@
 #ifndef SCHEDULE_H
 #define SCHEDULE_H
 #include<valType.h>
+#include<list.h>
 extern unsigned ticks;
 /**if a process is prepared for running,we say it's 'active'.all active process
  * are stored in this linked-list in ascendsing order of 'prio'.
@@ -14,7 +15,9 @@ struct pcb *list_expire;
 
 void sleep_active(struct pcb *p);
 void schedule(void);
-void wake_up(struct pcb *p);
+void wake_up(struct list_head *root);
+void sleep_on(struct list_head *root);
+
 #define __SAVE()\
 	__asm__ __volatile__(\
 	"pushl $0\n\t"\
@@ -35,5 +38,4 @@ void wake_up(struct pcb *p);
 	)
 
 void kp_sleep(u32 msg_type,u32 msg_bind);
-void wake_up(struct pcb *p);
 #endif

@@ -81,6 +81,7 @@ _git:
 	cp ~/.vimrc ./
 	-mv *.img ~/Documents/tmpcmd_for_git/
 	-mv bochsout.txt ~/Documents/tmpcmd_for_git/
+	-mv tags ~/Documents/tmpcmd_for_git/
 
 # 把git动作里挪走的文件搬回来
 _tig:

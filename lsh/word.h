@@ -5,6 +5,24 @@ struct interp_item{
 const struct interp_item interp[] ={
 	{ "指针推移", "ptr_forward" },
 	{"连接不存在", "connect_null"},
+	{"全局链", "globalist"},
+	{"全局链长", "globalist_len"},
+	{"全局链容量", "globalist_max"},
+	{"添加", "add"},
+	{"查找", "lookup"},
+	{"缓冲块表", "hotable"},
+	{"缓冲块表长", "hotable_len"},
+	{"碰撞链容量", "HOTABLE_LEN2"},
+	{"放弃缓冲块", "decrement_bh"},
+	{"引用缓冲块", "increment_bh"},
+	{"解映射块", "munmap_disk"},
+	{"映射磁盘块", "mmap_disk"},
+	{"等待块解锁", "wait_on_buffer"},
+	{"缓冲块脱链", "pickoff_bh"},
+	{"回收最冷块", "recycle_lru"},
+	//{"缓冲块表_添加", "hotable_add"},
+	//{"缓冲块表_查找", "hotable_lookup"},
+
 };
 #define INTERP_TBL_LEN (sizeof(interp) / sizeof(struct interp_item))
 

@@ -6,6 +6,7 @@
 
 static void print_tcpmsg(struct sk_buff *skb);
 
+ptr_forward
 xunzhaozuixiao
 enum{
 	 connect_null,

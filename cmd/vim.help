@@ -1,0 +1,1 @@
+By default, a variable is scoped to the function in which it is first assigned to, or is global if its first assignment occurs outside any function. 

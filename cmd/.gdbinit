@@ -29,6 +29,33 @@ define LL
 	printf "=> 0\n" 
 end
 
+define list 
+	set $root = $arg0 
+	if $root == 0
+		printf "0!\n"
+		return
+	end
+
+	printf "%x =>", $root
+	set $curr = $root->next
+	while $curr != $root 
+		if $curr == 0 
+			loop_break
+		else
+			printf " %x =>", $curr
+		end
+
+		set $curr = $curr->next
+	end
+
+
+	if $curr 
+		printf ")\n"
+	else
+		printf "0\n"
+	end
+end
+
 define LL3
 	printf "active:  "
 	LL list_active
@@ -72,7 +99,16 @@ define origin
 	printf "%s: %s (0x%x)\n", $mmap->filename ,$mmap->dynstr + $dynsym->st_name, (unsigned)$mmap->eheader + $dynsym->st_value
 end
 
-
+#从一个地址开始向右扫描, 直到遇到0. byte unit of u32.
+define scan0
+	set $start = (unsigned *)$arg0
+	set $i = 0
+	while $start[$i]
+		set $i++
+		#printf "%x ", $start[$i]
+	end
+	printf "stop at %x, %x(%d) cells offset,  %x(%d) bytes offset\n", &$start[$i], $i, $i, $i*4,$i*4 
+end
 
 
 

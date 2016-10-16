@@ -31,6 +31,26 @@ static inline u32 hash_one(u32 hash, u8 c){
 	return hash +  c;
 }
 
+/* 只比较中文平面的utf8, 即, 3个字节一组的. 别的不考虑 
+ * return 0 when equal.
+ */
+static int utf8strcmp(char *words, char *words2){
+	char *word = words;
+	char *word2 = words2;
+	bool is, is2;
+	for(int i = 0; 
+		(is = is_utf8_leader(*(word = words+i))) & //NOT &&
+		(is2 = is_utf8_leader(*(word2 = words2+i)));
+		i+=3)
+	{
+		if(word[0] == word2[0] && 
+		   word[1] == word2[1] &&
+		   word[2] == word2[2]);
+		else return 1;
+	}
+	if(!is && !is2) return 0;	//同时遇到了边界
+	return 1;					//仅其中一方遇到了边界
+}
 /* @hash 调用者提前计算好hash,　通常这样更能允许一些优化.
 		 hash值实际上是二维数组words_hashtbl的主索引
  * @word 汉字
@@ -42,7 +62,7 @@ find_interp_item(char *words, int wordnum, u32 hash){			assert(hash < UTF8_HASHT
 	for(int i = 0; i < UTF8_HASHTBL_LEN2; i++){
 		int index = collision[i];	//哈希表存的是interp的索引
 		item = &interp[index];
-		if(strcmp(words, item->chinese) == 0) 
+		if(utf8strcmp( words, item->chinese) == 0)
 			return item;
 	}
 	return 0;	

@@ -6,7 +6,7 @@
 #ifndef CELL_COMMON_H
 #define CELL_COMMON_H
 
-#define ROOTCELL_DEFAULT 4096
+#define ROOTCELL_DEFAULT 4096	//MUST, aligned on BLOCKSIZE
 #define CELL_SIZE (128 * 1024)
 #define CELL_HEADER_SIZE (unsigned)(((struct cell *)0)->data)
 #define CELL_DATA_MAX (CELL_SIZE - CELL_HEADER_SIZE)

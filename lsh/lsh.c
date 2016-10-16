@@ -496,6 +496,15 @@ static int __call_vi_open(lua_State *L){
 	return 1;
 }
 
+static int __call_vi_out(lua_State *L){
+	char buf[1024];	//这儿会有bug,你不知道out多少?
+	struct vi *vi = lua_touserdata(L, 1);	
+	//char *filepath = (char *)lua_tostring(L, 2);
+	char *b = vi_out(vi, buf);								assert(b);
+	lua_pushstring(L, buf);
+	return 1;
+}
+
 static int __call_vi_write(lua_State *L){
 	struct vi *vi = lua_touserdata(L, 1);	
 	char *filepath = (char *)lua_tostring(L, 2);
@@ -580,6 +589,9 @@ void register_vi(lua_State *L){
 
 	lua_pushcfunction(L, __call_vi_open);
 	lua_setfield(L, -2, "open");
+
+	lua_pushcfunction(L, __call_vi_out);
+	lua_setfield(L, -2, "out");
 
 	lua_pushcfunction(L, __call_vi_write);
 	lua_setfield(L, -2, "write");

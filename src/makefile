@@ -14,8 +14,8 @@ cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nos
 #-Wno-implicit-function-declaration 
 export cflags
 all:
-	make -C drivers/block/
 	make -C drivers/ide/
+	make -C block/
 	make -C fs/
 	make -C fs/cell/
 	make -C mm/
@@ -47,7 +47,7 @@ clean_others:
 clean_src:
 	rm *.d -f
 	rm *.o -f
-	rm  drivers/block/*.o -f
+	rm block/*.o -f
 	rm drivers/ide/*.o -f
 	rm drivers/pci/*.o -f
 	rm drivers/net/*.o -f
@@ -65,6 +65,7 @@ _git:
 	make clean_src
 	-mv tmp ~/Documents/tmpsrc_for_git/
 	-mv *.out ~/Documents/tmpsrc_for_git/
+	-mv ./tags ~/Documents/tmpsrc_for_git/
 
 _tig:
 	-mv ~/Documents/tmpsrc_for_git/* ./
@@ -77,11 +78,9 @@ git:
 	make _git
 	make _git -C ../cmd/
 	make _git -C ../lsh/
-	-mv ../tags ~/Documents/
 tig:
 	make _tig 
 	make _tig -C ../cmd/
 	make _tig -C ../lsh/
-	-mv ~/Documents/tags ../
 
 

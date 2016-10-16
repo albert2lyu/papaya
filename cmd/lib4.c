@@ -13,7 +13,7 @@ int global_var;
 int global_var4 = 4;
 //extern int global_var3, global_var4;
 int foobar4(void){
-	print("foobar4 invoked"); 
+	print("foobar4 invoked\n"); 
 	//print("taste global_var3: %d, global_var4: %d\n", global_var3, global_var4);
 	return 4;
 }

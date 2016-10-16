@@ -106,6 +106,7 @@ struct pcb{
 			struct list_head sibling;
 			struct pcb *mother;					//who fork me?
 			struct pcb *monitor;				//who adopt me?
+			struct list_head sleep;				//for sleep_on
 			u32 __task_struct_end;
 		};
 		char padden[PCB_SIZE-sizeof(stack_frame)];

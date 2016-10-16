@@ -54,6 +54,7 @@ typedef struct{
 
 
 
+#define __1K 1024
 #define __4K 0x1000
 #define __8K 0x2000
 #define __1M 0x100000

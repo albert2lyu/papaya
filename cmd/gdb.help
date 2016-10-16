@@ -1,3 +1,6 @@
+*
+ gdb的printf也是行缓冲的 !
+
 set disassembly-flavor intel
 
 set arch i386 /  i8086

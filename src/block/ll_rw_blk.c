@@ -3,6 +3,7 @@
 #include <linux/blkdev.h>
 #include <schedule.h>
 #include<utils.h>
+#include<linux/buffer_head.h>
 
 static struct request rq_arr[MAX_REQUEST];
 static struct queue_getter queue_getters[MAX_BLKDEV];
@@ -40,32 +41,27 @@ static struct request *get_free_request(void){
 
 /* 'generic' means most block device use this function making request. i.e.,
  * their 'make_request_fn' points here
+ * TODO make_request而异, 就不要区分了吧.
  */
-void generic_mk_request(u16 dev_id, int rw, unsigned start, int count, char *buf){
+//void generic_mk_request(u16 dev_id, int rw, unsigned start, int count, char *buf){
+void generic_mk_request(int rw, struct buffer_head *bh){
 	cli_push();
-	int major = MAJOR(dev_id);
+	int major = MAJOR(bh->dev_id);
 	struct request * rq = get_free_request();
-	rq->dev_id = dev_id;
+	rq->bh = bh;
+	rq->dev_id = bh->dev_id;
 	rq->cmd = rw;
-	rq->start = start;
-	rq->count = count;
-	rq->buf = buf;
+	rq->start = bh->block;
+	rq->count = 1;
+	rq->buf = bh->data;
 	rq->asker = current;
 
-//	struct request_queue *q = blk_get_queue(dev_id);
-	blk_devs[major].add_request(rq);	
-	/*try trigger IO */
-	/*
-	if(q->running == false){
-		q->running = true;
-		blk_devs[major].do_request(dev_id);
-	}
-	*/
+	blk_devs[major].add_request(rq);	//硬盘闲的话, 这儿会触发IO
 	flagi_pop();
 }
 
 
-void blkdev_layer_init(void){
+void init_blklayer_basic(void){
 	for(int i =0; i < MAX_BLKDEV; i++){
 		//queue_getters[i].get_queue = 0;
 	}
@@ -76,13 +72,19 @@ void blkdev_layer_init(void){
 }
 
 //not correctly, we can't take partation as device, now.
-int ll_rw_block(u16 dev_id, int rw, unsigned start, int count, char *buf){
+//TODO bh->lock bh->uptodate
+//linux里, 在add_request里, 检查了bh->dirty和uptodate字段,
+//我们的ll_rw_block不这样做, 我们忠实的执行buffer层的调用.
+//int ll_rw_block(u16 dev_id, int rw, unsigned start, int count, char *buf){
+int ll_rw_block(int rw, struct buffer_head *bh){
 //	struct request_queue *queue = 	blk_get_queue(dev_id);
 	//oprintf("\nmake request:%u, %u, %u, %u, %x\n", dev_id, rw, start, count, buf);
-	generic_mk_request(dev_id, rw, start, count, buf);
+	bh->lock = true;
+	generic_mk_request(rw, bh);
 	return 0;
 }
 
+#if 0
 /*1, handle count larger than 256 sectors
  *2, this function is blocked
  */
@@ -108,6 +110,7 @@ int ll_rw_block2(u16 dev_id, int rw, unsigned start, int count, char *buf){
 	}
 	return 0;	
 }
+#endif
 
 
 

@@ -1,6 +1,7 @@
 #ifndef KIT_H
 #define KIT_H
 
+
 /* @desc  round x to 2^n
  * e.g. Given 65, got 128. Given 63, got 64.
  */
@@ -12,6 +13,20 @@ static inline unsigned ceil2n(int x){
 						 );
 	int mask = (1 << highest) - 1;
 	return (x + mask) & ~mask;
+}
+
+/* Usually, we need to know the minimal 'order' we need to 
+   allocate @nr pages.
+   e.g 34 pages => order 8 needed, that's 2^8
+ */
+static inline int pgorder_needed(int nr){
+	int order;
+	nr = ceil2n(nr);	
+	__asm__ __volatile__("bsr %1, %0"
+						 :"=r"(order)
+						 :"r"(nr)
+						 );
+	return order;
 }
 
 /* e.g.  ceil_div(10, 3) = 4, ceil_div(10, 4) = 3, ceil_div(10, 5) = 2 */

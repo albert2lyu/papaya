@@ -17,7 +17,7 @@ int foobar5(void);
 int foobar6(void);
 
 int foobar2(void){
-	print("foobar2 invoked"); 
+	print("foobar2 invoked\n"); 
 	print("taste global_var3: %d, global_var4: %d\n", global_var5, global_var6);
 	foobar5();
 	foobar6();

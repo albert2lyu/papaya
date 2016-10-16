@@ -91,7 +91,7 @@ void kernel_c(){
 	init_ISA_irqs();
 	init_time();
 	ide_init();
-	blkdev_layer_init();
+	init_blklayer();
 	/*
 	 * 1, 用内核函数生成一个ring1进程没问题，ring1进程的好处是，有大多数系统权限
 	 * 在访问内核空间时（例如它的eip就跑在内核空间的代码区),但它又是作为普通

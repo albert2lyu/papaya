@@ -1,4 +1,5 @@
 #include<unistd.h>
+	int aaaaa=1;
 void a(void){
 	//printf("hellow world");
 }
@@ -7,12 +8,6 @@ struct abc{
 	char b;
 }aaa = {1, 2};
 int main(void){
-	if(1){
-
-	}
-	int x = 3;
-	else{
-		x=4;
-	}
 	return 0;
+	aaaaa=2;
 }

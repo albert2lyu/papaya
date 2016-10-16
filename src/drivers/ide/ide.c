@@ -2,16 +2,20 @@
 #include<linux/ide.h>
 #include<irq.h>
 #include<schedule.h>
+#include<linux/buffer_head.h>
 
 static struct request * ide_get_next_rq(struct ide_hwif *hwif);
 static void ide_do_request(u16 dev_id);
+#define BLOCK_SECTORS (BLOCK_SIZE / 512)
+#define block2sectors(blocknum) ( (blocknum )* BLOCK_SECTORS)
+#define block2lba block2sectors
+#define lba2block(lba) ( (lba) / BLOCK_SECTORS)
 /*基本上是按0.11来的，同时又向上遵循2.4的块设备接口。
 */
 /*do_rw_disk() issues READ and WRITE commands to a disk
  */
+/* 0-63是硬盘1(master), 64-127是硬盘2(slave) */
 #define DEVICE_NR(dev_id) (MINOR(dev_id) / 64)
-/* a dangerous macro, take care */
-#define BLK_UNIT(dev_id) (*blk_devs[ MAJOR(dev_id) ].units[MINOR(dev_id)])
 
 #define CURR_HWIF(dev_id) (ide_hwifs + channel_id(dev_id))
 #define MAX_HWIFS 3
@@ -37,14 +41,22 @@ static struct request *tentacle2request(struct list_head *head){
 }
 
 /*delete current and choose next request as current */
-void ide_end_request(struct ide_hwif *hwif){
-	assert(hwif->cur_rq);
-	struct request *to_del = hwif->cur_rq;
+void ide_end_request(struct ide_hwif *hwif){				 assert(hwif->cur_rq);
+	struct buffer_head *bh;
+	struct request *to_del;
+
+	to_del = hwif->cur_rq;
+	bh = to_del->bh;	
 	hwif->cur_rq = ide_get_next_rq(hwif);
 	list_del_init(&to_del->tentacle);
 	to_del->dev_id = 0;
 	hwif->handler = 0;
-	wake_up(to_del->asker);
+
+	bh->lock = false;		//解锁
+	bh->dirty = false;		//块已经干净了
+	bh->io = true;			//IO成功
+
+	wake_up(&bh->wait);
 }
 
 static int win_result(struct ide_hwif *hwif){
@@ -137,8 +149,12 @@ static void __start_request(struct request *rq){
 		hwif->handler = write_intr;		
 	}
 	else assert(0);
-	rq->start = rq->start * 2 + BLK_UNIT(rq->dev_id).start_sector;
-	rq->count *= 2;
+	//rq->start = rq->start * 2 + BLK_UNIT(rq->dev_id).start_sector;
+	//rq->count *= 2;
+	//收到的请求是以块为单位的, 在发送前转化成扇区
+	//TODO 有必要修改request结构体吗?
+	rq->start = BLK_UNIT(rq->dev_id)->start_sector + block2sectors(rq->start);
+	rq->count *= BLOCK_SECTORS;		/*rq->count永远是1呀*/
 	hd_out(hwif->io_ports, ctrl, DEVICE_NR(rq->dev_id),rq->start, rq->count, rq->buf);
 
 	//only about 400ns, we wait it
@@ -201,51 +217,68 @@ static void add_request(struct request * rq){
  *
 */
 void ide_read_partation(int major, int drive){
-	struct blk_unit **units = blk_devs[major].units;
-	if(!units) {
-		units = (void *)kmalloc0(4 * 64);
-		blk_devs[major].units = units;
-	}
-	/*try initialize device 0/64 firstly, namely whole disk*/
-	if(!units[0])	units[0] = kmalloc0(sizeof(struct blk_unit));
-	units[0]->start_sector = 0;
-	units[0]->total_sectors = 0;	/*TODO*/
+	struct buffer_head *ebr_block = 0, 
+					   *mbr_block = 0;
+	struct blk_dev *blkdev = &blk_devs[major];
+	struct blk_unit **units = blkdev->units;
 
-	int disk_devid = (major<<8) + drive * 64;
-	char *mbr = kmalloc(BLOCK_SIZE);
-	ll_rw_block2(disk_devid, READ, 0, 1, mbr);
+	if(!units) {											assert(blkdev->unitmax == 128);
+		units = (void *)kmalloc0(4 * blkdev->unitmax);
+		blkdev->units = units;
+	}
+	/*try initialize device 0/64 firstly, i.e. whole disk*/
+	int i = drive * blkdev->units_per;	//0 or 64
+	if(!units[i])	
+		units[i] = kmalloc0(sizeof(struct blk_unit));
+	units[i]->start_sector = 0;
+	units[i]->total_sectors = 400 * __1M / 512;	//TODO
+	int disk_devid = MKDEV(major, i);
+	register_blkunit( units[i], disk_devid );	
+
+	mbr_block = mmap_disk(disk_devid, 0);					asrt(mbr_block);
+	char *mbr = mbr_block->data;
+	//ll_rw_block2(disk_devid, READ, 0, 1, mbr);
 	struct partition *dp = (void *)(mbr + 446);
-	int i;
 	int ebr_lba = 0;
 	//note! extend-partation may not be the 4th partation
 	for(i = 0; i <=3; i++){
 		int uid = i + 64*drive + 1;	/*device unit id*/
-		if(dp[i].start_sector == 0) continue;
-		if(!units[uid]) units[uid] = kmalloc( sizeof(struct blk_unit) );
+		if(dp[i].start_sector == 0) 
+				continue;	/* ignore empty entry */
+		if(!units[uid]) 
+			units[uid] = kmalloc( sizeof(struct blk_unit) );
 		units[uid]->start_sector = dp[i].start_sector;
 		units[uid]->total_sectors = dp[i].total_sectors;
-		if(dp[i].sys_id == SYSID_EXTEND) ebr_lba = dp[i].start_sector;
+		units[uid]->hotable = 0;	/* MUST */
+
+		if(dp[i].sys_id == SYSID_EXTEND) 
+			ebr_lba = dp[i].start_sector;
 	}
 	
-	/*怎么识别最后一个逻辑分区，是dp[0].start_sector，还是dp[1].start_sector。 */
+	/* 怎么识别最后一个逻辑分区，是dp[0].start_sector，
+	 * 还是dp[1].start_sector。 */
 	next_ebr:
-		if(ebr_lba == 0) goto done;
-		oprintf("\nread next ebr");
-		ll_rw_block2(disk_devid, READ, ebr_lba/2, 1, mbr);	
-		int uid = i + 64 * drive + 1;
-		//if(dp[0].start_sector == 0) goto done;
-		assert(dp[0].start_sector);		//TODO an empty extended partation will trigger it
+		if(ebr_lba == 0) goto done;							oprintf("\nread next ebr");
+		//ll_rw_block2(disk_devid, READ, ebr_lba/2, 1, mbr);	
+		if(ebr_block) munmap_disk(ebr_block);
+		ebr_block = mmap_disk(disk_devid, lba2block(ebr_lba) );
+		dp = (void *)(ebr_block->data + 446);
+		int uid = i + 64 * drive + 1;						/*TODO 一个空的扩展分区会触发这里 */
+															assert(dp[0].start_sector);	 
 		/*OK, this EBR precedes a logical partition*/
-		if(!units[uid]) units[uid] = kmalloc( sizeof(struct blk_unit) );
+		if(!units[uid]) 
+			units[uid] = kmalloc( sizeof(struct blk_unit));
 		units[uid]->start_sector = ebr_lba + dp[0].start_sector;
 		units[uid]->total_sectors = dp[0].total_sectors;
-		//ebr_lba = units[uid]->start_sector;
+															
 		if(dp[1].start_sector) ebr_lba += dp[1].start_sector;
 		else ebr_lba = 0;
 		i++;
 		goto next_ebr;
 	done:
-		kfree(mbr);	
+		if(ebr_block)	munmap_disk(ebr_block);	
+		if(mbr_block) munmap_disk(mbr_block);
+		register_blkdev(major);
 }
 
 void ide_init(void){
@@ -267,6 +300,10 @@ void ide_init(void){
 //	blk_devs[3].end_request = ide_end_request;
 	blk_devs[22].do_request = ide_do_request;
 	blk_devs[22].add_request = add_request;
+	blk_devs[3].unitmax = 128;
+	blk_devs[3].units_per = 64;
+	blk_devs[22].unitmax = 128;
+	blk_devs[22].units_per = 64;
 //	blk_devs[22].end_request = ide_end_request;
 }
 

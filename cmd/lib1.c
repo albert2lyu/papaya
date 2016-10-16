@@ -17,7 +17,7 @@ int foobar3(void);
 int foobar4(void);
 
 int foobar1(void){
-	print("moobar1 invoked"); 
+	print("foobar1 invoked\n"); 
 	//extern void write(char *str, int len);
 	//write("abcde", 5);
 	print("taste global_var3: %d, global_var4: %d\n", global_var3, global_var4);

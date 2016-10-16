@@ -2,6 +2,7 @@ set colorcolumn=60
 hi colorcolumn ctermfg=white  ctermbg=yellow
 set cscopequickfix=s-,c-,d-,i-,t-,e-,g- 
 map <F5> :colorscheme evening
+map<F12> :!/home/wws/lab/yanqi/cmd/mktag.sh<CR>:cs reset<CR>
 source ~/.vim/macros/gdb_mappings.vim
 set backspace=indent,eol,start
 syntax on
@@ -16,9 +17,9 @@ highlight Pmenu ctermbg=white
 highlight PmenuSel  ctermbg=white  ctermfg=red
 highlight MatchParen ctermbg=white ctermfg=blue
 set hlsearch
-au BufNewFile,BufRead *.cn set syntax=c
-au BufNewFile,BufRead *.lua set list lcs=tab:\¦\ 
-set tags+=../tags		"for ~/lab/yanqi/tags
+au BufNewFile,BufRead,BufEnter,BufWinEnter *.cn set syntax=c
+au BufNewFile,BufRead,BufEnter,BufWinEnter *.lua set list lcs=tab:\¦\ 
+"set tags+=../tags		"for ~/lab/yanqi/tags
 
 function! Doo()
 	:r!ls %<CR>
@@ -59,4 +60,5 @@ function! Pinyin()
 endfunction
 
 source /home/wws/lab/yanqi/cmd/cc2cn.vim
+
 
