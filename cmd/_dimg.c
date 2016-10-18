@@ -15,6 +15,7 @@
 #include<assert.h>
 #include<errno.h>
 #include"../src/include/old/bootinfo.h"
+#include"../src/include/old/valType.h"
 static int kernel_img_size;
 /* we avoid change R/W cursor of fd*/
 static int fdsize(int fd){
@@ -49,21 +50,32 @@ void magic_color(void){
 
 	int i;
 	for(i = 0; i < 511; i++){
+		bool final_sector = false;
 		char magic_x = i;
 		int color_pos = i * 512;
-		if(i == kernel_img_size / 512) magic_x = 0xcc;
-		if(color_pos > kernel_img_size){
-			printf(">>>>>>>>>>>>>>>>>>>>>>>>%d sectors colored\n", i);
-			break;
+
+		//如果下一个虚拟扇区的偏移>=文件体积, 说明当前就
+		//是最后一个扇区了
+		if(color_pos + 512 >= kernel_img_size){
+			//最后一个扇区的color是0xcc.
+			magic_x = 0xcc;
+			final_sector = true;
 		}
 
 		lseek(fd_kernel, color_pos, SEEK_SET);
 		assert( read(fd_kernel, &byte, 1) == 1 );	// fetch byte data
 		if(byte == 0 && i == 0) assert(0 && "kernel.elf seems old, try 'make'\n");
 		lseek(fd_kernel, color_pos, SEEK_SET);		//rewind for writing
-		assert( 
-		write(fd_kernel, &magic_x, 1) == 1 );//write magic number
+		assert( //write magic number
+			write(fd_kernel, &magic_x, 1) == 1 
+		);
 		assert( write(fd_fix, &byte, 1) == 1 );		//send byte data to fix.img
+
+		if(final_sector){
+			i++;	//这样, i就表示kernel.img总共的扇区数了
+			printf(">>>>>>>>>>>>>>>>>>>>>>>>%d sectors colored\n", i);
+			break;
+		}
 	}
 	assert( write(fd_fix, (char *)&i, 2) == 2);	//结尾的sector nr只用1个byte可
 												//装不下。　得两个.
