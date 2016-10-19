@@ -41,8 +41,8 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 
 	>块设备：	
 			* IDE驱动			<drivers/ide/ide.c>
-			* 块设备层		<drivers/block/ll_rw_blk.c>
-			+ 块设备层是不带buffer的。
+			* 块设备层			<block/ll_rw_blk.c>
+			+ 块设备缓冲		<block/buffer.cn>
 
 	>进程:
 			* schedule()		<schedule.c>
@@ -74,13 +74,18 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 
 【3】
 src/ 下面是源码
-cmd/ 调试时用到的小工具，以及papaya的用户态程序。包括刻录到
+cmd/ 虾米那辅助测试(调试)脚本，以及papaya的用户态程序。包括刻录到
 	 虚拟img，刻录到usb等等。
 lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为还
 	 在完善中，工作时遇到bug随手改过来，所以也一并上传。
 
 
 【4】
+[2016,10,19] Version 0.610
+==========update===========
+1, block buffer layer
+								see block/buffer.cn
+
 [2016,10,7] Version 0.609a
 ==========update===========
 1, dynamic linker,works under linux only, not papaya.
