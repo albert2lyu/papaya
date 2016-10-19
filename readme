@@ -23,18 +23,18 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 
 	>网络：
 			* 8139网卡驱动		<drivers/net/8139.c>
-			* arp协议				<net/ipv4/arp.c>
+			* arp协议			<net/ipv4/arp.c>
 			* 简单的ip协议		<net/ipv4/ip.c>
-			* 部分udp协议			<net/ipv4/udp.c>			
+			* 部分udp协议		<net/ipv4/udp.c>			
 			* 部分icmp协议		<net/ipv4/icmp.c>
-			* 部分tcp协议			<net/ipv4/tcp.cn>
+			* 部分tcp协议		<net/ipv4/tcp.cn>
 			+ papaya支持多网卡，这是我很骄傲的一点。
 			+ 我在tcp.cn里尝试了中文编程。感觉还好。
 		
 	
 	>文件系统:
 			* vfs					<fs/*>
-			* cell文件系统		<fs/cell/*>
+			* cell文件系统			<fs/cell/*>
 			+ vfs实现了open, read, lseek, close接口。　还有mount。
 			+ cell文件系统是我自己"发明"的，顾名思义，就是“划格子”，很简单
 				的一个文件系统，它好在自己没有inode等概念，但却跟vfs配合的很好。
