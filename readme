@@ -42,7 +42,7 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 	>块设备：	
 			* IDE驱动			<drivers/ide/ide.c>
 			* 块设备层			<block/ll_rw_blk.c>
-			+ 块设备缓冲		<block/buffer.cn>
+			* 块设备缓冲		<block/buffer.cn>
 
 	>进程:
 			* schedule()		<schedule.c>
