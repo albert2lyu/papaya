@@ -136,6 +136,23 @@ void sys_bad(struct pt_regs regs){
 	spin("");
 }
 
+#if 1
+/* 测试结果: 到了几十兆的样子 测试线程似乎睡去了, 似乎是ide
+   中断丢失的问题..哑火了?
+ */
+static void block_buffer_stamp(void){
+	for(int i = 0; ;i++){
+		struct buffer_head *bh = mmap_disk(0x300, i);
+		struct buffer_head *bh2 = mmap_disk(0x300, i);
+		munmap_disk(bh);	
+		munmap_disk(bh2);
+		if(i > 250){
+			
+		}
+	}
+}
+#endif
+
 int func_init(void *v){
 	task1 = current;
 	oprintf("func init run..\n");
@@ -167,6 +184,8 @@ int func_init(void *v){
 	//TODO rbytes的返回值是对的，但实际读入的却不止 指定的size这么多
 	int rbytes = sys_read(fd, testbuf, 100);
 	avoid_gcc_complain = rbytes = (unsigned)&indir;
+
+	block_buffer_stamp();
 
 	//执行用户用户程序init。进化成一个用户进程。
 	int x = 0;

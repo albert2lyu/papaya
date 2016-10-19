@@ -1,4 +1,4 @@
-set colorcolumn=60
+autocmd FileType python set ominifunc=pythonscriptcomplete#Complete
 hi colorcolumn ctermfg=white  ctermbg=yellow
 set cscopequickfix=s-,c-,d-,i-,t-,e-,g- 
 map <F5> :colorscheme evening
@@ -17,6 +17,8 @@ highlight Pmenu ctermbg=white
 highlight PmenuSel  ctermbg=white  ctermfg=red
 highlight MatchParen ctermbg=white ctermfg=blue
 set hlsearch
+au BufNewFile,BufRead,BufEnter,BufWinEnter *.c,*.cn  set colorcolumn=60
+au BufNewFile,BufRead,BufEnter,BufWinEnter *.h,*.txt  set colorcolumn=80
 au BufNewFile,BufRead,BufEnter,BufWinEnter *.cn set syntax=c
 au BufNewFile,BufRead,BufEnter,BufWinEnter *.lua set list lcs=tab:\¦\ 
 "set tags+=../tags		"for ~/lab/yanqi/tags

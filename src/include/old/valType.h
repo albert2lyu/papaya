@@ -8,7 +8,9 @@
 #define false 0
 #define __DEBUG
 
+#ifndef NULL
 #define NULL 0
+#endif
 
 typedef unsigned long ulong;
 typedef long long u64;

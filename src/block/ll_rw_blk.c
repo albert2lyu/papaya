@@ -79,38 +79,29 @@ void init_blklayer_basic(void){
 int ll_rw_block(int rw, struct buffer_head *bh){
 //	struct request_queue *queue = 	blk_get_queue(dev_id);
 	//oprintf("\nmake request:%u, %u, %u, %u, %x\n", dev_id, rw, start, count, buf);
+
+	/* 将来这部分代码会简单一些.
+		将来不会再用512作为blk_unit的存储单位.
+		真的, 你要是怕, 还不如用byte, 一劳永逸.
+		要不然就大胆的用4K. 也省得这儿麻烦 
+	*/
+	u32 dev_id = bh->dev_id;
+	struct blk_unit *unit = BLK_UNIT(dev_id);
+	u32 rw_start = block2lba( bh->block );
+	u32 rw_sectors = block2sectors( bh->count );
+	u32 rw_end = rw_start + rw_sectors;
+	if(rw_end <= unit->total_sectors);
+	else spin("ll_rw out-of-boundray");
+
 	bh->lock = true;
 	generic_mk_request(rw, bh);
 	return 0;
 }
 
-#if 0
-/*1, handle count larger than 256 sectors
- *2, this function is blocked
- */
-int ll_rw_block2(u16 dev_id, int rw, unsigned start, int count, char *buf){
-	unsigned curr = start;
-	while(curr <= start + count - 1){
-		int left = count - (curr - start);
-		//1 block = 2 sectors
-		/*TODO need more elegant code. 
-		 * the following is critical area.
-		 * we must ensure the disk IRQ won't issue before 'kp_sleep'.
-		 * real machine can tolerate here without 'cli', but QEMU can not.
-		 * In Qemu, the disk IRQ occurs before 'kp_sleep' done', so bugs occur.
-		 */
-		cli_push();
-		ll_rw_block(dev_id, rw, curr, left < 256/2 ? left:128, buf);
-		kp_sleep(0, 0);
-		flagi_pop();
-		/*-----critical area, end----- TODO use irq push pop */
 
-		curr +=  128;
-		buf+= 512;
-	}
-	return 0;	
-}
-#endif
+
+
+
 
 
 

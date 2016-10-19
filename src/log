@@ -1,4 +1,7 @@
 =============log
+Sun Oct 16 22:57:10 CST 2016
+*
+ block buffer过了编译. 调试中.
 
 Thu Oct  6 21:16:29 CST 2016
 *
@@ -368,3 +371,9 @@ Sun Sep 11 09:41:22 CST 2016)
   像brk(0)的行为，glibc返回０，裸的syscall返回边界值．
   在man手册的NOTES里的C library/kernel ABI differences讲的有．
 
+
+
+
+===================Danger!==================
+*
+ 用__alloc_pages时候要小心, 它的第一个参数是GFP, 不是order!

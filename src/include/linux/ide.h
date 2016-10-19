@@ -4,6 +4,7 @@
 
 #define WIN_READ 0x20
 #define WIN_WRITE 0x30
+#define WIN_IDENTIFY 0xec
 
 #define IDE_NR_PORTS 255
 #define MAX_DRIVES 2

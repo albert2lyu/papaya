@@ -94,9 +94,9 @@ cell_lookup(struct inode *dir, struct dentry *dentry){
 		int entsize = sizeof(struct cell_dentry) + cell_ent->len;
 		//cell_ent = (void *)((u32)cell_ent + entsize);
 		int len = cell_ent->len;
-		if(len != 0){
+		if(len != 0){	
 			if(len == name->len && strncmp(name->name, cell_ent->name, len) == 0) break;
-			remain -= entsize;
+			remain -= entsize; //似乎有bug, 该挪出去?
 		}
 		cell_ent = (void *)((u32)cell_ent + entsize);	/*next*/
 	}

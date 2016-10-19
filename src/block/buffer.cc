@@ -15,6 +15,7 @@
    bread()其实叫做disk_map更好一些. 获取叫diskblock_map
  *[5]
    有一些代码不容易测. 像比读写扇区出错的代码.
+
  *TODO
   > 最后统一的做"竞争条件"的审查, 主要是防止硬中断(IDE?)造成的破坏
   > wait_on_buffer有必要做了
@@ -25,6 +26,7 @@
   > ll_rw_block直接返回了错误怎么办? 例如你读取块超界.
   > 感觉空闲块的初始化可以全挪到 缓冲块表_添加() 这个函数里, 不要零零星星的初始化, 不要节约那一点内存.
   > ll_rw_block要检查块边界范围
+  > 用到mmap_disk()的几个syscall的中断要打开. 别不敢.
  */
 #include<linux/buffer_head.h>
 #include<linux/blkdev.h>
@@ -32,21 +34,47 @@
 #include<linux/slab.h>
 
 static struct slab_head *bufferhead_cache;
-static struct list_head huanchongkuaiquanjulian;	/*lianrulesuoyoudehuanchongkuai 
-> anLRUpaixu. zuijinyongdaodezaizuiweibu; zuilengdekuaizaizuikaitou*/
-static unsigned long globalist_len;			/* muqiandeyouduoshaogehuanchongkuai */
-static unsigned long globalist_max = 32 * 1024;	/*zuiduozheyaoduogekuai, dagai128M */
 
 static struct buffer_head *
 hotable_lookup(struct blk_unit *unit, ulong block_id);
 
+static struct list_head freelist;
+/* 为什么需要忙碌链呢? 其实我们是需要一个全局链. 否则遍历
+   缓冲块做统一回写时不方便.
+   但那样的话, buffer_head又多需要一个指针成员
+ */
+static struct list_head busylist;
+static ulong totalbusy;
+static ulong totalfree;
+static ulong totalnow;	// == totalbusy + totalfree
+static ulong totalmax = 256;	//neihehuageikuaishebeihuanchongcengdeshangxian
+static int shengchanglidu = 8;
 
-/* buffers_global_list */
-static inline void globalist_add(struct buffer_head *new){		
-	list_add_tail(&new->lru, &huanchongkuaiquanjulian);
-	globalist_len++;												asrt(globalist_len < globalist_max);
+/* 下面4个API, 其实处理的是缓冲块在 忙/闲链之间的流动.
+ * 新的块不会进入直接进入忙链. 而进入闲链也不会通过走下面的
+ * API */
+static inline void busylist_add( struct buffer_head *it){
+	list_add( &it->lru, &busylist );	//bujushouwei
+	totalbusy++;
 }
 
+static inline void busylist_del( struct buffer_head *it){	
+	list_del(&it->lru);
+	totalbusy--;
+}
+
+/* 认为接收的块是刚从忙碌链里来的, 按lru规则, 放在链尾 
+   扩增空闲链时不会调用这个函数
+ */
+static inline void freelist_add( struct buffer_head *it){
+	list_add_tail( &it->lru, &freelist );
+	totalfree++;	
+}
+
+static inline void freelist_del( struct buffer_head *it){
+	list_del(&it->lru);
+	totalfree--;
+}
 //increment_bh
 static inline void increment_bh(struct buffer_head *block){
 	block->count++;
@@ -60,7 +88,12 @@ static inline void  decrement_bh(struct buffer_head *block){	asrt(block->count >
 /* put_buffer() or munmap_disk() */
 void munmap_disk(struct buffer_head *block){					asrt(block->count > 0);
 	decrement_bh(block);
-	//TODO somethine else
+	if(block->count == 0){
+		//list_add_tail(&block->lru, &空闲链);
+		busylist_del( block );
+		freelist_add( block );
+	}
+	//TODO somethine else 真是英明
 }
 
 static inline void wait_on_buffer(struct buffer_head *bh){
@@ -71,7 +104,7 @@ static inline void wait_on_buffer(struct buffer_head *bh){
 /* this function name is not good, but vivid.
  * cache_hit
  */
-static struct buffer_head * huanchongkuaimingzhong(u32 dev, long block){
+static struct buffer_head * cache_hit(u32 dev, long block){
 	//如果命中了, 但是被加锁了, 那就等着, 这个等需要用sleep_on
 	//ll_rw_block里要处理sleep_on和asker两种情况了.
 	struct blk_unit *unit;
@@ -99,31 +132,6 @@ static struct buffer_head * huanchongkuaimingzhong(u32 dev, long block){
 	return mingzhongkuai;
 }
 
-/* 从hash表中摘除, 从全局链中摘除 */
-static void pickoff_bh(struct buffer_head *bh){
-	list_del(&bh->lru);
-	list_del(&bh->hash);
-	globalist_len--;
-}
-
-/* get least-recently-used 
- * 如果脏了, 就发送磁盘写命令, 并立刻返回.
-   所以回收到的"最冷块"不要直接用, 要调用一下wait_on_buffer
- */
-static struct buffer_head *recycle_lru(void){
-	if(list_empty(&huanchongkuaiquanjulian))	return 0;
-
-	struct buffer_head *coldblock; 
-	coldblock = container_of(huanchongkuaiquanjulian.next, struct buffer_head, lru);
-	if(coldblock->count > 0)	spin("unusual case");
-
-	pickoff_bh(coldblock);		//strong order
-	if(coldblock->dirty){
-		ll_rw_block(WRITE, coldblock);	//lock_buffer
-	}
-	return coldblock;	
-}
-
 
 /* 新建一个空白缓冲块, 加入全局链, 目前是一次长一个 */
 static struct buffer_head * xinjiankongbaikuai(void){
@@ -132,35 +140,79 @@ static struct buffer_head * xinjiankongbaikuai(void){
 	void *data = __alloc_page(0);
 	bh->data = data;
 	bh->lock = false;	//yaoqubieyu"recycle_lru", nagekenengyinhuixieershangsuo
+	bh->hash.prev = bh->hash.next = 0;
+	bh->dirty = false;
 	INIT_LIST_HEAD(&bh->wait);
 	return bh;
 }
 
+static bool expand_freelist(void){							assert( list_empty( &freelist ));
+	u32 newtotal = totalnow + shengchanglidu;
+	if(newtotal > totalmax){
+		return false;	
+	}
+	for(int i = 0; i < shengchanglidu; i++){
+		struct buffer_head *new = xinjiankongbaikuai();				asrt(new);
+		/* 插入最前面, 我们当然要优先用空白块 */
+		list_add(&new->lru, &freelist);
+	}
+	totalnow = newtotal;
+	totalfree += shengchanglidu;
+	return true;
+}
+
 /* 
- * get_unused
- > 返回的缓冲块可能是新建的(当缓冲块总量较少, 处于扩张阶段)
-   也可能是回收了"冷块"( 当缓冲块总量到了上线 )
- > 返回的块是个"孤儿", 不在hash表里, 也不在全局链里
- > 返回的buffer_head里的成员, 除了b_lock, b_wait,其它都是"垃圾数据"
-   无效的. 要重新初始化. 这样做很好.
+   freelist里既有才分配的空白块, 又有才unmap回来的块.
+   我么需要区别它们, 因为要把后者从热表里脱链.
+   怎么区分? 新分配的块的hash字段是0, 使用过的块一定不是.
+
+   @返回块规格: 
+   dirty = ? 崭新块: false, 表示不比磁盘块新
+   			 回收块: true, 如果早已经回写过了
+			 		 false, 如果是在回收时才启动的回写.
+   lock = ? 崭新块: false
+   			回收块: true, 如果早已经回写过了
+					false, 如果是在回收时才启动的回写.
+	io = true
+  	wait = 自循环	
+	count = 1	因为就是你请求了我	
+
+	简单的说, 请求到的块, 是一个孤儿, 跟任何链表都脱离了关系
+	而且可能因为正在回写磁盘而加锁.
  */
 static struct buffer_head *qingqiukongxiankuai(void){
-	//如果dirty了,要回写到磁盘
-	//先尝试扩张缓冲块容量
-	struct buffer_head *empty;
-	if(globalist_len < globalist_max){
-		empty = xinjiankongbaikuai();							
+	struct buffer_head *orphan;
+	if( list_empty( &freelist) ){
+		bool ok = expand_freelist();						if(!ok) return false;
 	}
-	else{
-		empty = recycle_lru();								
+	
+	/* 从空闲链中拿 */
+	orphan = container_of(freelist.next, 
+							struct buffer_head, lru);
+	//list_del( &orphan->lru );
+	freelist_del( orphan );
+
+	/*不拘prev还是next, 只要是0, 说明这是一个崭新的块. */
+	if(orphan->hash.prev == 0);	//do nothing;
+	else{	//zhegekuaihuandaizaihashbiaoli
+		list_del( &orphan->hash );	//congrebiaotuolian
+		if(orphan->dirty){									assert(0 && "write-back not implemented yet");
+			if(!orphan->lock)	ll_rw_block(WRITE, orphan);
+			else;	/*ruguoshangsuole, nazhenghewoyi, tawufeizaizhixing
+					 *yicicipanIO. ruguozhengzaihuixie, nahenhao; ruguo
+					 * zhengzaidu, najiugengbuyongcaoxinle. buguanzenyang,
+					 * jizhukongxianlianlidesuoyoukuaidecountdushi0 */
+		}
 	}
-															asrt(empty && list_empty( &empty->wait ));
-	return empty;	
+															assert( list_empty(&orphan->wait));
+	orphan->count = 1;
+	return orphan;	
 }
 
 
 void init_blklayer_buffer(void){
-	INIT_LIST_HEAD(&huanchongkuaiquanjulian);	
+	INIT_LIST_HEAD(&freelist);	
+	INIT_LIST_HEAD(&busylist);	
 	bufferhead_cache = kmem_cache_create(
 							"bufferhead_cache", 
 							sizeof(struct buffer_head), 0,
@@ -197,7 +249,7 @@ void register_blkdev(int major){ 							assert(major < MAX_BLKDEV);
 		struct blk_unit *unit;
 
 		//ignore <whole disk> MINOR, you must register it mannually
-		if(i % blkdev->units_per) continue;	
+		if( (i % blkdev->unitcycle) == 0) continue;	
 
 		unit = blkdev->units[i];
 		if(!unit) continue;									asrt(unit->total_sectors != 0);
@@ -214,11 +266,11 @@ void register_blkunit(struct blk_unit *unit, u32 dev){				asrt(unit && unit->tot
 	struct list_head *hotable;
 	int hotable_len;		//bushibytechang, shielement num
 
-	int page_need = suoxurebiaochang(unit) * 2;	//fanhuideshi"shuangye"
-	int order_need = pgorder_needed(page_need);	
-	int page_giveyou = __4K << order_need;	//shijigeiniduoyixie
-	hotable = __alloc_pages(order_need, 0);				asrt(hotable);
-	hotable_len = page_giveyou * __4K /sizeof(struct list_head);
+	int pages_need = suoxurebiaochang(unit) * 2;	//fanhuideshi"shuangye"
+	int order_need = pgorder_needed(pages_need);	
+	int pages_giveyou = 1 << order_need;	//shijigeiniduoyixie
+	hotable = __alloc_pages(0, order_need);				asrt(hotable);
+	hotable_len = pages_giveyou * __4K /sizeof(struct list_head);
 	for(int i = 0 ; i < hotable_len; i++){
 		INIT_LIST_HEAD( &hotable[i] );
 	}
@@ -236,11 +288,9 @@ void register_blkunit(struct blk_unit *unit, u32 dev){				asrt(unit && unit->tot
  */
 static void hotable_add(struct blk_unit *unit, 
 						struct buffer_head *new)
-{
+{															asrt(new->count == 1);
 	new->dev_id = unit->dev_id;
-	//new->block = block;
 	new->dirty = false;	//cishidataquhuanshikongbaide, tanbushangdirty
-	new->count = 1;		//asrt(buffer->count == 1);
 	new->lock = false;	//TODO BUG yinggaibachushihuahanshutiquchulai
 						//这样很别扭. 解锁是安全的?
 
@@ -261,7 +311,6 @@ hotable_lookup(struct blk_unit *unit, ulong block_id){
 	}
 	return 0;
 }
-
 
 /* This is bread(), also called mmap_disk()
  * 其实是两个不同的抽象模型, 缓冲块 vs. 扇区映射
@@ -287,16 +336,25 @@ hotable_lookup(struct blk_unit *unit, ulong block_id){
  */
 struct buffer_head *mmap_disk(u32 dev, ulong block){
 	struct buffer_head *buffer;
-	maybe_lucky:
-	buffer = huanchongkuaimingzhong(dev, block);	//kenengdaozhishuimian TODO  bugaishuimian, bashuimiandedaimanuodaozhelilai?
-	if(buffer) return buffer;			
+	struct buffer_head *raw;
 
-	buffer = qingqiukongxiankuai();	//zhegehanshubuhuishuimian
-	if(buffer->lock){	//womenbuyongxunhuandengdai, yinweizhegekuaiyijingtuolianle
+	//如果访问的块落在某个分区, 则转化成对那个分区的访问
+	blk_devs[MAJOR(dev)].global2local(&dev, &block);
+
+	buffer = cache_hit(dev, block);	//kenengdaozhishuimian TODO  bugaishuimian, bashuimiandedaimanuodaozhelilai?
+	if(buffer) return buffer;			
+	
+	raw = qingqiukongxiankuai();										asrt(raw);
+	if(raw->lock){	//womenbuyongxunhuandengdai, yinweizhegekuaiyijingtuolianle
 						//现在只有我们知道它, 我们等它回写完
-		kp_sleep(0, 0);		
-		goto maybe_lucky;
+		kp_sleep(0, 0);		 								
+		//空闲块已经可用了, 但我们不甘心, 再去hash表碰碰运气
+		if( (buffer = cache_hit(dev, block) ) ){
+			freelist_add(raw);	//huanhuiqu
+			return buffer;
+		}
 	}
+	buffer = raw;											
 
 	/* 现在,  这个缓冲块彻底属于我们了.
 	 * 因为稍后从磁盘加载内容, 会睡眠. 我们先把这个缓冲块
@@ -306,7 +364,7 @@ struct buffer_head *mmap_disk(u32 dev, ulong block){
 	 */
 	buffer->block = block;	
 	hotable_add( BLK_UNIT(dev), buffer);
-	globalist_add(buffer);
+	busylist_add(buffer);
 
 	ll_rw_block(READ, buffer);
 	wait_on_buffer(buffer);
@@ -317,8 +375,6 @@ struct buffer_head *mmap_disk(u32 dev, ulong block){
 	 * 的读写, 以及与内核线程的定时回写, 没有任何的限制.
 	 */
 	if(buffer->io == false){		//IO error
-		//缓冲块表_删除();
-		//全局链表_删除();
 		decrement_bh(buffer);
 		buffer = 0;											spin("IO fault");
 	}
@@ -335,13 +391,16 @@ int ll_rw_blocks(u32 dev_id, int rw,
 	char *from, *to;
 	struct buffer_head *bh;
 
-	if(rw == READ) to = buf;
-	else from = buf;
-
-	for(int i = start; i < start + blocknum; i++){
-		bh = mmap_disk(dev_id, i);							asrt(bh);	
-		if(rw == READ) from = bh->data;
-		else			to	= bh->data;
+	for(int i = 0; i < blocknum; i++){
+		bh = mmap_disk(dev_id, start + i);							asrt(bh);	
+		if(rw == READ) {
+			from = bh->data;
+			to = buf + i * BLOCK_SIZE;
+		}
+		else{
+			from = buf + i* BLOCK_SIZE;
+			to	= bh->data;
+		}
 
 		memcpy(to, from, BLOCK_SIZE);
 		munmap_disk(bh);
@@ -355,10 +414,66 @@ struct buffer_head *qingqiuxierukuai(u32 dev, ulong block){
 #endif
  
 
+#if 0
+/* get least-recently-used 
+ * 如果脏了, 就发送磁盘写命令, 并立刻返回.
+   所以回收到的"最冷块"不要直接用, 要调用一下wait_on_buffer
+ */
+static struct buffer_head *recycle_lru(void){
+	if(list_empty(&globalist))	return 0;
+
+	struct buffer_head *coldblock; 
+	coldblock = container_of(globalist.next, struct buffer_head, lru);
+	if(coldblock->count > 0)	spin("unusual case");
+
+	pickoff_bh(coldblock);		//strong order
+	if(coldblock->dirty){
+		//BUG here 可能人家已经在回写了
+		ll_rw_block(WRITE, coldblock);	//lock_buffer
+	}
+	return coldblock;	
+}
+#endif
 
 
+#if 0
+	<zheshijiude "qingqiukongxiankuai">
+	//如果dirty了,要回写到磁盘
+	//先尝试扩张缓冲块容量
+	struct buffer_head *empty;
+	if(globalist_len < globalist_max){
+		empty = xinjiankongbaikuai();							
+	}
+	else{
+		empty = recycle_lru();								
+	}
+															asrt(empty && list_empty( &empty->wait ));
+	return empty;	
+#endif
 
 
+#if 0
+static struct list_head globalist;	/*lianrulesuoyoudehuanchongkuai 
+> anLRUpaixu. zuijinyongdaodezaizuiweibu; zuilengdekuaizaizuikaitou*/
+static unsigned long globalist_len;			/* muqiandeyouduoshaogehuanchongkuai */
+//static unsigned long 全局链容量 = 32 * 1024;	/*最多这么多个块, 大概128M */
+static unsigned long globalist_max = 256;	/*zuiduozheyaoduogekuai, dagai128M */
+
+
+/* buffers_global_list */
+static inline void globalist_add(struct buffer_head *new){		
+	list_add_tail(&new->lru, &globalist);
+	globalist_len++;												asrt(globalist_len <= globalist_max);
+}
+
+
+/* 从hash表中摘除, 从全局链中摘除 */
+static void pickoff_bh(struct buffer_head *bh){
+	list_del(&bh->lru);
+	list_del(&bh->hash);
+	globalist_len--;
+}
+#endif
 
 
 

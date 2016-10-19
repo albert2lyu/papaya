@@ -16,7 +16,7 @@
 
 #define MAX_BLKDEV 200
 #define MAX_REQUEST 32
-#define BLOCK_SIZE 1024		/* 读写块设备的基本单位是4K.主要原因是:
+#define BLOCK_SIZE 4096		/* 读写块设备的基本单位是4K.主要原因是:
 							> 1k的话, 无法保证在一个物理页内的连续.不利于mmap()
 							> 况且, 现代的硬盘设备, 不在乎多读几个扇区
 							> 唯一可能就是对小文件不太友好. 因为文件系统通常
@@ -67,29 +67,37 @@ struct blk_unit {
 	unsigned start_sector;		/*这儿将来改成start_block, 不考虑非4K情况*/
 	unsigned total_sectors;
 	struct list_head *hotable;	/*热表 或 缓冲块表 */
-	int hotable_len;			/* 热表长 或 缓冲块表长 注意! 单位是element, 不是byte */
+	int hotable_len;			/* 热表长 或 缓冲块表长, 
+								也许更好的名字是hotable_entnum,
+								注意! 单位是element, 不是byte */
 	#define HOTABLE_LEN2 64		/*碰撞调解链的长度上限. 太长了会慢
 								8K的哈希表映射256M, 8M能映射256G的缓冲块
 								很够了, 内存也没那么大*/
 	u32 dev_id;
+	bool hanzi;		/*含子的中文拼音. 因为有些unit不是纯粹的分区, 像次设备号
+					  为0时, 指代整个硬盘. 像扩展分区, 它包含了所有的逻辑分区
+					  所以用户访问这样的unit时, 我们先尝试把这次请求转成一个
+					  针对普通的其内含分区的请求, 当然, 这种转化可能失败 
+					  例如硬盘有未分区的地方, 扩展分区未分给逻辑磁盘的地方*/
 };
 struct blk_dev{
 	/*@dev_id we need it to acknowledge the device-major, because, for example,
 	 * the primary IDE channel(major 3) and the secondary IDE(major 22) share
 	 * a same "do_request()", so do_request need to know service for whom*/
-	void (*do_request)(u16 dev_id);			
+	void (*do_request)(u32 dev_id);			
 	void (*add_request)(struct request *rq);
+	void (*global2local)(u32 *dev, ulong *block);
 
 	/* 像8号major, SCSI硬盘, 容纳16个硬盘, 每个硬盘16个分区(0号其实不是)
-	   那它的unitmax就是255, units_per就是16.
+	   那它的unitmax就是255, unitcycle就是16.
 	   像3号major, IDE硬盘, 容纳两个硬盘, 每个硬盘64个分区
-	   那它的unitmax就是128, units_per就是64.
+	   那它的unitmax就是128, unitcycle就是64.
 	   之所以存放的是unitmax, 而不是physical_max,(上例中分别是16和2)
 	   是因为unitmax使用的更频繁, 而physical_max(即物理设备)用得不多
 	 */
 	struct blk_unit **units;
 	int unitmax;		//并不总是255,像IDE,最多64个分区
-	int units_per;		//每个物理设备
+	int unitcycle;		//每个物理设备
 };
 struct blk_dev blk_devs[MAX_BLKDEV];
 struct request_queue{
@@ -141,6 +149,10 @@ void init_blklayer(void);
 
 void generic_mk_request(int rw, struct buffer_head *bh);
 
-
+/* 这几个宏将来会挪回ide.c里, 因为现在blk_unit的存储512. 所以少不了用这几个宏*/
+#define BLOCK_SECTORS (BLOCK_SIZE / 512)
+#define block2sectors(blocknum) ( (blocknum )* BLOCK_SECTORS)
+#define block2lba block2sectors
+#define lba2block(lba) ( (lba) / BLOCK_SECTORS)
 
 #endif

@@ -2,9 +2,19 @@ struct interp_item{
 	char *chinese;
 	char *english;
 };
+/* 像 "缓冲块表_添加" 这样的, 就翻译不了.
+ * 因为目前是看到非utf8, 也就是ascii字符, 就认为到边界了. 所以只能分别翻译成hotable, add
+ * 这样当然不好. 但暂时没时间增强了.
+ * 先把思路记下来, 以后做: 主要在于计算hash值时, 或者说识别utf8变量时, 不要遇到
+ * ascii字符就停住了, 要看看是"_"或者数字不是.
+ * 如果是, 备份已经算出来的hash值, 接着hash.
+ * 为什么要备份呢? 因为如果interp里没有hash匹配带ascii的那种, 就退一步, 看有无
+ * 备份的hash. 如果再没有, 那就只能用拼音字典了.
+ */
 const struct interp_item interp[] ={
 	{ "指针推移", "ptr_forward" },
 	{"连接不存在", "connect_null"},
+	{"缓冲块全局链", "globalist"},
 	{"全局链", "globalist"},
 	{"全局链长", "globalist_len"},
 	{"全局链容量", "globalist_max"},
@@ -20,6 +30,15 @@ const struct interp_item interp[] ={
 	{"等待块解锁", "wait_on_buffer"},
 	{"缓冲块脱链", "pickoff_bh"},
 	{"回收最冷块", "recycle_lru"},
+	{"缓冲块命中", "cache_hit"},
+	{"转换全局块", "global2local"},
+	{"空闲块数量", "totalfree"},
+	{"忙碌块数量", "totalbusy"},
+	{"目前块数量", "totalnow"},
+	{"块数量配额", "totalmax"},
+	{"空闲链", "freelist"},
+	{"忙碌链", "busylist"},
+	{"移除", "del"},
 	//{"缓冲块表_添加", "hotable_add"},
 	//{"缓冲块表_查找", "hotable_lookup"},
 

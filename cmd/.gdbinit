@@ -29,11 +29,12 @@ define LL
 	printf "=> 0\n" 
 end
 
+
 define list 
 	set $root = $arg0 
 	if $root == 0
 		printf "0!\n"
-		return
+		exit
 	end
 
 	printf "%x =>", $root
@@ -55,6 +56,7 @@ define list
 		printf "0\n"
 	end
 end
+
 
 define LL3
 	printf "active:  "

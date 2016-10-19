@@ -122,21 +122,30 @@ jmp dword selector_plain_c0:fix_kernel	;'jmp'-operation necessary?
 
 [bits 32]
 fix_kernel:
+	;edi指向内核映像, 每次跳512, 总是指在扇区的第一个字节
+	;也是取它的'destination'之意, fix.img里的byte要一个个补回到edi所指的地方
 	mov edi, _base_kernel_loaded
+	;esi指向fix.img, 每次走一个byte
 	mov esi, (_fiximg_start_sector - 1) * 512 + 0x7c00
+	;eax相当于"扇区偏移", 表示修正到第几个扇区(从0计数)
 	xor eax, eax
 	mov ecx, 0	; !boolean, indicates the last sector to fix
 	.check_one:
+		;注意, 这里比对的只能是al, 但稍后inc的确实ax, 我们是故意让它回绕的.
 		cmp byte [edi], al		;check magic number
 		je .fix_it
-		;magic number check failed, we still have a chance
+		;递增序终止, 看看是不是kernel.elf的最后一个扇区
+		;如果是,那它被染的色肯定是0xcc
 		cmp byte [edi], 0xcc
-		jne .bad
-		;not the end, let us see how many sectors we fixed
+		jne .bad	;完了, kernel.img的内存映像在这个扇区出错了
+		;好的, 校验通过, 现在来修正kernel.elf最后一个扇区
 		mov ecx, 1		;有些早，但没事，因为如果count核对失败，就死循环了。
-		inc ax		;assume have fixed this sector
-		cmp word [esi + 1], ax		;esi此时指向最后一个.　注意，结尾的扇区
-									;数量要两个字节来容纳
+		;inc ax之后, ax的值就相当于kernel.elf总的扇区数量
+		inc ax		
+		cmp word [esi + 1], ax		;esi此时还指向fix.img的最后一个着色byte备份
+									;在它之后, 紧跟的是两个byte的"总扇区数"
+									;我们要跟ax比对一下, 这是一次总的校验
+		;检验通过, 跳到fix_it, 就不再回来了.因为ecx已经置1
 		je .fix_it
 		.bad: jmp $
 	.fix_it: 

@@ -15,6 +15,7 @@
    bread()其实叫做disk_map更好一些. 获取叫diskblock_map
  *[5]
    有一些代码不容易测. 像比读写扇区出错的代码.
+
  *TODO
   > 最后统一的做"竞争条件"的审查, 主要是防止硬中断(IDE?)造成的破坏
   > wait_on_buffer有必要做了
@@ -25,6 +26,7 @@
   > ll_rw_block直接返回了错误怎么办? 例如你读取块超界.
   > 感觉空闲块的初始化可以全挪到 缓冲块表_添加() 这个函数里, 不要零零星星的初始化, 不要节约那一点内存.
   > ll_rw_block要检查块边界范围
+  > 用到mmap_disk()的几个syscall的中断要打开. 别不敢.
  */
 #include<linux/buffer_head.h>
 #include<linux/blkdev.h>
@@ -32,21 +34,47 @@
 #include<linux/slab.h>
 
 static struct slab_head *bufferhead_cache;
-static struct list_head 缓冲块全局链;	/*链入了所有的缓冲块 
-> 按LRU排序. 最近用到的在最尾部; 最冷的块在最开头*/
-static unsigned long 全局链长;			/* 目前的有多少个缓冲块 */
-static unsigned long 全局链容量 = 32 * 1024;	/*最多这么多个块, 大概128M */
 
 static struct buffer_head *
 缓冲块表_查找(struct blk_unit *unit, ulong block_id);
 
+static struct list_head 空闲链;
+/* 为什么需要忙碌链呢? 其实我们是需要一个全局链. 否则遍历
+   缓冲块做统一回写时不方便.
+   但那样的话, buffer_head又多需要一个指针成员
+ */
+static struct list_head 忙碌链;
+static ulong 忙碌块数量;
+static ulong 空闲块数量;
+static ulong 目前块数量;	// == 忙碌块数量 + 空闲块数量
+static ulong 块数量配额 = 256;	//内核划给块设备缓冲层的上限
+static int 生长粒度 = 8;
 
-/* buffers_global_list */
-static inline void 全局链_添加(struct buffer_head *new){		
-	list_add_tail(&new->lru, &缓冲块全局链);
-	全局链长++;												asrt(全局链长 < 全局链容量);
+/* 下面4个API, 其实处理的是缓冲块在 忙/闲链之间的流动.
+ * 新的块不会进入直接进入忙链. 而进入闲链也不会通过走下面的
+ * API */
+static inline void 忙碌链_添加( struct buffer_head *it){
+	list_add( &it->lru, &忙碌链 );	//不拘首尾
+	忙碌块数量++;
 }
 
+static inline void 忙碌链_移除( struct buffer_head *it){	
+	list_del(&it->lru);
+	忙碌块数量--;
+}
+
+/* 认为接收的块是刚从忙碌链里来的, 按lru规则, 放在链尾 
+   扩增空闲链时不会调用这个函数
+ */
+static inline void 空闲链_添加( struct buffer_head *it){
+	list_add_tail( &it->lru, &空闲链 );
+	空闲块数量++;	
+}
+
+static inline void 空闲链_移除( struct buffer_head *it){
+	list_del(&it->lru);
+	空闲块数量--;
+}
 //increment_bh
 static inline void 引用缓冲块(struct buffer_head *block){
 	block->count++;
@@ -60,7 +88,12 @@ static inline void  放弃缓冲块(struct buffer_head *block){	asrt(block->coun
 /* put_buffer() or munmap_disk() */
 void 解映射块(struct buffer_head *block){					asrt(block->count > 0);
 	放弃缓冲块(block);
-	//TODO somethine else
+	if(block->count == 0){
+		//list_add_tail(&block->lru, &空闲链);
+		忙碌链_移除( block );
+		空闲链_添加( block );
+	}
+	//TODO somethine else 真是英明
 }
 
 static inline void 等待块解锁(struct buffer_head *bh){
@@ -99,31 +132,6 @@ static struct buffer_head * 缓冲块命中(u32 dev, long block){
 	return 命中块;
 }
 
-/* 从hash表中摘除, 从全局链中摘除 */
-static void 缓冲块脱链(struct buffer_head *bh){
-	list_del(&bh->lru);
-	list_del(&bh->hash);
-	全局链长--;
-}
-
-/* get least-recently-used 
- * 如果脏了, 就发送磁盘写命令, 并立刻返回.
-   所以回收到的"最冷块"不要直接用, 要调用一下wait_on_buffer
- */
-static struct buffer_head *回收最冷块(void){
-	if(list_empty(&缓冲块全局链))	return 0;
-
-	struct buffer_head *coldblock; 
-	coldblock = container_of(缓冲块全局链.next, struct buffer_head, lru);
-	if(coldblock->count > 0)	spin("unusual case");
-
-	缓冲块脱链(coldblock);		//strong order
-	if(coldblock->dirty){
-		ll_rw_block(WRITE, coldblock);	//lock_buffer
-	}
-	return coldblock;	
-}
-
 
 /* 新建一个空白缓冲块, 加入全局链, 目前是一次长一个 */
 static struct buffer_head * 新建空白块(void){
@@ -132,35 +140,79 @@ static struct buffer_head * 新建空白块(void){
 	void *data = __alloc_page(0);
 	bh->data = data;
 	bh->lock = false;	//要区别于"回收最冷块", 那个可能因回写而上锁
+	bh->hash.prev = bh->hash.next = 0;
+	bh->dirty = false;
 	INIT_LIST_HEAD(&bh->wait);
 	return bh;
 }
 
+static bool expand_freelist(void){							assert( list_empty( &空闲链 ));
+	u32 newtotal = 目前块数量 + 生长粒度;
+	if(newtotal > 块数量配额){
+		return false;	
+	}
+	for(int i = 0; i < 生长粒度; i++){
+		struct buffer_head *new = 新建空白块();				asrt(new);
+		/* 插入最前面, 我们当然要优先用空白块 */
+		list_add(&new->lru, &空闲链);
+	}
+	目前块数量 = newtotal;
+	空闲块数量 += 生长粒度;
+	return true;
+}
+
 /* 
- * get_unused
- > 返回的缓冲块可能是新建的(当缓冲块总量较少, 处于扩张阶段)
-   也可能是回收了"冷块"( 当缓冲块总量到了上线 )
- > 返回的块是个"孤儿", 不在hash表里, 也不在全局链里
- > 返回的buffer_head里的成员, 除了b_lock, b_wait,其它都是"垃圾数据"
-   无效的. 要重新初始化. 这样做很好.
+   freelist里既有才分配的空白块, 又有才unmap回来的块.
+   我么需要区别它们, 因为要把后者从热表里脱链.
+   怎么区分? 新分配的块的hash字段是0, 使用过的块一定不是.
+
+   @返回块规格: 
+   dirty = ? 崭新块: false, 表示不比磁盘块新
+   			 回收块: true, 如果早已经回写过了
+			 		 false, 如果是在回收时才启动的回写.
+   lock = ? 崭新块: false
+   			回收块: true, 如果早已经回写过了
+					false, 如果是在回收时才启动的回写.
+	io = true
+  	wait = 自循环	
+	count = 1	因为就是你请求了我	
+
+	简单的说, 请求到的块, 是一个孤儿, 跟任何链表都脱离了关系
+	而且可能因为正在回写磁盘而加锁.
  */
 static struct buffer_head *请求空闲块(void){
-	//如果dirty了,要回写到磁盘
-	//先尝试扩张缓冲块容量
-	struct buffer_head *empty;
-	if(全局链长 < 全局链容量){
-		empty = 新建空白块();							
+	struct buffer_head *orphan;
+	if( list_empty( &空闲链) ){
+		bool ok = expand_freelist();						if(!ok) return false;
 	}
-	else{
-		empty = 回收最冷块();								
+	
+	/* 从空闲链中拿 */
+	orphan = container_of(空闲链.next, 
+							struct buffer_head, lru);
+	//list_del( &orphan->lru );
+	空闲链_移除( orphan );
+
+	/*不拘prev还是next, 只要是0, 说明这是一个崭新的块. */
+	if(orphan->hash.prev == 0);	//do nothing;
+	else{	//这个块还呆在hash表里
+		list_del( &orphan->hash );	//从热表脱链
+		if(orphan->dirty){									assert(0 && "write-back not implemented yet");
+			if(!orphan->lock)	ll_rw_block(WRITE, orphan);
+			else;	/*如果上锁了, 那正合我意, 它无非在执行
+					 *一次磁盘IO. 如果正在回写, 那很好; 如果
+					 * 正在读, 那就更不用操心了. 不管怎样,
+					 * 记住空闲链里的所有块的count都是0 */
+		}
 	}
-															asrt(empty && list_empty( &empty->wait ));
-	return empty;	
+															assert( list_empty(&orphan->wait));
+	orphan->count = 1;
+	return orphan;	
 }
 
 
 void init_blklayer_buffer(void){
-	INIT_LIST_HEAD(&缓冲块全局链);	
+	INIT_LIST_HEAD(&空闲链);	
+	INIT_LIST_HEAD(&忙碌链);	
 	bufferhead_cache = kmem_cache_create(
 							"bufferhead_cache", 
 							sizeof(struct buffer_head), 0,
@@ -197,7 +249,7 @@ void register_blkdev(int major){ 							assert(major < MAX_BLKDEV);
 		struct blk_unit *unit;
 
 		//ignore <whole disk> MINOR, you must register it mannually
-		if(i % blkdev->units_per) continue;	
+		if( (i % blkdev->unitcycle) == 0) continue;	
 
 		unit = blkdev->units[i];
 		if(!unit) continue;									asrt(unit->total_sectors != 0);
@@ -214,11 +266,11 @@ void register_blkunit(struct blk_unit *unit, u32 dev){				asrt(unit && unit->tot
 	struct list_head *缓冲块表;
 	int 缓冲块表长;		//不是byte长, 是element num
 
-	int page_need = 所需热表长(unit) * 2;	//返回的是"双页"
-	int order_need = pgorder_needed(page_need);	
-	int page_giveyou = __4K << order_need;	//实际给你多一些
-	缓冲块表 = __alloc_pages(order_need, 0);				asrt(缓冲块表);
-	缓冲块表长 = page_giveyou * __4K /sizeof(struct list_head);
+	int pages_need = 所需热表长(unit) * 2;	//返回的是"双页"
+	int order_need = pgorder_needed(pages_need);	
+	int pages_giveyou = 1 << order_need;	//实际给你多一些
+	缓冲块表 = __alloc_pages(0, order_need);				asrt(缓冲块表);
+	缓冲块表长 = pages_giveyou * __4K /sizeof(struct list_head);
 	for(int i = 0 ; i < 缓冲块表长; i++){
 		INIT_LIST_HEAD( &缓冲块表[i] );
 	}
@@ -236,11 +288,9 @@ void register_blkunit(struct blk_unit *unit, u32 dev){				asrt(unit && unit->tot
  */
 static void 缓冲块表_添加(struct blk_unit *unit, 
 						struct buffer_head *new)
-{
+{															asrt(new->count == 1);
 	new->dev_id = unit->dev_id;
-	//new->block = block;
 	new->dirty = false;	//此时data区还是空白的, 谈不上dirty
-	new->count = 1;		//asrt(buffer->count == 1);
 	new->lock = false;	//TODO BUG 应该把初始化函数提取出来
 						//这样很别扭. 解锁是安全的?
 
@@ -261,7 +311,6 @@ static struct buffer_head *
 	}
 	return 0;
 }
-
 
 /* This is bread(), also called mmap_disk()
  * 其实是两个不同的抽象模型, 缓冲块 vs. 扇区映射
@@ -287,16 +336,25 @@ static struct buffer_head *
  */
 struct buffer_head *映射磁盘块(u32 dev, ulong block){
 	struct buffer_head *buffer;
-	maybe_lucky:
+	struct buffer_head *raw;
+
+	//如果访问的块落在某个分区, 则转化成对那个分区的访问
+	blk_devs[MAJOR(dev)].global2local(&dev, &block);
+
 	buffer = 缓冲块命中(dev, block);	//可能导致睡眠 TODO  不该睡眠, 把睡眠的代码挪到这里来?
 	if(buffer) return buffer;			
-
-	buffer = 请求空闲块();	//这个函数不会睡眠
-	if(buffer->lock){	//我们不用循环等待, 因为这个块已经脱链了
+	
+	raw = 请求空闲块();										asrt(raw);
+	if(raw->lock){	//我们不用循环等待, 因为这个块已经脱链了
 						//现在只有我们知道它, 我们等它回写完
-		kp_sleep(0, 0);		
-		goto maybe_lucky;
+		kp_sleep(0, 0);		 								
+		//空闲块已经可用了, 但我们不甘心, 再去hash表碰碰运气
+		if( (buffer = 缓冲块命中(dev, block) ) ){
+			空闲链_添加(raw);	//还回去
+			return buffer;
+		}
 	}
+	buffer = raw;											
 
 	/* 现在,  这个缓冲块彻底属于我们了.
 	 * 因为稍后从磁盘加载内容, 会睡眠. 我们先把这个缓冲块
@@ -306,7 +364,7 @@ struct buffer_head *映射磁盘块(u32 dev, ulong block){
 	 */
 	buffer->block = block;	
 	缓冲块表_添加( BLK_UNIT(dev), buffer);
-	全局链_添加(buffer);
+	忙碌链_添加(buffer);
 
 	ll_rw_block(READ, buffer);
 	等待块解锁(buffer);
@@ -317,8 +375,6 @@ struct buffer_head *映射磁盘块(u32 dev, ulong block){
 	 * 的读写, 以及与内核线程的定时回写, 没有任何的限制.
 	 */
 	if(buffer->io == false){		//IO error
-		//缓冲块表_删除();
-		//全局链表_删除();
 		放弃缓冲块(buffer);
 		buffer = 0;											spin("IO fault");
 	}
@@ -335,13 +391,16 @@ int ll_rw_blocks(u32 dev_id, int rw,
 	char *from, *to;
 	struct buffer_head *bh;
 
-	if(rw == READ) to = buf;
-	else from = buf;
-
-	for(int i = start; i < start + blocknum; i++){
-		bh = mmap_disk(dev_id, i);							asrt(bh);	
-		if(rw == READ) from = bh->data;
-		else			to	= bh->data;
+	for(int i = 0; i < blocknum; i++){
+		bh = mmap_disk(dev_id, start + i);							asrt(bh);	
+		if(rw == READ) {
+			from = bh->data;
+			to = buf + i * BLOCK_SIZE;
+		}
+		else{
+			from = buf + i* BLOCK_SIZE;
+			to	= bh->data;
+		}
 
 		memcpy(to, from, BLOCK_SIZE);
 		munmap_disk(bh);
@@ -355,10 +414,66 @@ struct buffer_head *请求写入块(u32 dev, ulong block){
 #endif
  
 
+#if 0
+/* get least-recently-used 
+ * 如果脏了, 就发送磁盘写命令, 并立刻返回.
+   所以回收到的"最冷块"不要直接用, 要调用一下wait_on_buffer
+ */
+static struct buffer_head *回收最冷块(void){
+	if(list_empty(&缓冲块全局链))	return 0;
+
+	struct buffer_head *coldblock; 
+	coldblock = container_of(缓冲块全局链.next, struct buffer_head, lru);
+	if(coldblock->count > 0)	spin("unusual case");
+
+	缓冲块脱链(coldblock);		//strong order
+	if(coldblock->dirty){
+		//BUG here 可能人家已经在回写了
+		ll_rw_block(WRITE, coldblock);	//lock_buffer
+	}
+	return coldblock;	
+}
+#endif
 
 
+#if 0
+	<这是旧的 "请求空闲块">
+	//如果dirty了,要回写到磁盘
+	//先尝试扩张缓冲块容量
+	struct buffer_head *empty;
+	if(全局链长 < 全局链容量){
+		empty = 新建空白块();							
+	}
+	else{
+		empty = 回收最冷块();								
+	}
+															asrt(empty && list_empty( &empty->wait ));
+	return empty;	
+#endif
 
 
+#if 0
+static struct list_head 缓冲块全局链;	/*链入了所有的缓冲块 
+> 按LRU排序. 最近用到的在最尾部; 最冷的块在最开头*/
+static unsigned long 全局链长;			/* 目前的有多少个缓冲块 */
+//static unsigned long 全局链容量 = 32 * 1024;	/*最多这么多个块, 大概128M */
+static unsigned long 全局链容量 = 256;	/*最多这么多个块, 大概128M */
+
+
+/* buffers_global_list */
+static inline void 全局链_添加(struct buffer_head *new){		
+	list_add_tail(&new->lru, &缓冲块全局链);
+	全局链长++;												asrt(全局链长 <= 全局链容量);
+}
+
+
+/* 从hash表中摘除, 从全局链中摘除 */
+static void 缓冲块脱链(struct buffer_head *bh){
+	list_del(&bh->lru);
+	list_del(&bh->hash);
+	全局链长--;
+}
+#endif
 
 
 
