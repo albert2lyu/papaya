@@ -88,7 +88,7 @@ lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为还
 
 [2016,10,7] Version 0.609a
 ==========update===========
-1, dynamic linker,works under linux only, not papaya.
+1, dynamic linker,for linux only, not papaya.
 								see ../cmd/ld.c
 
 [2016,9,24] Version 0.609
