@@ -2,7 +2,7 @@
 
 /* 功能要完整实现，例如对rlimits的支持，但为了代码简单，会选择牺牲效率。例如不用bitmap。
  */
-static int get_unused_fd(void){
+int get_unused_fd(void){
 	struct files_struct *files = current->files;
 	int i;
 	for(i = 0; i < files->max_fds; i++){
@@ -37,7 +37,8 @@ int sys_open(char *path, unsigned flags, unsigned mode){
 	if(fd == -1) return -1;
 
 	
-	struct file *file = kmalloc( sizeof(struct file) );
+	//struct file *file = kmalloc( sizeof(struct file) );
+	struct file *file = kmem_cache_alloc(file_cache, 0);
 	file->dentry = indir.dentry;
 	file->pos = 0;
 	file->count = 1;

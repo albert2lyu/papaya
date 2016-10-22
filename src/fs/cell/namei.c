@@ -29,7 +29,7 @@ static struct super_operations cell_sb_operations = {
 };
 
 static int read(struct file *file, char *buf, 
-				unsigned size, unsigned *ppos);
+				ulong size, ulong *ppos);
 static int onclose(struct file *file);
 static struct file_operations cell_f_ops = {
 	open: 0,
@@ -147,9 +147,13 @@ struct buf2{
 	char *firstbuf, *lastbuf;
 };
 
-static int read(struct file *file, char *buf, unsigned size, unsigned *ppos){
-	//struct dentry *dentry = file->dentry;
+static int read(struct file *file, char *buf, ulong size, 
+				ulong *ppos)								
+{															
 	struct inode *inode = file->dentry->inode;
+	long remain = inode->size  - file->pos;
+	if(size > remain) size = remain;						
+
 	if(!file->data) file->data = kmalloc0( sizeof(struct buf2) );
 	struct buf2 *buf2 = file->data;
 	if(!buf2->firstbuf) buf2->firstbuf = kmalloc0( BLOCK_SIZE );

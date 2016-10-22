@@ -136,7 +136,7 @@ void sys_bad(struct pt_regs regs){
 	spin("");
 }
 
-#if 1
+#if 0
 /* 测试结果: 到了几十兆的样子 测试线程似乎睡去了, 似乎是ide
    中断丢失的问题..哑火了?
  */
@@ -185,7 +185,7 @@ int func_init(void *v){
 	int rbytes = sys_read(fd, testbuf, 100);
 	avoid_gcc_complain = rbytes = (unsigned)&indir;
 
-	block_buffer_stamp();
+	//block_buffer_stamp();
 
 	//执行用户用户程序init。进化成一个用户进程。
 	int x = 0;

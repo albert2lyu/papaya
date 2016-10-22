@@ -73,6 +73,7 @@
 
 #define int80_carry_stack_args_4(name)									\
 ({																		\
+	int ret;															\
 	__asm__ __volatile__("push %%ebx\n\t"								\
 						 "push %%edx\n\t"								\
 						 "push %%esi\n\t"								\
@@ -83,21 +84,27 @@
 						 "mov 20(%%ebp), %%esi\n\t"						\
 																		\
 						 "int $0x80\n\t"								\
+						 "mov %%eax, %0\n\t"							\
 																		\
 						 "pop %%esi\n\t"								\
 						 "pop %%edx\n\t"								\
 						 "pop %%ebx\n\t"								\
-						 :												\
+						 :"=r"(ret)										\
 						 :"a"(NR_##name)								\
 						 );												\
+	ret;																\
 })
+
 #define int80_carry_stack_args_0(name)									\
 ({																		\
+	int ret;															\
 	__asm__ __volatile__(												\
 						 "int $0x80\n\t"								\
-						 :												\
+						 "mov %%eax, %0\n\t"							\
+						 :"=r"(ret)										\
 						 :"a"(NR_##name)								\
 						 );												\
+	ret;																\
 })
 
 #define int80_carry_stack_args_1(name)									\
@@ -163,8 +170,7 @@ static inline int printf(char *format, ...){
 
 
 static inline int fork(void){
-	int80_carry_stack_args_0(fork);
-	return 0x8899;
+	return int80_carry_stack_args_0(fork);
 }
 
 static inline void exit(int status){
@@ -172,8 +178,7 @@ static inline void exit(int status){
 }
 
 static inline int wait4(int pid, int *status, int option, struct rusage *ru){
-	int80_carry_stack_args_4(wait4);
-	return 0x8899;
+	return int80_carry_stack_args_4(wait4);
 }
 
 static inline void * mmap2(void *addr, int length, int prot, 
@@ -197,6 +202,21 @@ static inline unsigned long lseek(int fd, int offset, int origin){
 	return int80_carry_stack_args_3(lseek);
 }
 
+static inline int read(int fd, char *buf, unsigned long size){
+	return int80_carry_stack_args_3(read);
+}
 
+static inline int write(int fd, char *buf, unsigned long size){
+	return int80_carry_stack_args_3(write);
+}
+
+static inline int close(int fd){
+	return int80_carry_stack_args_1(close);
+}
+
+static inline int pipe(int fd[2], int flags)
+{
+	return int80_carry_stack_args_2(pipe);
+}
 
 #endif

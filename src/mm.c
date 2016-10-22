@@ -11,6 +11,7 @@ struct slab_head * mm_cache;
 struct slab_head * vm_area_cache;
 struct slab_head *fs_struct_cache;
 struct slab_head *files_struct_cache;
+struct slab_head *file_cache;
 u32 gmemsize=0;
 char testbuf[1024];
 void init_memory(void){
@@ -120,6 +121,9 @@ void mm_init2(void){
 										SLAB_HWCACHE_ALIGN, 0, 0);
 	files_struct_cache = kmem_cache_create("files_struct_cache", 
 										sizeof(struct files_struct), 0,
+										SLAB_HWCACHE_ALIGN, 0, 0);
+	file_cache = kmem_cache_create("files_cache", 
+										sizeof(struct file), 0,
 										SLAB_HWCACHE_ALIGN, 0, 0);
 }
 

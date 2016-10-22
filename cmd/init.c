@@ -18,18 +18,36 @@ char * __envp[] = {
 
 static char g_array[10] = {1, 2, 3, 4, 5, 6};
 int static_array[1024];
+char msgbuf[1024];
 void init(int argc, char *argv[], char *envp[]){
 	int x;
 	for(int i = 0; i < 10; i++) printf("%u\n", g_array[i]);
+	int fd[2];
+	pipe(fd, 0);
 	int ret = fork();
-	printf("I am back ! %u\n", ret);
+	printf("I am back !! %u\n", ret);
 	if(ret == 0){		//子进程演变成cat
-		execve("/home/cat", __argv, __envp);	
+		int i = 0;
+		while(++i){
+			for(int i = 0; i < 0xffffff; i++) 
+				msgbuf[1000] ++;
+			char buf[10];
+			buf[0] = 'a' + i % 20;
+			write(fd[1], buf, 1);
+		}
+		while(1);
+		//execve("/home/cat", __argv, __envp);	
 	}
+	while(1){
+		read(fd[0], msgbuf, 2);
+		msgbuf[2] =0;
+		printf("%s", msgbuf);
+	}
+
 	int exit_code;
 	int got;
 	while( (got = wait4(ret, &exit_code, WNOHANG, 0)) <= 0){
-		if(got == 0) ;
+		if(got == 0);
 			//printf("saw ");
 			//printf("i saw her, she haven't exited yet\n");
 		else if(got == -1){

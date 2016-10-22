@@ -30,7 +30,7 @@ struct inode_operations{
 struct super_block;
 struct file_operations;
 struct inode{
-	unsigned ino;	
+	ulong ino;	
 	u16 dev;
 	u16 rdev;
 	u32 mktime;
@@ -40,6 +40,7 @@ struct inode{
 	struct inode_operations *operations;
 	struct file_operations *file_ops;
 	struct list_head hash;
+	struct list_head wait;
 	
 	#define INODE_COMMON_SIZE 128
 	char common[INODE_COMMON_SIZE];
@@ -84,8 +85,9 @@ struct file{
  */
 struct file_operations{
 	int (*lseek)(struct file *, int offset, unsigned origin);
-	int (*read)(struct file *, char *path, unsigned size, 
-				unsigned *ppos);	/* @ppos should be abount read-ahead, i guess */
+	int (*read)(struct file *, char *buf, ulong size, 
+				ulong *ppos);	/* @ppos should be abount read-ahead, i guess */
+	int (*write)(struct file *, char *buf, ulong size, ulong *ppos);	
 	int (*open)(struct inode *, struct file *);
 	int (*onclose)(struct file *);
 };
@@ -120,5 +122,28 @@ struct file * k_open(char *path, ulong flags, ulong mode);
 int k_seek(struct file *file, int offset, unsigned origin);
 int k_read(struct file *file, char *buf, unsigned size);
 int k_close(struct file*file);
-#define get_file(file) ( (file)->count++ )
+//#define get_file(file) ( (file)->count++ )
+//static inline struct file
+
+static inline struct file *get_file(struct file *it){
+	assert(it);
+	it->count++;
+	return it;
+}
+
+static inline  void put_file(struct file *it){
+	assert(it);
+	it->count--;
+	if(it->count == 0){
+		kmem_cache_free(file_cache, it);
+	}
+}
+
+int get_unused_fd(void);
+
+
 #endif
+
+
+
+

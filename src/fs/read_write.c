@@ -34,9 +34,7 @@ static int do_close(struct file *file){
 	struct file_operations *fops = file->dentry->inode->file_ops;
 	if(fops->onclose) fops->onclose(file);
 
-	if(--file->count == 0){		/* close, step 2 */
-		kfree(file);	
-	}
+	put_file(file);
 	return 0;
 }
 /* mainly do two jobs:
@@ -58,23 +56,40 @@ int sys_close(unsigned fd){
 
 //这样一个接口，内核稍微分装一下，可以对外当做系统调用, sys_xx; 对内自己用, k_xx
 static int do_read(struct file *file, char *buf, unsigned size){
+	long error;
 	if(!file) return -EBADF;
 	if(!(file->mode & FMODE_READ))	return -EACCES;
+	if(size == 0) return 0;
 
-	unsigned filesize = file->dentry->inode->size;
-	if(file->pos + size > filesize) size = filesize - file->pos;
-	int ret = file->dentry->inode->file_ops->read(file, buf, size, 0);
-	return ret;
+	error = file->dentry->inode->file_ops->
+				read(file, buf, size, 0);
+	 return error;
 }
+
+static int do_write(struct file *file, char *buf, long size)
+{
+	long error;
+	if(!file) return -EBADF;
+	if(!(file->mode & FMODE_WRITE))	return -EACCES;
+
+	error = file->dentry->inode->file_ops
+				->write(file, buf, size, 0);
+	return error;
+}
+
+/* fd用unsigned类型也不是不可以 */
 int sys_read(unsigned fd,  char *buf, unsigned size){
-	int bytes_r;
+	long error;
 	struct file *file = fcheck(fd);
-	bytes_r =  do_read(file, buf, size);
-	if(bytes_r < 0){
-		//errno = bytes_r;
-		return -1;
-	}
-	return bytes_r;
+	error =  do_read(file, buf, size);
+	return error;
+}
+
+int sys_write(unsigned fd,  char *buf, unsigned size){
+	long error;
+	struct file *file = fcheck(fd);
+	error =  do_write(file, buf, size);
+	return error;
 }
 
 //k_打头的，都是直接供内核调用的，且不经过syscall。否则用kernel_打头

@@ -352,7 +352,8 @@ struct ll2{
 	node;												\
 })
 
-#define O_APPEND(root, new)								\
+/* 为了避免跟文件flags O_APPEND重名 */
+#define O_APEND(root, new)								\
 ({														\
 	(new)->next = root;									\
 	(new)->prev = root->prev;							\
@@ -367,7 +368,7 @@ struct ll2{
 		root = new;										\
 		new->prev = new->next = new;					\
 	}													\
-	else O_APPEND(root, new);							\
+	else O_APEND(root, new);							\
 })
 
 

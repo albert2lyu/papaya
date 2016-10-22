@@ -1,3 +1,5 @@
+; 调试的时候, 不要直接断在0x7exx这样的地方, 似乎bios代码会经过这片区域.
+; 先断到0x7c00再说.
 ; The memory layout diagram is in bootinfo.asm
 ;1 single segment should be smaller than 64KB
 %include "bootinfo.asm"
@@ -15,9 +17,9 @@ mbrHead:
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 2,0,1,63,(addr_mbr_loaded + 512 * 63 * 2) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 3,0,1,63,(addr_mbr_loaded + 512 * 63 * 3) >> 4, 0
 	read_floppy_side_o_sector_total_destsa_destea 0x80, 4,0,1,63,(addr_mbr_loaded + 512 * 63 * 4) >> 4, 0
-	;read_floppy_side_o_sector_total_destsa_destea 0x80, 5,0,1,63,(addr_mbr_loaded + 512 * 63 * 5) >> 4, 0
-	;read_floppy_side_o_sector_total_destsa_destea 0x80, 6,0,1,63,(addr_mbr_loaded + 512 * 63 * 6) >> 4, 0
-	;read_floppy_side_o_sector_total_destsa_destea 0x80, 7,0,1,63,(addr_mbr_loaded + 512 * 63 * 7) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 5,0,1,63,(addr_mbr_loaded + 512 * 63 * 5) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 6,0,1,63,(addr_mbr_loaded + 512 * 63 * 6) >> 4, 0
+	read_floppy_side_o_sector_total_destsa_destea 0x80, 7,0,1,63,(addr_mbr_loaded + 512 * 63 * 7) >> 4, 0
 	;共度取kernel.elf 63 x 8 / 2 = 252K ，还要减去几个扇区的boot.bin和fix.img
 	;when the size of kernel.elf gets close to  256K, we can't load it completely
     jmp entrance

@@ -94,9 +94,8 @@ void magic_color(void){
 		assert( read(fd_kernel, &byte, 1) == 1 );	// fetch byte data
 		if(byte == 0 && i == 0) assert(0 && "kernel.elf seems old, try 'make'\n");
 		lseek(fd_kernel, color_pos, SEEK_SET);		//rewind for writing
-		assert( //write magic number
-			write(fd_kernel, &magic_x, 1) == 1 
-		);
+
+		assert(	write(fd_kernel, &magic_x, 1) == 1 ); //write magic number
 		assert( write(fd_fix, &byte, 1) == 1 );		//send byte data to fix.img
 
 		if(final_sector){

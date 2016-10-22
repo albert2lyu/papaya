@@ -2,6 +2,7 @@
 #include<linux/sched.h>
 #include<asm/errno.h>
 #include<linux/NR_syscall.h>
+#include<linux/pipe.h>
 
 int kernel_thread(int (*fn)(void *), void *arg, unsigned flags){
 	__asm__ __volatile__(".intel_syntax noprefix\n\t"
@@ -26,6 +27,15 @@ int sys_execve(struct pt_regs regs){
 	char **argv = (void *)regs.ecx;	
 													if(!argv)	return -EINVAL;
 	error = do_execve(filename, argv, (char **)regs.edx, &regs);
+	return error;
+}
+
+int sys_pipe(struct pt_regs regs){
+	long error;
+	int *fds = (void *)regs.ebx;
+	int flags = regs.ecx;
+	flags = flags & ~0b11;
+	error = do_pipe(fds, flags);
 	return error;
 }
 

@@ -12,7 +12,7 @@ papaya内核是我学习linux的一个习作。
 虽然这样，还是希望把这个内核写到某种极致。
 
 【2】
-papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
+papaya os目前的代码量约一万行(*.c, *.asm, *.cn})
 只能在x86下运行。为了减少调试的工作量，也没有支持多核。
 目前完成的部分有：
 	>内存模块:
@@ -50,6 +50,9 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 			* exec()			<fs/exec.c>
 			* exit(),wait4()	<kernel/exit.c>
 			+ papaya os的进程调度算法几乎没有。
+
+	>进程间通信:
+			* pipe()			<fs/pipe.c>
 			
 	>基础：
 			* kmalloc()		<pmm.c>
@@ -69,7 +72,7 @@ papaya os目前的代码量约一万行(*.c + *.asm + *.cn)。
 计划12月前完成的模块有:
 	> ext2文件系统
 	> 键盘driver, 字符设备层，以及vfs层的完善
-	> 进程通信 signal() pipe()
+	> 进程通信 signal() 
 
 
 【3】
@@ -81,47 +84,45 @@ lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为还
 
 
 【4】
+[2016,10,22] Version 0.610A
++ pipe							see fs/pipe.cn
+
 [2016,10,19] Version 0.610
-==========update===========
-1, block buffer layer
++ block buffer layer
 								see block/buffer.cn
 
 [2016,10,7] Version 0.609a
-==========update===========
-1, dynamic linker,for linux only, not papaya.
++ dynamic linker,for linux only, not papaya.
 								see ../cmd/ld.c
 
 [2016,9,24] Version 0.609
-==========update===========
-1, Implementaion of vm_area, mm_struct 
-2, execve()		1/2 done 		see fs/exec.c  fs/binfmt_elf.c
-3, fork() 		2/3 done		see kernel/fork.c   mm/memory.c
-4, mmap(), brk()	1/2 done	see mm/mmap.c
++1, Implementaion of vm_area, mm_struct 
++2, execve()		1/2 done 		see fs/exec.c  fs/binfmt_elf.c
++3, fork() 		2/3 done		see kernel/fork.c   mm/memory.c
++4, mmap(), brk()	1/2 done	see mm/mmap.c
 
 [2016,7,27] Version 0.607b
-==========update===========
-1, TCP implementation. Receive only.  See net/ipv4/tcp.cn
-2, Chinese Programming introduced. 	  Also see tcp.cn
-3, Mutliple NICs support.			  See net/core/dev.c @pick_nic()
++1, TCP implementation. Receive only.  See net/ipv4/tcp.cn
++2, Chinese Programming introduced. 	  Also see tcp.cn
++3, Mutliple NICs support.			  See net/core/dev.c @pick_nic()
 
 [2016,7,12] Version 0.607
-==========update==========
-1, New feature: bottom monitor window.   see lib/printf.c
-2, The driver for RTL8139.
-3, ARP layer, IP layer.
++1 New feature: bottom monitor window.   see lib/printf.c
++2 The driver for RTL8139.
++3 ARP layer, IP layer.
 
 
 [2016,6,5]Version 0.606
 ==========update==========
-1, memory management module: SLAB (without colouring)	
++ memory management module: SLAB (without colouring)	
    see src/mm/slab.c
 
 
 [2016,5] Version 0.605
 ==========update===============
-1, block device layer without buffer
-2, ide driver
-3, virtual filesystem( interfaces: open(), read(), close() implemented, write() not yet)
++1, block device layer without buffer
++2, ide driver
++3, virtual filesystem( interfaces: open(), read(), close() implemented, write() not yet)
 
 
 【4】

@@ -1,4 +1,10 @@
 =============log
+
+Sat Oct 22 17:59:09 CST 2016
+* 今天_dimg.c和boot.asm配合的magic color校验终于发挥了作用. 内核映像突破150K时
+   捕捉到了加载不完整的bug. 我一开始以为_dimg.c自己又出了bug, 检查了一下午.
+   早点儿怀疑是boot.asm出问题就好了.
+
 Sun Oct 16 22:57:10 CST 2016
 *
  block buffer过了编译. 调试中.
@@ -326,6 +332,16 @@ Thu Jul  2 02:04:55 PDT 2015
 
 
 ===========tips
+* open, pipe时传入的flags参数, 只有低2位需要转换编码风格. 这两个似乎不属于
+  fcntl范畴, 内核是把它们提取到file->mode字段里. file->flags存储的完全是fcntl位.
+  除了低2位需要转换, 别的flags, 内核都是直接用的. 没有编码风格的差异, 当然,
+  在具体的内核函数里, 会检查是否有不需要的bit被set. (因而返回-EINVAL)
+  应该是由glibc保证这些flag bit在不同unix系统上的精准.
+  open的时候还有一个mode参数, 那时创建文件时指定文件系统访问权限.
+
+* glibc的重要性可见一斑: 不同的*nix, fcntl.h里定义的同名常量的数值是不同的.
+  glibc在编译时, 会根据目标系统, 使用对应的头文件.
+ 
 *
   一直听别人说实际上磁盘IO用的是DMA，而非PIO．
   今天才知道，此DMA非彼DMA．

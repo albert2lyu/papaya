@@ -245,7 +245,7 @@ get_mm(struct mm *that){
 	return that;
 }
 
-extern struct slab_head *fs_struct_cache, *files_struct_cache;
+extern struct slab_head *fs_struct_cache, *files_struct_cache, *file_cache;
 
 #endif
 
