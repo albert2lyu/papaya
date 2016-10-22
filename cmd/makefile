@@ -5,7 +5,7 @@ so_flags = -std=c99 -g -Wall -fPIC -fno-builtin  -fno-stack-protector
 cc = gcc
 
 target = cell _dimg cat init
-#ld.so t    printf.so string.so lib1.so lib2.so lib3.so lib4.so lib5.so lib6.so go
+target2 = ld.so t    printf.so string.so lib1.so lib2.so lib3.so lib4.so lib5.so lib6.so go
 all:$(target)
 
 init:init.c
@@ -68,6 +68,7 @@ cell:cell.c
 
 clean:
 	rm $(target) -f
+	rm $(target2) -f
 	rm *.o -f
 	rm *~ -f
 
