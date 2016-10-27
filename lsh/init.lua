@@ -19,17 +19,23 @@ Env.PATH = Env.PATH .. ":/home/wws/software/"
 local lshmod = Env.lshmod
 lshmod.default = lshmod.cmd
 
-function lfs.collect(path)
-	local dir = {}
+--path, depth, dir
+function lfs.collect(path, ...)
+	arg = {...}
+	local depth = arg[1] or 0
+	local holder = arg[2] or {}
 	for filename in lfs.dir(path) do
 		if filename ~= "." and filename ~= ".." then
 			local _fullpath = path .. "/" .. filename
 			local attribute = lfs.attributes(_fullpath)
 			local file = {name = filename; attr = attribute, path = _fullpath}	
-			dir[#dir + 1] = file
+			holder[#holder + 1] = file
+			if attribute.mode == "directory" and depth >= 1 then 
+				lfs.collect(_fullpath, depth-1, holder)	
+			end
 		end
 	end
-	return dir
+	return holder
 end
 
 function lfs.rmdir(path)

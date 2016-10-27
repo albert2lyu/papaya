@@ -1,0 +1,140 @@
+* 
+  信号量是有睡眠的锁.
+
+*
+  down()和up()位于include/asm-i386/semaphore.h
+================================================(
+static inline void down(struct semaphore * sem)
+{
+	__asm__ __volatile__(
+		"# atomic down operation\n\t"
+		LOCK "decl %0\n\t"     /* --sem->count */
+		"js 2f\n"
+		"1:\n"
+        ".section .text.lock,\"ax\"\n"  >--------+
+        "2:\tcall __down_failed\n\t"             |
+        "jmp 1b\n"                               |
+        ".previous"                     >--------+
+		:"=m" (sem->count)
+		:"c" (sem)
+		:"memory");
+}
+
+static inline void up(struct semaphore * sem)
+{
+	__asm__ __volatile__(
+		"# atomic up operation\n\t"
+		LOCK "incl %0\n\t"     /* ++sem->count */
+		"jle 2f\n"
+		"1:\n"
+		".section .text.lock,\"ax\"\n"     >--------+ 
+		"2:\tcall __up_wakeup\n\t"                  | 
+		"jmp 1b\n"                                  | 
+		".previous"                        >--------+ 
+		:"=m" (sem->count)
+		:"c" (sem)
+		:"memory");
+}
+================================================)
++ 上面用虚线标记的范围, 也就是.section .text.lock和.previous之间的代码, 最终被
+  编译到一个单独的section里了. 所以up()和down()的函数体是很小的.  
++ 也因此, jle2f的下一条指令不是call __up_wakeup, 没有下一条指令了. 这就结束了.
++ 所以up()和down()的速度是非常极限的. 设计者让函数尽快的fall through, 也
+  就是尽快的通过up/down(). 快到只需要一条指令, 并且函数体很小, 对指令cache很友好.
++ fall through的意思是, down()时立刻拿到门票, up()返还门票时, 没有等待者. 这其实
+  是最大概率的情形. 因为race condition毕竟是碰巧.
+  
+
+*
+  2.4时期的struct semaphore没有lock字段. 只有一把文件域的"大锁", 定义在
+  semaphore.c里, 名字是semaphore_lock.
+  + __down()函数里,操作semaphore结构体之前, 先抓取这把锁.
+  + 可见2.4内核里, 不同cpu上, 对不同信号量的__down()操作, 也会互相阻塞.
+
+*
+  semaphore结构体的count字段, 可以理解为门票数.
+
+*
+  __down()函数的
+
+
+
+
+
+*
+  把2.4的信号量源码看懂, 只是为了忘记它. sleepers和count相加的这个设计, 觉得
+  很难看.
+
+*
+  到目前为止, 还有两个问题没解决. 一个是发给wowo邮箱的.
+  另一个, 是为什么要把count变成-1.情景上的那句分析感觉有问题. "然后根据结果是否
+  为0判定是否有进程需要唤醒".
+*
+  下面是down()和up()相关的剩余的代码.
+===fall through失败后的操作, 都在arch/i386/kernel/semaphore.c
+asm(
+".align 4\n"
+".globl __down_failed\n"
+"__down_failed:\n\t"
+	"pushl %eax\n\t"
+	"pushl %edx\n\t"
+	"pushl %ecx\n\t"
+	"call __down\n\t"
+	"popl %ecx\n\t"
+	"popl %edx\n\t"
+	"popl %eax\n\t"
+	"ret"
+);
+
+void __down(struct semaphore * sem)
+{
+	struct task_struct *tsk = current;
+	DECLARE_WAITQUEUE(wait, tsk);
+	tsk->state = TASK_UNINTERRUPTIBLE;
+	add_wait_queue_exclusive(&sem->wait, &wait);
+
+	spin_lock_irq(&semaphore_lock);
+	sem->sleepers++;
+	for (;;) {
+		int sleepers = sem->sleepers;
+
+		/*
+		 * Add "everybody else" into it. They aren't
+		 * playing, because we own the spinlock.
+		 */
+		if (!atomic_add_negative(sleepers - 1, &sem->count)) {
+			sem->sleepers = 0;
+			break;
+		}
+		sem->sleepers = 1;	/* us - see -1 above */
+		spin_unlock_irq(&semaphore_lock);
+
+		schedule();
+		tsk->state = TASK_UNINTERRUPTIBLE;
+		spin_lock_irq(&semaphore_lock);
+	}
+	spin_unlock_irq(&semaphore_lock);
+	remove_wait_queue(&sem->wait, &wait);
+	tsk->state = TASK_RUNNING;
+	wake_up(&sem->wait);
+}
+
+void __up(struct semaphore *sem)
+{
+	wake_up(&sem->wait);
+}
+
+asm(
+".align 4\n"
+".globl __up_wakeup\n"
+"__up_wakeup:\n\t"
+	"pushl %eax\n\t"
+	"pushl %edx\n\t"
+	"pushl %ecx\n\t"
+	"call __up\n\t"
+	"popl %ecx\n\t"
+	"popl %edx\n\t"
+	"popl %eax\n\t"
+	"ret"
+);
+

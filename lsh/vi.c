@@ -745,17 +745,18 @@ struct vi* vi_new( char *str){
 	return vi;
 }
 
+#define LMAX (1024 * 8)
 struct vi * vi_init(struct vi *vi){
-	vi->lines = malloc0(1024 * sizeof(void *));	/* 1024 lines at most*/
-	vi->size_of_line = malloc0(1024 * sizeof(int));
-	vi->len_of_line = malloc0(1024 * sizeof(int));
+	vi->lines = malloc0(LMAX * sizeof(void *));	/* 1024 lines at most*/
+	vi->size_of_line = malloc0(LMAX * sizeof(int));
+	vi->len_of_line = malloc0(LMAX * sizeof(int));
 
 	vi->ylines = malloc0(VI_YLINE_MAX * sizeof(void *));
 	vi->size_of_yline = malloc0(VI_YLINE_MAX * sizeof(int));
 	vi->len_of_yline = malloc0(VI_YLINE_MAX * sizeof(int));
 
 	vi->m_regs = malloc0(128 * sizeof(struct mark_register));
-	vi->clipboard_buf = malloc(1024);
+	vi->clipboard_buf = malloc(LMAX);
 	vi->clipinfo = calloc(1, sizeof(struct vi_clipinfo));
 	vi->clipinfo->ylmax = -1;
 	return vi;
@@ -778,7 +779,7 @@ void  vi_set( struct vi* vi, const char *str ){
 		if(*curr == 0) break;
 
 		curr++;	/*jmp this '\n'*/
-		currl++;
+		currl++;											assert(currl != LMAX);
 	}while(1);
 
 	vi->v_begin=0;

@@ -1,0 +1,58 @@
+*
+  到了2.6里, semaphore.c挪到了kernel/下面. semaphore.h也挪到了include/linux下面.
+  原先2.4里, 分别在arch/i386/kernel/和include/asm-i386/.
+  一下子走出阴暗的感觉.
+
+
+*
+  2.4内核里, wait_queue_t这个名字取的难受. 明明是"队列项".
+  到了 2.6它依然存在, 但是semaphore.c里已经不用它了. 而是自己定义了一个
+	struct semaphore_waiter {
+		struct list_head list;
+		struct task_struct *task;
+		int up;
+	};
+  同时取消了strcut semaphore里的wait_queue_head_t这个成员, 换成了简单的list_head.
+	struct semaphore {
+		spinlock_t		lock;
+		unsigned int		count;
+		struct list_head	wait_list;
+	};
+  这样一下子要清爽好多!
+
+*
+  2.4里高度优化的代码, 为什么到了2.6里, 换成了普通的c函数呢?
+  因为从2.6.16开始, mutex(互斥体)取代了semaphore成为主要的互斥手段.
+  这样, 信号量源码的可维护性就相对更重要了.
+  a patch comes along which deletes over 7600 lines of code - replacing it with
+  a mere 314 lines - while claiming to maintain the same functionality. 
+  Matthew Wilcox's generic semaphore patch is one of those changes. 
+  ... 
+  											https://lwn.net/Articles/273731/
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

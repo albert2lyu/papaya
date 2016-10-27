@@ -1,0 +1,14 @@
+
+*
+  原先的wait_queue_t是这样的.
+  =============(wait.h)
+	struct __wait_queue {
+		unsigned int flags;
+		struct task_struct * task;
+		struct list_head task_list;
+		#if WAITQUEUE_DEBUG
+			long __magic;
+			long __waker;
+		#endif
+	};
+
