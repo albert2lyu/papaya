@@ -67,7 +67,7 @@ papaya os目前的代码量约12000行(*.c/asm/cn)
 			+ 只在linux下测试通过，尚未移植到papaya
 
 	>几个入口文件：
-			boot.asm	==>		kernel.asm		==>		kernel.c
+			boot.asm   ==>    kernel.asm    ==>   kernel.c
 
 
 
