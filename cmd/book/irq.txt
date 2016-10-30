@@ -1,0 +1,206 @@
+*
+  一个重要的percpu变量
+    typedef struct {
+        unsigned int __softirq_active;
+        unsigned int __softirq_mask;
+        unsigned int __local_irq_count;
+        unsigned int __local_bh_count;
+        unsigned int __syscall_count;
+    } ____cacheline_aligned irq_cpustat_t;
+
+*
+  in_interrupt()有点儿词不达意.
+    #define in_interrupt()						\
+    ({								\
+        int __cpu = smp_processor_id();				\
+        (local_irq_count(__cpu) + local_bh_count(__cpu)) != 0;	\
+    })
+  它是把bottom half也当成一种interrupt, 不知道所为何意.
+
+
+*
+  下面是do_IRQ的删减版, 注意观察irq_count和bh_count的变化.
+asmlinkage void do_IRQ(int irq, struct pt_regs * regs)
+{   ...
+	cpu = smp_processor_id();
+	irq_enter(cpu, irq);            //递增irq count
+	...
+	if (action) {
+		...
+	}
+    ...
+	irq_exit(cpu, irq);             //递减irq count
+
+	if (softirq_active(cpu) & softirq_mask(cpu))
+		do_softirq();               //bh_count在其中有一个增减, 但出来时保持不变
+	return;
+    ...
+}
+
+
+*
+  关于thread_info里preempt_count的编码:
+  摘自linux/hardirq.h
+  * We put the hardirq and softirq counter into the preemption
+  * counter. The bitmask has the following meaning:
+  *
+  * - bits 0-7 are the preemption count (max preemption depth: 256)
+  * - bits 8-15 are the softirq count (max # of softirqs: 256)
+  *
+  * The hardirq count can in theory reach the same as NR_IRQS.
+  * In reality, the number of nested IRQS is limited to the stack
+  * size as well. For archs with over 1000 IRQS it is not practical
+  * to expect that they will all nest. We give a max of 10 bits for
+  * hardirq nesting. An arch may choose to give less than 10 bits.
+  * m68k expects it to be 8.
+  *
+  * - bits 16-25 are the hardirq count (max # of nested hardirqs: 1024)
+  * - bit 26 is the NMI_MASK
+  * - bit 28 is the PREEMPT_ACTIVE flag
+  *
+  * PREEMPT_MASK: 0x000000ff
+  * SOFTIRQ_MASK: 0x0000ff00
+  * HARDIRQ_MASK: 0x03ff0000
+  *     NMI_MASK: 0x04000000
+  */
+  ...
+  preempt_count()宏就是取current thread_info->preempt_count字段.
+  #define hardirq_count()	(preempt_count() & HARDIRQ_MASK)
+  #define softirq_count()	(preempt_count() & SOFTIRQ_MASK)
+  #define irq_count()	(preempt_count() & (HARDIRQ_MASK | SOFTIRQ_MASK \
+  				 | NMI_MASK))
+  #define in_irq()		(hardirq_count())
+  #define in_softirq()		(softirq_count())
+  #define in_interrupt()		(irq_count())
+
+
+[内核何时能被抢占?]
+  或者说, 何时不能被抢占?
+  简单的说, 只要thread_info->preempt_count不为0, 就不能.
+  而何时能?
+  # define preemptible()	(preempt_count() == 0 && !irqs_disabled())
+  另外需要need_resched为1.
+
+[内核被抢占的时机]
+  注意跟上面的区别, 是说, 内核在哪个点会尝试发动抢占?
+  两个点:
+  1, 从硬中断返回时, 就是ret_from_intr, restore_all那块代码附近.
+  2, 调用preempt_enable()
+
+
+*
+  几个增/减preempt_count字段的函数:
+  @ preempt_count()
+  > 就是current thread_info->preempt_count. 一个32位成员.
+
+  @ preempt_disable()
+  > preempt_count() += 1;
+
+  @ preempt_enable_no_resched()
+  > preempt_count() -= 1;
+
+  @ preempt_enable()
+  > preempt_count() -= 1;
+  > 如果preempt_count到达0, 且thread_info的TID_NEED_RESCHED标志为1, 调用
+    preempt_schedule().
+ 
+  @ irq_exit()
+  > sub_preempt_count(IRQ_EXIT_OFFSET);
+
+  @ irq_enter()
+  > add_preempt_count(HARDIRQ_OFFSET);
+
+  @ local_bh_enable()
+  > sub_preempt_count(SOFTIRQ_OFFSET);
+
+  @ local_bh_disable()
+  > add_preempt_count(SOFTIRQ_OFFSET);
+
+  上面的几个XXX_OFFSET字段, 都是相应编码字节的最低位置1的value, 就相当于给那个
+  编码字节加1.
+
+
+
+
+[分析一下do_IRQ]
+  这是frv处理器的do_IRQ()函数. 比x86的简单.
+  asmlinkage void do_IRQ(void)
+  {
+  	irq_enter();
+  	generic_handle_irq(__get_IRL());
+  	irq_exit();
+  }
+  irq_exit()里尝试处理pending的软中断. 在x86里最后也是调用了irq_exit(). 这个函数
+  在kernel/softirq.c里, 跟体系无关!
+  void irq_exit(void)
+  {
+  	account_system_vtime(current);
+  	trace_hardirq_exit();
+  	sub_preempt_count(IRQ_EXIT_OFFSET);         //在这之前, 是处于cli/sti? 确定吗? 这很重要! TODO
+  	if (!in_interrupt() && local_softirq_pending())
+  		invoke_softirq();
+  
+  #ifdef CONFIG_NO_HZ
+  	/* Make sure that timer wheel updates are propagated */
+  	rcu_irq_exit();
+  	if (idle_cpu(smp_processor_id()) && !in_interrupt() && !need_resched())
+  		tick_nohz_stop_sched_tick(0);
+  #endif
+  	preempt_enable_no_resched();
+  }
+  上面的sub_preempt_count(IRQ_EXIT_OFFSET)这句似乎正常, 但细看 IRQ_EXIT_OFFSET
+  的定义, 就有些诡异了.
+  # define IRQ_EXIT_OFFSET (HARDIRQ_OFFSET-1)
+  sub -1相当于+1.
+  整个就是: hardirq_count--;   preempt_count++;
+  然后, irq_exit又赶紧enable()了preempt.
+  preempt_enable_no_resched(); 
+
+  上面IRQ_EXIT_OFFSET为什么是那个样子?-? TODO
+  是不是为了接下来do_softirq时绝对禁止抢占?
+  似乎有些多余, 因为整个do_softirq本身会防止内核抢占(它disable了local bh, 也是
+  一样) ... 再看.
+
+*
+  假如不发生中断嵌套.
+  一个中断进入do_IRQ, 在中断处理阶段, 不会开中断. 所以谈不上抢占.
+        --对吗对吗???
+  进入bottom half前, 也就是调用do_softirq之前, 又变相递增了了preempt_count.
+  所以bottom half里开了中断也不会被抢占.
+        --但其实不用递增呀! 我们在bootom half的全程都是disable_bh的, 这样本身就
+          防止了抢占!       TODO
+  所以, 最后是不是说. 一个中断, 在执行完do_softirq之前, 绝不可能被抢占?
+  
+*
+  sub_preempt_count(IRQ_EXIT_OFFSET)有点儿厉害了.
+  它是在hardirq_count--的同时, 执行了preempt_count++;
+  这样一点空隙都没有! 
+  之前我们是通过hardirq_count来禁止抢占的, 现在我们又通过preempt_count禁止了
+  抢占!
+  那就是说, 在sub_preempt_count执行的时候, 中断可能是开着的? TODO
+  但至少有一个结论, do_IRQ的全程, 是不会被抢占的!
+
+
+*
+  接上文.
+  仍旧分析sub_preempt_count(IRQ_EXIT_OFFSET)这一句的巧妙处的必要性.(必须要这样巧妙)
+  在hardirq_count--和preempt_count++之间不能有空隙!
+  设想在这个空隙里, 发生了硬中断, 那进而产生的软中断B之后, 返回到内核.
+  这个返回可能会导致内核被抢占!
+  但抢占也没问题呀, 这时候确实不在interrupt里. 而且软中断B肯定把所有的active
+  bit 都处理完了.
+  为什么不能被抢占? 应该可以吧. TODO
+
+
+
+
+
+
+
+
+
+
+
+
+
+

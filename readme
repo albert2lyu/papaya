@@ -118,9 +118,3 @@ lsh/ 我平时工作时用到的shell。 自己写的，叫lua shell。因为还
 +1, block device layer without buffer
 +2, ide driver
 +3, virtual filesystem( interfaces: open(), read(), close() implemented, write() not yet)
-
-
-【4】
->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-空间博客：http://user.qzone.qq.com/2106507650/2
-

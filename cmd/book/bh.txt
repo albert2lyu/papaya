@@ -1,0 +1,80 @@
+*
+  32个bh通道, 网卡, 时钟占用指定的通道. 这样是可以的.
+  时钟中断自不必说, 网卡的bh其实就是处理skbuff队列. 内核把net_bh()函数写死, 网卡驱动们通常不用管. 它们只管往skbuff队列里添加或摘取就行了.
+  像linux的网卡bh又分为TX和RX通道, 这样更好.
+  papaya目前是网卡驱动自己注册bh函数, 这样不好, 因为所有的网卡注册的bh handler都会是:
+	static int tx_bottomhalf( void *_netdev){
+		nic_wake_queue(_netdev);
+		return 0;
+	}
+  还浪费通道. 
+
+*  
+  有了softirq之后, 网卡发包,收包的bottom half改为softirq实现. 很应该. 因为这是内核自用的, 又涉及到网卡这种性能要求很高的地方.
+
+*
+  即使软中断, 在同一个core上也是序列化的. 
+  一个软中断不会抢占另一个软中断.唯一可以抢占软中断的是中断处理程序.
+  这样很好.
+  
+*
+  作为一种优化措施, 一个tasklet总在调度它的处理器上执行.
+*
+  我感觉local_bh_disable()的作用就是串行化bh, 我早就知道了.
+  用一个静态变量效果也一样.
+  static bool renter= false;	
+  if(!renter) renter = true; 
+  else return;
+  这样也没有任何问题吧.
+  它只是do_softirq里用一下, bh用户还需要它吗?
+  
+
+
+
+*
+  softirq有多种被调用的方式:
+  1,
+  在do_IRQ末尾以及从内核返回用户空间前夕检测并执行.
+  下面是do_IRQ()中的一个片段:
+  if(softirq_active(cpu) & softirq_mask(cpu))
+  	do_softirq();
+  return;
+  2,
+  在ksfotirqd内核线程中.
+  3,
+  在那些显示检查和执行待处理软中断的代码中, 入网络子系统中.
+
+*
+  刚才有一个想法, 在多核环境下, do_softirq的时候, 不应该把active变量整个读过来
+  并清0. 因为你一下子拿这么多, 不一定立刻做得完, 若有别的cpu也经过do_softirq,
+  却无事可做. 你应该一个bit接着一个bit的处理.
+  ---------但上面的想法是错的-.- 因为active这个变量是percpu的.
+
+
+
+
+
+
+
+
+
+
+
+* 
+  一些东西不妨到了一定程度, 做了再想, 例如软中断为什么不能是per-cpu的, tasklet为什么又做成per-cpu的.
+  -----软中断也是per-cpu的!
+
+* 
+  软中断执行时会不会发生内核抢占?
+
+*
+  local_bh_disable(), 为什么需要这个函数?
+
+
+
+
+
+
+
+
+

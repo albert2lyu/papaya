@@ -1,0 +1,277 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ENV_NOT_KERNEL	_dimg.c	9;"	d	file:
+ERRNO	ld.c	21;"	d	file:
+ERRNO_BASE	ld.c	19;"	d	file:
+F_DIR	cell.c	22;"	d	file:
+F_REG	cell.c	21;"	d	file:
+LD_BASE	ld.c	/^static unsigned LD_BASE;$/;"	v	file:
+LD_H	ld.h	2;"	d
+MAP_ANONYMOUS	syscall.h	18;"	d
+MAP_FIXED	syscall.h	17;"	d
+MAP_PRIVATE	syscall.h	15;"	d
+MAP_SHARED	syscall.h	14;"	d
+MAP_TYPE	syscall.h	16;"	d
+MAX_SO	ld.c	98;"	d	file:
+PAPAYA_MALLOC_H	malloc.h	2;"	d
+PAPAYA_STRING_H	string.h	2;"	d
+PAPAYA_SYSCALL_H	syscall.h	2;"	d
+PRINTF_H	printf.h	2;"	d
+PROT_EXEC	syscall.h	8;"	d
+PROT_GROWSDOWN	syscall.h	11;"	d
+PROT_GROWSUP	syscall.h	12;"	d
+PROT_NONE	syscall.h	10;"	d
+PROT_READ	syscall.h	6;"	d
+PROT_SEM	syscall.h	9;"	d
+PROT_WRITE	syscall.h	7;"	d
+Redirect	cc2cn.vim	/^function! Redirect()$/;"	f
+SECTOR2BLOCK	cell.c	68;"	d	file:
+__USER	testlist.c	1;"	d	file:
+__argc	init.c	17;"	d	file:
+__argv	init.c	/^char *__argv[] = {$/;"	v
+__connection_lookup	tcp.cc	/^__connection_lookup(u32 hisip, u16 hisport, u32 myip, u16 myport){$/;"	f	file:
+__envp	init.c	/^char * __envp[] = {$/;"	v
+__start	ld.c	/^void __start(char *arg0){$/;"	f
+_connection_create	tcp.cc	/^_connection_create(u32 hisip, u16 hisport, u32 myip, u16 myport){$/;"	f	file:
+_dl_runtime_resolve	ld.c	/^static void _dl_runtime_resolve(unsigned arg){$/;"	f	file:
+_entpwd	cell.c	/^struct cell_dentry *_entpwd;		\/* dentry which points to the block of 'pwd'*\/$/;"	v	typeref:struct:cell_dentry
+_pwd_block	cell.c	/^struct cell *_pwd_block;$/;"	v	typeref:struct:cell
+_tmp_block	cell.c	/^struct cell *_tmp_block;$/;"	v	typeref:struct:cell
+a	foobar.c	/^static int a;$/;"	v	file:
+a	t.c	/^	int a;$/;"	m	struct:abc	file:
+a	t.c	/^void a(void){$/;"	f
+aaa	t.c	/^}aaa = {1, 2};$/;"	v	typeref:struct:abc
+aaaaa	t.c	/^	int aaaaa=1;$/;"	v
+abc	t.c	/^struct abc{$/;"	s	file:
+add_entry	cell.c	/^struct cell_dentry *add_entry(struct cell *cell, int cellid, char *name, int tocell){$/;"	f
+age	testlist.c	/^	int age;$/;"	m	struct:flower	file:
+alloc_free_block	cell.c	/^int alloc_free_block(struct cell_superblock *sb){$/;"	f
+apply_rel	ld.c	/^apply_rel(Elf32_Rel *rel, struct elf_mmap *mmap){$/;"	f	file:
+area_of_rel	ld.c	/^static unsigned *area_of_rel(Elf32_Rel *rel, struct elf_mmap *mmap){$/;"	f	file:
+arg1	cell.c	/^char arg1[64];$/;"	v
+b	t.c	/^	char b;$/;"	m	struct:abc	file:
+b:c_minlines	c.vim	/^    let b:c_minlines = 15	" mostly for () constructs$/;"	v
+b:c_minlines	c.vim	/^    let b:c_minlines = 50	" #if 0 constructs can be long$/;"	v
+b:c_minlines	c.vim	/^  let b:c_minlines = c_minlines$/;"	v
+b:c_minlines	cn.vim	/^    let b:c_minlines = 15	" mostly for () constructs$/;"	v
+b:c_minlines	cn.vim	/^    let b:c_minlines = 50	" #if 0 constructs can be long$/;"	v
+b:c_minlines	cn.vim	/^  let b:c_minlines = c_minlines$/;"	v
+b:current_syntax	c.vim	/^let b:current_syntax = "c"$/;"	v
+b:current_syntax	cn.vim	/^let b:current_syntax = "c"$/;"	v
+bar	foobar.c	/^void bar(){$/;"	f
+bool	cell.c	19;"	d	file:
+boot	cell.c	/^	unsigned char boot;$/;"	m	struct:dp	file:
+bottom	malloc.c	/^unsigned bottom;	\/*以字节为单位的＂零售＂下限*\/$/;"	v
+brk	syscall.h	/^static inline unsigned long brk(unsigned long brk){$/;"	f
+byte	old/han2pinyin.cc	/^		local byte = string.byte(i)$/;"	v
+cat	cat.c	/^int cat(int argc, char *arg0){$/;"	f
+cc	makefile	/^cc = gcc$/;"	m
+cell_find_entry	cell.c	/^struct cell_dentry *cell_find_entry(struct cell *cell, char *name){$/;"	f
+check_cell_flags	cell.c	/^bool check_cell_flags(struct cell_superblock *_sb){$/;"	f
+choose_partation	cell.c	/^bool choose_partation(int pid){$/;"	f
+cmd	cell.c	/^char cmd[16];$/;"	v
+connect	tcp.cc	/^struct connect{$/;"	s	file:
+connection_create	tcp.cc	/^connection_create(struct sk_buff *comer){$/;"	f	file:
+connection_lookup	tcp.cc	/^static struct connect * connection_lookup(struct sk_buff * comer){$/;"	f	file:
+const_symbol_type	ld.c	/^static char const_symbol_type[5][8] = {$/;"	v	file:
+convert_line	old/han2pinyin.lua	/^function convert_line(str)$/;"	f
+count	cell.c	/^	unsigned count;$/;"	m	struct:dp	file:
+dp	cell.c	/^struct dp{$/;"	s	file:
+dynamic	ld.c	/^	Elf32_Dyn *dynamic;$/;"	m	struct:elf_mmap	file:
+dynlen	ld.c	/^	int dynlen;$/;"	m	struct:elf_mmap	file:
+dynstr	ld.c	/^	char *dynstr;$/;"	m	struct:elf_mmap	file:
+dynsym	ld.c	/^	Elf32_Sym *dynsym;$/;"	m	struct:elf_mmap	file:
+dynsym_nr	ld.c	/^	int dynsym_nr;$/;"	m	struct:elf_mmap	file:
+eheader	ld.c	/^	Elf32_Ehdr *eheader;	\/\/同时也是这段mmap的起始基址$/;"	m	struct:elf_mmap	file:
+elf_mmap	ld.c	/^struct elf_mmap{$/;"	s	file:
+end_cylender	cell.c	/^	unsigned char end_cylender;$/;"	m	struct:dp	file:
+end_head	cell.c	/^	unsigned char end_head;$/;"	m	struct:dp	file:
+end_sector	cell.c	/^	unsigned char end_sector;$/;"	m	struct:dp	file:
+entpwd	cell.c	48;"	d	file:
+execve	syscall.h	/^static inline int execve(char *filename, char *argv[], char *envp[]){$/;"	f
+exit	syscall.h	/^static inline void exit(int status){$/;"	f
+fail_say	cell.c	58;"	d	file:
+faqizhe_dengdaiqueren	tcp.cc	/^	 faqizhe_dengdaiqueren,$/;"	e	enum:__anon1	file:
+fdsize	_dimg.c	/^static int fdsize(int fd){$/;"	f	file:
+fdsize	ld.c	/^static int fdsize(int fd){$/;"	f	file:
+filename	ld.c	/^	char *filename;$/;"	m	struct:elf_mmap	file:
+filesize	_dimg.c	/^static int filesize(char *name){$/;"	f	file:
+find_symbol	ld.c	/^static struct symbol_origin find_symbol(char *name){$/;"	f	file:
+flower	testlist.c	/^struct flower{$/;"	s	file:
+flowers	testlist.c	/^struct flower flowers[10];$/;"	v	typeref:struct:flower
+foo	foobar.c	/^void foo(){$/;"	f
+foobar	testlist.c	/^void foobar(void){$/;"	f
+foobar1	lib1.c	/^int foobar1(void){$/;"	f
+foobar2	lib2.c	/^int foobar2(void){$/;"	f
+foobar3	lib3.c	/^int foobar3(void){$/;"	f
+foobar4	lib4.c	/^int foobar4(void){$/;"	f
+foobar5	lib5.c	/^int foobar5(void){$/;"	f
+foobar6	lib6.c	/^int foobar6(void){$/;"	f
+fork	syscall.h	/^static inline int fork(void){$/;"	f
+ftbl_fix	ld.c	/^	Elf32_Rel *ftbl_fix;	\/\/.rel.plt$/;"	m	struct:elf_mmap	file:
+ftbl_fix_len	ld.c	/^	int ftbl_fix_len;$/;"	m	struct:elf_mmap	file:
+ftbl_len	ld.c	/^	int ftbl_len;			\/\/函数地址表的entry num$/;"	m	struct:elf_mmap	file:
+func_tbl	ld.c	/^	unsigned *func_tbl;		\/\/.got.plt 函数地址表。$/;"	m	struct:elf_mmap	file:
+g_array	init.c	/^static char g_array[10] = {1, 2, 3, 4, 5, 6};$/;"	v	file:
+g_dpnum	cell.c	/^int g_dpnum;$/;"	v
+g_dps	cell.c	/^}*g_dps;$/;"	v	typeref:struct:dp
+gaotuizhe_baoliuzhenting	tcp.cc	/^	 gaotuizhe_baoliuzhenting$/;"	e	enum:__anon1	file:
+gaotuizhe_dengdaiqueren	tcp.cc	/^	 gaotuizhe_dengdaiqueren,$/;"	e	enum:__anon1	file:
+get_filesize	cell.c	/^int get_filesize(int fd){$/;"	f
+geteip	ld.c	/^static unsigned geteip(unsigned x) {$/;"	f	file:
+global_var	lib1.c	/^int global_var;$/;"	v
+global_var	lib2.c	/^int global_var;$/;"	v
+global_var	lib3.c	/^int global_var;$/;"	v
+global_var	lib4.c	/^int global_var;$/;"	v
+global_var	lib5.c	/^int global_var;$/;"	v
+global_var	lib6.c	/^int global_var;$/;"	v
+global_var1	lib1.c	/^int global_var1 = 1;$/;"	v
+global_var2	lib2.c	/^int global_var2 = 2;$/;"	v
+global_var3	lib3.c	/^int global_var3 = 3;$/;"	v
+global_var4	lib4.c	/^int global_var4 = 4;$/;"	v
+global_var5	lib5.c	/^int global_var5 = 5;$/;"	v
+global_var6	lib6.c	/^int global_var6 = 6;$/;"	v
+go_on	cell.c	53;"	d	file:
+goodarea	ld.c	/^unsigned goodarea;		\/\/一旦碰到heap_bottom，就要继续brk$/;"	v
+han2pinyin	old/han2pinyin.lua	/^function han2pinyin()$/;"	f
+happy	static.h	/^void happy(void){$/;"	f
+heap_bottom	ld.c	/^unsigned heap_bottom;	\/\/总是等于brk(0)，是真正的"底线"+1$/;"	v
+hisip	tcp.cc	/^	u32 hisip;$/;"	m	struct:connect	file:
+hisport	tcp.cc	/^	u16 hisport;$/;"	m	struct:connect	file:
+houtuizhe_dengdaiqueren	tcp.cc	/^	 houtuizhe_dengdaiqueren,$/;"	e	enum:__anon1	file:
+id	ld.c	/^	int id;$/;"	m	struct:elf_mmap	file:
+info_dynsym	ld.c	/^static void info_dynsym(Elf32_Sym *sym, struct elf_mmap *mmap){$/;"	f	file:
+info_rel	ld.c	/^static void info_rel(Elf32_Rel *rel, struct elf_mmap *mmap){$/;"	f	file:
+init	init.c	/^void init(int argc, char *argv[], char *envp[]){$/;"	f
+init_dp	cell.c	/^static void init_dp(void){$/;"	f	file:
+init_heap	ld.c	/^void init_heap(void){$/;"	f
+init_heap	malloc.c	/^void init_heap(void){$/;"	f	file:
+init_tcp	tcp.cc	/^void init_tcp(void){$/;"	f
+int80_carry_stack_args_0	syscall.h	94;"	d
+int80_carry_stack_args_1	syscall.h	103;"	d
+int80_carry_stack_args_2	syscall.h	119;"	d
+int80_carry_stack_args_3	syscall.h	136;"	d
+int80_carry_stack_args_4	syscall.h	74;"	d
+int80_carry_stack_args_6	syscall.h	44;"	d
+is_utf8_leader	old/han2pinyin.lua	/^function is_utf8_leader(byte)$/;"	f
+kernel_img_size	_dimg.c	/^static int kernel_img_size;$/;"	v	file:
+ld_staic_var1	ld.c	/^static int ld_staic_var1 = 0x123;$/;"	v	file:
+ld_var1	ld.c	/^int ld_var1 = 0x111;$/;"	v
+ld_var2	ld.c	/^int ld_var2 = 0x222;$/;"	v
+ld_var3	ld.c	/^int ld_var3 = 0x333;$/;"	v
+ldmmap	ld.c	/^static struct elf_mmap ldmmap;$/;"	v	typeref:struct:elf_mmap	file:
+lianjiebiao	tcp.cc	/^static connect *lianjiebiao;$/;"	v	file:
+lianjiebiaochang	tcp.cc	30;"	d	file:
+lianjiebucunzai	tcp.cc	/^	 lianjiebucunzai,$/;"	e	enum:__anon1	file:
+lianjieyijianli	tcp.cc	/^	 lianjieyijianli,$/;"	e	enum:__anon1	file:
+loadelf	ld.c	/^static void *loadelf(int fd){$/;"	f	file:
+loadfile	cell.c	/^bool loadfile(char *name, char *buf){$/;"	f
+loadso	ld.c	/^struct elf_mmap *loadso(char *name){$/;"	f
+locate_cell	cell.c	/^void locate_cell(int cellid){$/;"	f
+lseek	syscall.h	/^static inline unsigned long lseek(int fd, int offset, int origin){$/;"	f
+lua	old/han2pinyin.cc	/^--1, 可能在word.lua里找不到某个unicode所对应的pinyin,那样的话，lua会报错,concat $/;"	v
+magic_color	_dimg.c	/^void magic_color(void){$/;"	f
+main	_dimg.c	/^int main(int argc, char *argv[]){$/;"	f
+main	cell.c	/^int main(int argc, char *argv[]){$/;"	f
+main	t.c	/^int main(void){$/;"	f
+main	testlist.c	/^int main(void){$/;"	f
+main_read_cell	cell.c	/^bool main_read_cell(char *buf, int cellid){$/;"	f
+main_read_sector	cell.c	/^static void main_read_sector(char *buf, unsigned lba){$/;"	f	file:
+main_write_cell	cell.c	/^bool main_write_cell(char *buf, int cellid){$/;"	f
+mainfd	cell.c	/^int mainfd;$/;"	v
+malloc	ld.c	/^void *malloc(int size){$/;"	f
+mbrbuf	cell.c	/^char mbrbuf[1024];	\/*512 is not enough, we collect all ebr and put after gdp*\/$/;"	v
+memset	ld.c	/^void * memset(void *start, int value, int len){$/;"	f
+mk_piece	draw.lua	/^local function mk_piece(len, head, padden)$/;"	f
+mmap	ld.c	/^	struct elf_mmap *mmap;$/;"	m	struct:symbol_origin	typeref:struct:symbol_origin::elf_mmap	file:
+mmap2	syscall.h	/^static inline void * mmap2(void *addr, int length, int prot, $/;"	f
+mmap_of_so	ld.c	/^static struct elf_mmap *mmap_of_so[MAX_SO];$/;"	v	typeref:struct:elf_mmap	file:
+munmap	syscall.h	/^static inline void * munmap(void *addr, int length){$/;"	f
+myip	tcp.cc	/^	u32 myip;$/;"	m	struct:connect	file:
+myport	tcp.cc	/^	u16 myport;$/;"	m	struct:connect	file:
+nameof_dynsym	ld.c	/^static char *nameof_dynsym(Elf32_Sym *sym, struct elf_mmap *mmap){$/;"	f	file:
+next_ack	tcp.cc	/^	u32 next_ack;$/;"	m	struct:connect	file:
+next_seq	tcp.cc	/^	u32 next_seq;$/;"	m	struct:connect	file:
+nomain	go.c	/^int nomain(void){$/;"	f
+now_its_address	ld.c	/^static unsigned now_its_address(Elf32_Sym *sym, struct elf_mmap *mmap){$/;"	f	file:
+open	syscall.h	/^static inline int open(char *filepath, int flags, int mode){$/;"	f
+p_count	cell.c	/^int p_count;		\/* current partation's sector count *\/$/;"	v
+p_ext_id	cell.c	/^int p_ext_id;		\/* extened partation id *\/$/;"	v
+p_id	cell.c	/^int p_id;			\/*current partation id, start from 0*\/$/;"	v
+p_start	cell.c	/^int p_start;		\/* current partation start sector id*\/$/;"	v
+parse_elf_mmap	ld.c	/^parse_elf_mmap(Elf32_Ehdr *eheader, struct elf_mmap *mmap, int fd){$/;"	f	file:
+pheader	ld.c	/^	Elf32_Phdr *pheader;$/;"	m	struct:elf_mmap	file:
+phnum	ld.c	/^	int phnum;$/;"	m	struct:elf_mmap	file:
+print	printf.c	/^void print(char *fmt, ...){$/;"	f
+print	static.h	/^static void print(char *fmt, ...){$/;"	f
+print_cell	cell.c	/^void print_cell(struct cell *cell, int depth){$/;"	f
+print_dp	cell.c	/^static void print_dp(struct dp *dp, int p_id)$/;"	f	file:
+print_tcpmsg	tcp.cc	/^static void print_tcpmsg(struct sk_buff *skb){$/;"	f	file:
+printf	syscall.h	/^static inline int printf(char *format, ...){$/;"	f
+printn	printf.c	/^void printn(uint n, uint b){$/;"	f
+printn	static.h	/^static void printn(uint n, uint b){$/;"	f
+printx	old/han2pinyin.lua	/^local function printx(value)$/;"	f
+putch	printf.c	/^void putch(int c){$/;"	f
+putch	static.h	/^static void putch(int c){$/;"	f
+puts	printf.c	/^void puts(char *str){$/;"	f
+puts	static.h	/^static void puts(char *str){$/;"	f
+pwd_block	cell.c	46;"	d	file:
+rebase	ld.c	/^	u32 rebase;$/;"	m	struct:elf_mmap	file:
+register_got	ld.c	/^static int register_got(int so_id){$/;"	f	file:
+resolve_dependence	ld.c	/^static bool resolve_dependence(struct elf_mmap *mmap){$/;"	f	file:
+resolve_dependenceR	ld.c	/^static bool  resolve_dependenceR(void){$/;"	f	file:
+resolve_needed	ld.c	/^static struct elf_mmap *resolve_needed(char *filename){$/;"	f	file:
+return_say	cell.c	63;"	d	file:
+right	ld.c	/^static int right;		\/\/shared object at the most right side currently$/;"	v	file:
+s:cpo_save	c.vim	/^let s:cpo_save = &cpo$/;"	v
+s:cpo_save	cn.vim	/^let s:cpo_save = &cpo$/;"	v
+s:ft	c.vim	/^let s:ft = matchstr(&ft, '^\\([^.]\\)\\+')$/;"	v
+s:ft	cn.vim	/^let s:ft = matchstr(&ft, '^\\([^.]\\)\\+')$/;"	v
+sb	cell.c	/^struct cell_superblock sb;$/;"	v	typeref:struct:cell_superblock
+search_in_dynsym	ld.c	/^search_in_dynsym( char *name, struct elf_mmap *so){$/;"	f	file:
+shnum	ld.c	/^	int shnum;$/;"	m	struct:elf_mmap	file:
+so_flags	makefile	/^so_flags = -std=c99 -g -Wall -fPIC -fno-builtin  -fno-stack-protector$/;"	m
+spin	static.h	/^static void spin(char *str){$/;"	f
+start	old/han2pinyin.cc	/^	local start = 0$/;"	v
+start_cylender	cell.c	/^	unsigned char start_cylender;$/;"	m	struct:dp	file:
+start_head	cell.c	/^	unsigned char start_head;$/;"	m	struct:dp	file:
+start_lba	cell.c	/^	unsigned start_lba;$/;"	m	struct:dp	file:
+start_sector	cell.c	/^	unsigned char start_sector;$/;"	m	struct:dp	file:
+state	tcp.cc	/^	int state;$/;"	m	struct:connect	file:
+static_array	init.c	/^int static_array[1024];$/;"	v
+strcmp	static.h	/^static int strcmp(const char *str1, const char *str2){$/;"	f
+strcmp	string.c	/^int strcmp(const char *str1, const char *str2){$/;"	f
+strip_space	old/han2pinyin.lua	/^local function strip_space(str)$/;"	f
+strlen	static.h	/^static int strlen(char*str){$/;"	f
+strlen	string.c	/^int strlen(char*str){$/;"	f
+strncmp	static.h	/^int strncmp(const char *str1, const char *str2, int n){$/;"	f
+strncmp	string.c	/^int strncmp(const char *str1, const char *str2, int n){$/;"	f
+symbol	ld.c	/^	Elf32_Sym *symbol;$/;"	m	struct:symbol_origin	file:
+symbol_origin	ld.c	/^struct symbol_origin{$/;"	s	file:
+symof_rel	ld.c	/^static Elf32_Sym *symof_rel(Elf32_Rel *rel, struct elf_mmap *mmap){$/;"	f	file:
+symstr	ld.c	/^	char *symstr;		\/\/常规字符串表$/;"	m	struct:elf_mmap	file:
+sys_id	cell.c	/^	unsigned char sys_id;\/\/means the fs type ID.$/;"	m	struct:dp	file:
+sys_string	cell.c	/^static char* sys_string[256];$/;"	v	file:
+target	makefile	/^target = cell _dimg ld.so t   cat init printf.so string.so lib1.so lib2.so lib3.so lib4.so lib5.so lib6.so go$/;"	m
+tcp_layer_recv	tcp.cc	/^void tcp_layer_recv(struct sk_buff *comer){$/;"	f
+tentacle	testlist.c	/^	struct list_head tentacle;$/;"	m	struct:flower	typeref:struct:flower::list_head	file:
+text	ld.c	/^	void *text;			\/*realtime address of text section, for gdb *\/$/;"	m	struct:elf_mmap	file:
+tmp_block	cell.c	47;"	d	file:
+uint	printf.h	/^typedef unsigned uint;$/;"	t
+uint	static.h	/^typedef unsigned uint;$/;"	t
+user_program_cflags	makefile	/^user_program_cflags = -fno-builtin -std=c99 -g -fno-stack-protector$/;"	m
+utf8_to_pinyin	old/han2pinyin.lua	/^function utf8_to_pinyin(str)$/;"	f
+utf8_to_unicode	old/han2pinyin.lua	/^function utf8_to_unicode(high, mid, low)$/;"	f
+var_tbl	ld.c	/^	unsigned *var_tbl;		\/\/变量地址表。是不是叫var_addr_tbl好一些，太长了。$/;"	m	struct:elf_mmap	file:
+vtbl_fix	ld.c	/^	Elf32_Rel *vtbl_fix;	\/\/.rel.dyn$/;"	m	struct:elf_mmap	file:
+vtbl_fix_len	ld.c	/^	int vtbl_fix_len;$/;"	m	struct:elf_mmap	file:
+vtbl_len	ld.c	/^	int vtbl_len;			\/\/变量地址表的entry num$/;"	m	struct:elf_mmap	file:
+wait4	syscall.h	/^static inline int wait4(int pid, int *status, int option, struct rusage *ru){$/;"	f
+write	ld.h	/^static inline void write(char *str, int len){$/;"	f
+write	printf.c	/^void write(char *str, int len){$/;"	f
+write_sb	cell.c	/^void write_sb(void){$/;"	f
+yingdazhe_dengdaiqueren	tcp.cc	/^	 yingdazhe_dengdaiqueren,$/;"	e	enum:__anon1	file:
