@@ -1,0 +1,301 @@
+#include<proc.h>
+#include<disp.h>
+#include<utils.h>
+#include<mm.h>
+#include<ku_utils.h>
+#include<linux/fs.h>
+#include<linux/cell.h>
+#include<linux/mount.h>
+#include<schedule.h>
+#include<asm_lable.h>
+#include<linux/blkdev.h>
+#include<linux/ide.h>
+#include<linux/slab.h>
+#include<linux/pci.h>
+#include<linux/skbuff.h>
+#include<linux/timer.h>
+#include<linux/binfmts.h>
+#include<linux/printf.h>
+#include<time.h>
+#include<i8259.h>
+#include<linux/NR_syscall.h>
+void blkdev_layer_init(void);
+
+char *testbuf;
+char *bigbuf;
+int avoid_gcc_complain;
+extern int p1,p2,sec_data;
+extern void tty(void);
+extern void tty1(void);
+extern void p3(void);
+extern void p4(void);
+extern void hs(void);
+extern void t(void);
+extern void fs_ext(void);
+extern void mm(void);
+char cpu_string[16];
+void task0_func(void);
+void func1(void);
+int func2(void *arg);
+void func0(void);
+int func_init(void *v);
+void usr_func(void);
+static void probe(void);
+struct pcb *task0;
+struct pcb *task1;
+
+extern void init_display(void);
+#include"../debug/debug.h"
+void kernel_c(){
+	//小心，数据断点和指令断点，一个是陷阱，一个是故障。
+	//http://f.osdev.org/viewtopic.php?f=1&t=25540&p=212462&hilit=dr7&sid=45ea840669700790a2b0cc4adcd24a21#p212462 提到了bochs对CR6的模拟（即未在cr7里激活的断点也要标记到cr6寄存器里)处理的有问题，是gray area
+	//尝试同一个系统多bochs呢，不需要虚拟机吧。不同目录下的？
+	assert(sizeof(union dr_ctrl) == 4);
+	union dr_ctrl dr7= {value:0};
+	__asm__ __volatile__ (
+						"mov %%dr7, %0\n\t"
+						:"=r"(dr7.value)
+						);
+	dr7.LEN0 = BRK_ADDR_ALIGN_4;	
+	dr7.RWE0 =  RWE_WR;	
+	 dr7.G0 =  dr7.G1 = 1;
+	#if 1
+	__asm__ __volatile__ (
+						"mov %0, %%dr7\n\t"
+						:
+						:"r"(dr7.value)
+						);
+	
+	#endif
+	init_display();
+	write_bar(2, 2, "BH ", "see");
+
+	int count = 0;
+	while(0){
+		count++;
+		mdelay(20);
+		oprintf("hello world, %x  ", count);
+	}
+	//while(1);
+	//k_screen_reset();
+	probe();
+
+	mm_init();
+	kmem_cache_init();
+	mm_init2();			/*this partion has to be done after kmem_cache_init() */
+		
+	net_init();
+	pci_init();
+	//kmem_cache_test();
+	proc_init();
+	init_ISA_irqs();
+	init_time();
+	ide_init();
+	init_blklayer();
+	/*
+	 * 1, 用内核函数生成一个ring1进程没问题，ring1进程的好处是，有大多数系统权限
+	 * 在访问内核空间时（例如它的eip就跑在内核空间的代码区),但它又是作为普通
+	 * 进程来调度的，即，进程被中断时，它也是push了esp和ss,iret时，也是切换了
+	 * 堆栈的。 而且我们把非ring0的”用户空间堆栈“都设置在USR_STACK_BASE,也就是，
+	 * 3G - 64byte的地方。 所以fire()一个ring1进程的时候，会立刻陷入页错误，因
+	 * 为3G-64byte的virtual address不在该进程的页表里。mm例程能轻松解决这个错误
+	 * 2, 但是ring1进程不能调用一些敏感的内核函数，像比schedule_timeout(), 
+	 * 像比ll_rw_block,因为 
+	 * 这些函数依赖于current指针，esp必须停在pcb内。
+	 * 3, ring0进程运行的时候，永远不会被抢占。除非它主动调用schedule。用need_
+	 * sched软schedule都不行。
+	 * 4, ring0进程的坏处是，虽然它不会被抢占，但它有时间片，扣为0之后，虽然它
+	 * 还能继续运行，但在扣为0的那一刻就被do_timer给active_expire了。此后，它
+	 * 如果想调用active_sleep就不行了。因为它已经处于一个出错的状态。（即，明明
+	 * 在expire队列里，却还运行着)
+	 * 5, 所以我们来避免产生这种”错误局面“，我们把它的time_slice生成 0xffffffff,
+	 * 同时也能提醒内核程序员：你要手动让他sleep，不然别的进程会饿死。
+	 */
+	bigbuf = (void *)__alloc_pages(__GFP_DEFAULT, 8+1);//4k * 256 * 2 = 2M
+	task0=(struct pcb*)__alloc_pages(__GFP_DEFAULT,1);
+	init_pcb(task0,(u32)task0_func,10,0xffffffff,"idle");
+	/**
+	 * 1, 不要用create_process创建idle进程，因为这个函数会把它挂入list_active里。	 * 2, 不要让idle进程休眠，因为sleep_active对它的操作会出错。
+	 */
+	/**
+	 * 1, it's necessary to fire a process manually before the first clock
+	 * interruption occures, because clock-handler will call 'do_time()' and
+	 * 'schedule()' which can not work well without process-switch context.
+	 * (for example,'current'(see in proc.h) will be invalid when esp register
+	 * not in the kernel stack of a process.
+	 */
+	fire_thread(task0);
+	assert(0);
+}
+
+
+
+void sys_bad(struct pt_regs regs);
+void sys_bad(struct pt_regs regs){
+	oprintf("unimplemented syscall :NR =  %u\n", regs.eax);	
+	spin("");
+}
+
+#if 0
+/* 测试结果: 到了几十兆的样子 测试线程似乎睡去了, 似乎是ide
+   中断丢失的问题..哑火了?
+ */
+static void block_buffer_stamp(void){
+	for(int i = 0; ;i++){
+		struct buffer_head *bh = mmap_disk(0x300, i);
+		struct buffer_head *bh2 = mmap_disk(0x300, i);
+		munmap_disk(bh);	
+		munmap_disk(bh2);
+		if(i > 250){
+			
+		}
+	}
+}
+#endif
+
+int func_init(void *v){
+	task1 = current;
+	oprintf("func init run..\n");
+
+	extern unsigned long func_table[255];
+	for(int i = 0; i < 255; i++){
+		if(func_table[i] == 0) func_table[i] = (unsigned long)sys_bad;
+	}
+
+	extern struct linux_binfmt elf_format;
+	register_binfmt(&elf_format);
+
+	ide_read_partation(0x3, 0);
+	init_vfs();
+	register_filesystem("cell", cell_read_super);	
+	struct vfsmount *mnt_stru = do_mount(0x301, "/", "cell");	
+	if(!mnt_stru) spin("root device mount failed");
+	struct fs_struct *fs_stru = current->fs;
+	fs_stru->root = fs_stru->pwd = mnt_stru->small_root;
+	fs_stru->rootmnt = fs_stru->pwdmnt = mnt_stru;
+	//current->fs = fs_stru;
+
+	struct in_dir indir;
+	//int err = pathwalk("/home/mnt/", &indir, 0);	avoid_gcc_complain = err;
+	mnt_stru = do_mount(0x305, "/home/mnt/", "cell");	
+	//int err = pathwalk("/home/mnt/5", &indir, 0);
+	testbuf = kmalloc(512 * 200);
+	int fd = sys_open("/home/mnt/5/_dimg.c", 2, 0);
+	//TODO rbytes的返回值是对的，但实际读入的却不止 指定的size这么多
+	int rbytes = sys_read(fd, testbuf, 100);
+	avoid_gcc_complain = rbytes = (unsigned)&indir;
+
+	//block_buffer_stamp();
+
+	//执行用户用户程序init。进化成一个用户进程。
+	int x = 0;
+	char *argv[] = {"init", "arg1", 0};
+	__asm__ __volatile__(
+						"int $0x80\n\t"
+						:"=a"(x)
+						:"a"(NR_execve), "b"("/init"), "c"(argv), "d"(0)
+						);
+	oprintf("execve failed, error code %u ", x);
+	while(1);
+
+	//assert("func init keep running" && 0);
+	//while(1);
+	while(1) schedule_timeout(1000);
+	
+}
+
+void task0_func(void){
+	kernel_thread(func_init, (void *)123, 0);	
+	while(1){
+/*		oprintf("idle..");*/
+		__asm__("hlt");
+		/*这个条件判断很必要，它看一眼有没有别的进程，一个没有，它执行下一个
+		 * idle
+		 */
+		if(list_active || list_expire) schedule();
+	}
+}
+
+struct cpuid_family{
+	u32 stepping_id:4;
+	u32 model:4;
+	u32 family:4;
+	u32 type:2;
+	u32 :2;
+	u32 model_extend:4;
+	u32 family_extend:8;
+	u32 :4;
+};
+static void probe(void){
+	struct cpuid_family cpuid_family;
+	int cpuid_input_max=0;
+	int xapic_support=0;
+	int x2apic_support=0;
+	int multi_thread_support=0;
+	int addressable_core_num=0;
+	int addressable_logic_num=0;
+	__asm__ __volatile__(
+			"mov $0,%%eax\n\t"
+			"cpuid\n\t"
+			"movl %%eax,%3\n\t"
+
+			"movl $1,%%eax\n\t"
+			"cpuid\n\t"
+			"movl %%eax,%6\n\t"
+			"bt $9,%%edx\n\t"
+			"setc %0\n\t"
+			"bt $21,%%ecx\n\t"
+			"setc %1\n\t"
+			"bt $28,%%edx\n\t"
+			"setc %2\n\t"
+
+			"shl $8,%%ebx\n\t"
+			"shr $24,%%ebx\n\t"
+			"mov %%ebx,%4\n\t"
+
+			"movl $4,%%eax\n\t"
+			"movl $0,%%ecx\n\t"
+			"cpuid\n\t"
+			"shr $26,%%eax\n\t"
+			"inc %%eax\n\t"
+			"movl %%eax,%5\n\t"
+			"end:nop"
+			:"=m"(xapic_support),"=m"(x2apic_support),"=m"(multi_thread_support),"=m"(cpuid_input_max),"=m"(addressable_logic_num),\
+			"=m"(addressable_core_num), "=m"(cpuid_family)
+			:
+			:"memory"
+			);
+	oprintf("cpu family:%x model:%x\n",cpuid_family.family+(cpuid_family.family_extend<<4), cpuid_family.model+(cpuid_family.model_extend<<4));
+	#if 1
+	if(!xapic_support ) spin("xapic not support");
+	oprintf("apic/xapic_support support:%s\n",xapic_support ? "yes" : "no");
+	oprintf("x2apic_support support:%s\n",x2apic_support ? "yes" : "no");
+	oprintf("multi-threading support:%s\n",multi_thread_support ? "yes" : "no");
+	oprintf("cpuid input max:%u\n",cpuid_input_max);
+	oprintf("addressable cores:%u\n",addressable_core_num);
+	oprintf("addressable logics:%u\n",addressable_logic_num);
+	#endif
+	/* 删掉了一个（宏调用）,build_equal_map和一段汇编码。
+	   这个函数是映射0xfee00000这个页，用(0x200000-0x2000)处的page做页表。
+	   这个函数好丑
+	  *后面的一段汇编吗操作了0xfee00300，这段地址应该是：illustrates the 
+	   interrupt command register mapped to two, contiguous 16-byte-aligned
+	   memory regions with addresses “FEE0—0300” and “FEE0—0310.”
+	  */
+
+}
+
+#if 0
+static int scan_dirty_machine_words(unsigned start, unsigned end){
+	int count = 0;
+	for(int i = start; i < end; i += 4){
+		unsigned x  = *(unsigned *)(i+PAGE_OFFSET);
+		if( x ){
+			oprintf("%u ", x);
+			count++;
+		}
+	}
+	return count;
+}
+#endif
+

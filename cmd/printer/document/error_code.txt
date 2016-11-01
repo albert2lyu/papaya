@@ -1,0 +1,26 @@
+error_code 
+
+*
+error_code:
+	;fs还没有保存，要保存它，先把对应位置上的function　address取出来。
+	GET_CURRENT(ebx)
+	mov edi, [esp + REGS_FS_OFFSET]
+	mov eax, fs
+	mov [esp + REGS_FS_OFFSET], eax	;done
+
+	;寄存器都保护好了，现在根据传递过来的函数地址，呼叫对应的服务例程
+	;服务例程都需要两个参数，preg, err_code
+	mov eax, esp		;esp现在就是preg，先存起来
+	push dword [eax + REGS_ERR_CODE_OFFSET]
+	push eax
+	call edi
+	;------------已经进入到服务例程里了--------------
+	
+	add esp, 8
+	jmp ret_from_exception	;run away
+  异常处理虽然有16个入口，但是很快都汇入error_code标签处统一处理。
+  每个入口处，仅仅是做很少量的处理：
+  push exp_nr	;如果硬件没有压出错码，就把自己的exception number推进栈
+  push handler  ;把自己的处理函数压栈
+  然后就jmp err_code汇入统一处理
+

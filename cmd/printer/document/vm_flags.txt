@@ -1,0 +1,38 @@
+VM_SHARE
+
+【VM_DONTCOPY】		Do not copy the region when forking a new process.
+【VM_SHARE】		Pages can be shared by several processed.
+　把这两个标志位放在一块儿说，是因为它们有某种"神似"。
+　它们都是为fork()而生的。
+  如果一个vma有VM_DONTCOPY标志，那就是告诉fork()说，我这个区间的所有页，都不劳你费心了，我不希望子进程看到它们。
+  这样fork()出的子进程，线性空间就"天生缺了一块儿"。
+
+  VM_SHARE标志，则是进一步的，告诉fork()，如果你遇到了可写的页，请直接把它共享给子进程,不要copy-on-write了。这样的页，是允许多进程的写入的。
+  从2.4的源码来看，VM_SHARE只针对writtable vma,对于只读区间没作用，也没法作用，本来就是共享的。
+　VM_SHARED的含义似乎是:允许子进程直接使用我的可写页。
+
+【VM_MAYWRITE】
+　VM_WRITE flag may be set.
+　有时候，一个vma是按readonly来初始化的(没有打开VM_WRITE位)，但内核又允许用户通过mprotect()把它转为可写。VM_MAYWRITE就是为了标记这种"潜在属性"。或者说是一种权限。
+　有的vma就没有这种权限，像一个进程的代码区，它的VM_WRITE和VM_MAYWRITE都是关闭的，这辈子都不可能再打开。
+　
+【VM_MAYEXEC】
+　VM_EXEC flag may be set.
+　通常用户堆栈的vma，它的VM_EXEC标志位是关闭的，但VM_MAYEXEC是1。用户想执行位于堆栈上的代码，通过mprotect()申请打开VM_EXEC位。
+
+
+【VM_WRITE】
+　不是说VM_WRITE标志位被打开，这个区间的page在硬件上就是可写的。可以说几乎不相关。
+　像比刚fork出来的进程的数据段，堆栈段，VM_WRITE都是1,但硬件上就是只读的(页表项的bit 1)。
+　刚fork()出来的子进程运行一会儿后(不执行execve())，就更杂了，有的页还是只读，有的页恢复到可写。但自始至终，VM_WRITE标志位都是1。
+
+参考:
+http://www.linuxinternals.org/blog/2014/04/22/design-of-fork-followed-by-exec-in-linux/
+
+
+
+
+
+
+
+

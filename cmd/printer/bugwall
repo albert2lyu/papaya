@@ -1,0 +1,39 @@
+some bugs encountered:
+
+Sun Jun 26 17:04:03 CST 2016
+* 发现tx descriptor busy时，在nic_wake_queue里mdelay(2000)造成出去之后再没有中断了。我延迟了两秒，按理说出去就该有中断啊。
+
+* 为什么从来看不到tx_queue排队，永远都是立刻解决。
+
+Fri Jun 17 09:22:39 CST 2016
+quemu的15号中断
+1, 我确定IMR15号中断已经屏蔽。
+2, 这个15号中断，是在网卡do_IRQ里的do_bh是偶时候发生的。
+3, 导致第一层的regs(即stack frame)里的value被修改，但watch 那个regs的话，15号变量又消失。
+4, 真是机器上没有这个bug。
+5, 问题是，即使发生15号中断，我的内核也不会出个个问题。
+
+Sun Jun  5 01:58:03 EDT 2016
+1, struct slab_head里的objsize不能是u16类型。 没有任何约束限制objsize不能大于64K。
+  今天的bug就出在这里。bug的起因是objsize是u16类型。
+  所以在kmem_cache_test里测试12组通用cache时，当测到malloc_sizes[11]的时候，发现“连续申请100个obj“，得到的地址竟然不是阶梯变化的，而是每连续若干个是一样的！
+  bug是这样发生的，malloc_sizes[11]的objsize刚刚达到64K，也就是(0xffff+1),但因为objsize是u16类型的，所以赋值时截断，64K就变成了0.以后在分配的时候，当做objsize=0，所以同一个slab分配处的object地址都是一样的！都是第一个！ 当切到下一个slab时，才会变。
+
+Mon May  2 05:01:37 EDT 2016
+1, 发现这么久以来，内核里的memset函数竟然一直都是错的。 
+   把memset(char *dest, int value, int n); 定义成了
+     memset(char *dest, int n, int value);
+   这个函数通常用来给内存清零，就因为如此，这个函数不会引发大的错误。因为执行memset(xx, 0, n)的时候，就错就错，认为n=0。于是直接退出。
+   相当于空函数。
+   kmalloc0依赖于它，但因为以前heap很少有free，所以kmalloc拿到的内存都是干净的。但写vfs以来，kfree的情况发生了。就是在read_inode里，读到的cell_headar转换成标准inode之后，就要释放了。
+   今天发现的bug是，若read_inode里申请的内存是1024（它刚刚好需要这么多），则cell/namei.c里的read函数就会出错。
+   经检查，read出错在kmalloc0得到内存不干净。
+   但是read_inode里如果申请1024 * 10或者更多的内存，read就不会出错。
+   原因是什么呢？
+   申请很大的内存的话，因为heap分配时是从高地址向低地址逐渐把堆用完的，read_inode分配很大一块内存时，它只会写开头的一小部分。而且是低地址的。等到它free掉，read函数再kmalloc0时，它要求的size基本也就是1024左右，这样，这一块区域其实就是刚才read_inode拿到的那一大块内存的高地址段，read_inode没有碰那里。还是干净的。
+   所以kmalloc0里memset的bug被隐藏起来。
+   应该是这样。
+
+   -------------
+   值得庆祝的是，这次bug是根据gdb调出来的，不是冥想出来的。这次gdb在page_fault时，竟bt到了上级堆栈。。。gdb和screen log显示的某个heap块里的变量值离奇，我以为是被越界覆盖掉了，但再一查，原来是普通的函数错误。
+   

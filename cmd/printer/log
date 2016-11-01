@@ -1,0 +1,395 @@
+=============log
+
+Sat Oct 22 17:59:09 CST 2016
+* 今天_dimg.c和boot.asm配合的magic color校验终于发挥了作用. 内核映像突破150K时
+   捕捉到了加载不完整的bug. 我一开始以为_dimg.c自己又出了bug, 检查了一下午.
+   早点儿怀疑是boot.asm出问题就好了.
+
+Sun Oct 16 22:57:10 CST 2016
+*
+ block buffer过了编译. 调试中.
+
+Thu Oct  6 21:16:29 CST 2016
+*
+ linux的头文件的布置真的那么有道理吗?
+ 一个c文件对应一个.h有什么缺点？
+ 就像早期的buffer_head结构体定义在fs.h里，后来还是有了linux/buffer_head.h?
+ 我以后不理会linux的头文件布局了..
+
+*
+ 动态链接器基本完成．支持显示(直接从命令行调用)和隐式的
+ 运行(由内核加载)．
+
+Sun Sep 25 22:50:22 CST 2016
+*
+ 用户进程的execve()初步调通了。
+
+Sat Sep 24 22:40:03 CST 2016
+*
+ 可能的话，尽量不支持active_mm。
+
+Sun Sep 18 22:07:55 CST 2016
+*
+ sys_xxx()/k_xxx()
+ 			=======> do_xxx()
+ 这种分层是有用的。do_xxx()完成实体工作。sys_xxx()是用户空间界面。k_xxx()是提供给内核的界面。
+ 内核直接调用do_xxx()，很多时候未尝不可。但那样失去了不少灵活性。
+ 例如，现在的k_read(), k_seek()系列，都是以file为参数,这就很符合内核的习惯。（好吧，do_read()也是以file为参数，不是fd，但我相信一定有它的好处)。
+ 再相比，我可以在k_xxx()里加一些assert()，一是调试方便，再者内核里调用的确有一些错误是可以断言的。
+
+Sun Sep 18 21:32:29 CST 2016
+*
+  原来系统调用出错了，是直接返错误码到用户空间的。
+  我们之所以能用errno，是glibc的功劳。像比用汇编手工int 0x80，就没有errno可用。
+
+Tue Sep 13 17:43:09 CST 2016
+*
+ 今天感觉到C语言类型不定长的有用性了。像你需要把一个指针转换成整形再做运算，该转成那个类型，才能跨平台?该转化成long。
+Mon Sep 12 07:10:00 CST 2016
+*
+ 今天好愚，把linux的版本号弄错了。
+ man mmap2,看到说2.3.31引入了这个系统调用。
+ "但是",我在我的2.3.4上的entry.S里，系统调用号最大才是190(mmap2是192)。grep也抓不到。
+ 原来4是小于31的。那就叫做2.3.04呀。
+ 另外,linux迈过1.0之后，版本号就不再是x.yy.zz，而是x.y.zz，zz是多少次，zz并不是小数部分，它是第zz次。
+
+Sun Sep 11 18:46:55 CST 2016
+@ 在NX位上折腾了以上午，想调整内核支持PAE。还是放弃了。
+  下午在VM_READ这一些列宏上花了时间，纠结于bitfield还是用宏。纠结要不要定义pgprot这个结构体，纠结于page_prot这个成员在papaya里取什么名字。
+  这些地方我不怕浪费时间，只希望处理的漂亮。自己是获胜的状态。
+  晚上把mmap()写起来。
+
+Sun Sep 11 05:14:36 CST 2016
+* 删除map_pg函数，它的ppg参数是多余的，因为每一次调用，几乎都要同时调用alloc_page()传给它。
+
+Sat Sep 10 11:22:49 CST 2016
+* 
+  今天翻看glibc的mmap函数。发现最终的系统调用不是走int 0x80，而是放在
+  ff 15 00 00 00 00 	-----------  call *0x0
+  当然不是call *0x0，这句在静态链接后被重定位成:
+  call *%gs:0x10
+  这个调用，涉及到内核的一个叫Virtual Dynamic Shared Object的东西。
+  因为系统呼叫的指令有int,也有Pentium 4以后的sysenter。
+  linux希望每次开机的时候，能够读取CPU的类型，决定开机以后，使用哪一个指令。
+  所有进程的系统呼叫基本都是调用glibc，所以在glibc链接进程序的时候，并不能把int 或者sysenter写死进程序里。
+ 而是由linux提供gs:0x10这么一个东西，glibc把控制权导向这儿，内核在此处安排好了最佳的指令。
+  http://justanothergeek.chdir.org//2010/02/how-system-calls-work-on-recent-linux/
+
+
+Wed Jul 27 10:56:44 CST 2016
+×
+  调通了双网卡。 papaya的网卡驱动能同时驱动多个8139网卡。
+Tue Jul 19 18:50:44 CST 2016
+* 这几天把tcp做完，就结束network模块。 剩下的http, ppoe其实是想学的，还想用ppoe登陆家里的光猫，用http访问一个网页，只好作罢。
+  因为tcp层做完，算是“点到为止”。
+  网络的调试太费神，真实机器上，全靠printf和肉眼。想过实现一个gdbstub，但调试功能跟虚拟机还是不能比。而且实现它本身也不简单。
+  想回到bochs调试。
+  另外时间的确不早了，想开始《情景分析》整本书的学习了。
+
+Mon Jul 18 03:10:09 CST 2016
+* icmp的rely在wireshark上显示的好好的，但ping程序就是接受不到。明天弄清楚。
+Sun Jul 17 18:28:59 CST 2016
+* oprintf的一个bug,好在只是打量输出后才出现。找时间再找。
+Sun Jul 17 11:39:41 CST 2016
+*  8139. i3主板上测，老毛病，unknown interrupt reason， 这次我想看看到底是ISR的哪个bit，于是把ISR的所有bit都写了handler，但发现没有一个触发。 原来ISR是0 ！ 只好让等于0时直接返回。 这样改动之后，却发现再不会发生这种情况了，又出现irq7的suprious irq。 估计冥冥中有关系。 好在内核现在能处理7,15中断了。
+Sat Jul 16 22:38:42 CST 2016
+*  在i3主板上，"waiting on IDE controller's BYS-bit “，打量循环输出。 暂时先把func_init里的这段代码注释掉。
+Thu Jul 14 20:48:26 CST 2016
+* vim 在执行lua脚本时候的输出,怎么捕获它!!!!!
+   它显示两秒左右就消失了!
+
+Thu Jul 14 20:21:45 CST 2016
+* 调用vim的ex模式,如果不指定-s,是有输出的,可以用>重定向到文件里去.但是它遇到打开文件会提示,进而导致vim僵死.
+  但不指定-s,又无法查看脚本的执行信息.
+Thu Jul 14 18:45:00 CST 2016
+* lua的string.char设计的不符合我的第一习惯.
+  我以为string.char(str, 1, 2, -1 ,-2)是获取初始和末尾的两个character的byte value,但它的设计是跟string.sub()保持一致的,str后面只接受两个参数,按区间转换.
+  想学python了,lua的错误检查机制太弱.很耽误时间.
+
+
+Thu Jul 14 17:42:37 CST 2016
+* han2pinyin.lua 里面若设置package.path="../cmd/bit.so",即使在cmd本目录下执行,也会报错,说加载bit.so时symbol错误.去掉这个path就可以.但去掉了path又找不到bit.so了.
+  --没办法,必须于异目录调用,只好做个softlink指向cmd里的.
+
+Tue Jul 12 08:16:16 CST 2016
+* 试着折腾了一下汉语关键字的语法高亮。开始在工作目录下面建立了一个CN.vim，source然后set filetype，没效果。最后找到了/opt/share/vim/vim74/syntax/c.vim。在里面修改就好了，这个文件从哪儿来的呢？是自己编译的那个vim，make install 时，从源码包复制到opt路径的。 所以这个c.vim对/usr/bin下面的vim 就没用。
+
+* clang能用中文变量。而且可以define中文宏。但是还不想内核就用它，因为估计迁移的代价不小。 而且clang的输出文件跟gdb配合的不知道怎么样。
+  一个问题是，用中文变量，写出来的程序不好调试，因为中文变量没办法查看。
+  现在觉得妥善的做法是，先小范围的用，并且把中文转化成拼音或英语。
+
+Sun Jul 10 13:58:08 CST 2016
+* 完成了bottom monitor window的调试。
+
+Sun Jul 10 00:58:24 CST 2016
+* 基于sprintf的printf函数初步测试通过。明天要删掉disp.c了。
+
+Sat Jul  9 22:01:26 CST 2016
+* 就希望有一条指令，能关中断的同时，把旧的的中断标志保存了或者读取出来。不然总要
+  先读，再cli，非原子的，中间可能会被打断。
+
+old
+---
+1, func_init里加了代码之后，反而kernel.elf变小，因为加的是while(1),导致后面的都被优化掉了。
+2, 就是加了这个while(1){oprintf(); msleep();}之后，减小为210+1,立刻崩溃。当关中断不崩溃。
+
+Mon Jul  4 01:44:15 CST 2016
+Thu Jun 30 08:45:13 CST 2016
+* 原来8139的驱动“长满”了15号suprious irq。
+Wed Jun 29 18:14:59 CST 2016
+* e1000, bochs上的mmio的地址是0xc0000000, qemu上是0xfebc0000。后者还靠谱一些。
+  但不像RTL8139，是3ebd10000。
+  等芯片回来了再写把。
+
+Tue Jun 28 22:40:07 CST 2016
+* ne2k打开注释，但是检测不到。 另外bochs里似乎有把虚拟网卡连接到真实网卡的选项。
+Sat Jun 18 05:56:20 CST 2016
+* 从今天起，内核去除rng1进程。
+  因为要支持无进程模式下，中断所带来的堆栈和返回。在restore_all的时候，就该单纯的restore all register。不要mov esp, [ebx]之类的。
+  原先为了支持rign1进程，（因为ring1进程被中断的时候，自己搞了一个preg，后来有了pcb->thread,就不需要了。。。对，是忘了删掉那一部分代码。
+  ring1进程还是可以运行的。对。
+  linux自己实现了对内核栈的记忆和切换，这样看来，intel的设计是不是白费了。
+  .........
+  还是要在进程里测，因为即使在ret_from_intr的时候，也要用GET_CURRENT获取pcb，看sigpending等状态，更别提别的还要看softirq的状态。
+
+Sat Jun 18 05:03:36 CST 2016
+* sprious irq. 0x7 , 0x15
+
+Fri Jun 17 23:39:08 CST 2016
+*  好一段时间，发现自己的dimg在usb拔掉后，即/dev/usb消失后，还是能成功写入。 今天才想通，应该是我open的参数不对，应该设置为，path不存在，则打开失败。
+
+Thu Jun 16 08:39:09 CST 2016
+×　今天在qemu上测驱动的发包部分，发现发出一个包不久，出现了15号irq。
+Tue Jun 14 11:41:04 CST 2016
+* 从手上的一份打印资料来看，８１３９的驱动是在start_xmit里就做了dev_kfree_skb()，而不是等到发包中断里确认成功了再释放。　这样驱动层就没有用软件实现数据重发，但是网卡硬件有这个功能。
+
+Sun Jun 12 04:17:17 CST 2016
+* Realtek Audio那个设备是旧电脑上含有的。网卡只是一个设备。
+* 今天把网线插上去，检测不出来型号了。可能是插网线的时候，pci插槽松了。
+Sat Jun 11 17:06:15 CST 2016
+*  QEMU的坑：
+  1，安装完后是没有qemu命令的，要运行的是qemu-system-i386 qemu-system-x86_64.
+  2, 其实/usr/bin里还有qemu-i386这个程序，不要运行它。 我就是运行它，耗了很久。
+
+Fri Jun 10 16:13:37 CST 2016
+
+* 一个问题，arch/x86/asm和include/asm这两个目录下有相同的头文件，若编译指定x86，那怎么区分。 --我们东西都丢到x86/asm目录下。要通用asm目录干什么。 好恶心。
+Fri Jun 10 14:21:53 CST 2016
+* 2.4到2.6，源码树的一个变动。
+  include目录下，不再为每一个cpu设立一个子目录。 而是放在arch/???/include/asm目录下。
+  与cpu相关的代码，统统放在arch。头文件和c文件都是。
+
+Wed Jun  8 12:21:10 CST 2016
+* 在驱动的接口上，还是跟linux兼容把。这样一些驱动能轻易的移植，虽然我没准备移植。但说不定有一天这个内核会实际运用呢，那时候，可以先用linux的驱动铺开局面。
+  还是不兼容算了，那样负担比较大，反正我写这个内核的目的是用来学习。
+
+Tue Jun  7 15:49:02 CST 2016
+* 关于硬盘head number的疑问（网上的)
+  。。从以上可以看出/dev/sda这块硬盘有255个head，以我对硬盘构造的了解，一个硬盘是由若干同心圆的platter组成，每个platter都有一个或两个磁头（单面或双面）用来读写platter上的数据。磁盘那么小一个，怎么可能有255个磁头？
+  。。。。>
+  我同事说那个磁头是不真实的，是模拟出来的，现在LBA寻址，磁头数都是模拟出来的。
+  。。。>
+  楼主要想知道为什么，去看看LBA的知识吧，上面现实的都是LBA的结果，不是实际的磁头。。
+Tue Jun  7 15:06:30 CST 2016
+× 关于vendor information 
+  主要是纠结vendor infomation list太大的问题。
+1, 我从网上找到了一个C语言头文件形式的，但还是太大，500K的大小，用ascii编码也要250K,再算1/2的字符串量，也要120K.除去里面的杂的内容，也要100K。
+2， 搜到的那个头文件，它的组织已经接近正确了。 因为vendor不是在0~65535分布满的，必须要这样才能密集存储。
+3， 我在pci_vendor.c里，用start_of_vseg把PciDevTable这个大表分段，Make Fast Access。
+   那样存储的还有一个好处是，在小设备上，裁剪内核的时候，可以把那个Table裁剪的很小。
+4， 我觉得这样可以了，但突然想到一个问题。 像papaya这样的内核，它很长一段时间以内都会是几百KB这样的样子，拿100多k来装字符串，我觉得有些别扭。  所以决定是内核存储的信息不细化到device。
+  算了算了，还是暂时先放到内核里。100K，还能忍受吧。
+  。。。还是从内核中分离出去把，因为目前来看，内存印象只在1M内存里，而且要做elf的解析和装载，就只能用一半了，内核的大小大概也就60000~a00000,240K的限制了。暂时还不想动这一块。所以还是尽量控制内核映像的大小。
+  单这样以来，内核印象的运行就需要文件系统，因为映像里一些大的信息部分被当做文件分离出去。
+
+Tue Jun  7 14:32:54 CST 2016
+1, boot.asm里又一个old bug被发现了。 在	int 15probe内存的时候，把jc写成了je。jc跟je其实没关系！ je只跟zf标志有关。
+Tue Jun  7 13:21:18 CST 2016
+*  用08号测parameter，得到400m.img的sector_per是63，heads=(63-48+1)
+  在裸机上测的  h.d1s?  即heads=46 disk=2 sector_per=63
+* 就保证kernel.elf不超过60kb，这样总共只需要读两个track。我不知道第三个track是在哪个side。
+
+Mon Jun  6 22:38:46 EDT 2016
+× 开始裸机测试。
+  连kernel.asm都没能进去。问题出在往0xc00304xx跳过去后失败了。 
+  那里没有指令。
+  kernel reset没问题，但kernel reset的source就么有指令。
+  因为用dap读磁盘失败了。虽然显示的是成功。
+*  关于es:di, ds:si 
+  一直以来都以为[di]默认是用es做为段寄存器，今天才酿成了祸。。。。记住，只要不指定段寄存器，像这样[],都是默认ds的。 
+  之所以有这个错误印象，是因为rep时，是默认ds:si => es:di的。
+
+Sun Jun  5 23:07:13 EDT 2016
+* 开始做网卡驱动了。 rtl8139的datasheet很简略，我一直怀疑realtek公司应该有xx guide一类的文档存在。 在google上搜rtl8139 guide，竟然找到了。
+  这篇文档看的我泪流满面，每句话都说到我心里，我想问的像听的，都在上面，没有一句废话。
+  文档的年份是1999,1,15  RTL8139(A/B) Programming guide: (V0.1)  来源是usfca.edu.com，美国旧金山大学。 我竟然有兴趣搜了搜这个学校怎么样。 
+
+* CAPR是干什么的。 它是由驱动更新的，那网卡硬件要它何用?
+  网摘：收报处理最后一部是更新读指针，包括主机CPU副本cur_rx和8139的CAPR。更行8139的CAPR还有一个重要的副作用，就是如果CAPR=CBA时，8139置CR.RxBufEmpry为1，表示缓冲为空，8139对外发出取消暂停控制帧。。。
+
+
+Sat Jun  4 22:32:15 EDT 2016
+* 再确定一遍。控制mmzone的gfp_flags是在kmem_cache_create时候就确定下来了。 以后kmem_cache_alloc时候，还会传gfp_flags，但那个就是__GFP_KERNEL或者__GFP_ATOMIC。grow时候，alloc_pages时候，用到的flags是slabhead->gfpflags | arg_flags。
+
+Fri Jun  3 21:32:30 EDT 2016
+* 从SET_PAGE_slab()到page_set_slab()的变迁
+  当一个page被分配给slab模块后，就在page结构体内标记上它所属的slab和slab_head。2.4内核里，标记slab是通过SET_PAGE_SLAB，一个宏，具体源码我没看，但是从《情景》的介绍来看，这个宏是把slab链到page->list->prev。
+  到了2.6，有两个改变。第一是函数命名的调整，page_set_slab更符合我的口味.第二是把slab链到lru->prev上，其实新版本里的struct page里已经不再有list这个链接点了。属于内核的变动。
+  这个函数的实现也很喜欢：
+	static inline void page_set_slab(struct page *page, struct slab *slab)
+	{
+		page->lru.prev = (struct list_head *)slab;
+	}
+  在papaya里，我把这个函数命名成page_mark_slab。
+
+* 通过kmem_cache_create()创建的专用slab队列，在创建时，就要指定是否是DMA类型的。它里面的所有slab，要么全在DMA内存区(<16M),要么全不在。
+  但通用slab队列(通过kmalloc分配)，则是在alloc时，指定是否是DAM页面。 generic cache本身就维护了两个slab队列。（一个是DMA，一个不是).
+ 
+* makefile的维护有点吃力了
+  像mm,fs这些目录下的makefile，都是只依赖于c文件，.h文件的更新不会引发重编译。 所以今天slab.c里的一个函数找不到链接，我去utils.h里加了个static inilne的，make，还是提示链接不到。运行make clean，也不行。 似乎必须把.c文件保存了才行。 其实make clean之后按理该重编译的，但因为mm文件夹是新添加的，clean的时候，不会清除其中的.o文件。 必须手动添加相应的命令在总makefile里。
+
+Thu Jun  2 21:33:02 EDT 2016
+*slab的freelist数组是紧跟在slab结构体的后面，这是很常见的，因为freelist长度不固定，所以放在结构体尾巴上。 但因此有一个问题，若遇到1/4,1/2 page_sze的objsize，slab结构体要分离出slab，那给slab结构体分配内存空间就要小心， 它不是固定的大小！那它就没有专用的slab队列了。不知道linux怎么做的。 我暂时不考虑“游离”slab_s的情况。
+* cache_cache不仅通过partial,unsedout,fresh三个指针维持着一个普通的slab_head类型的slab队列，还通过global持有所有正在纸用的slab_head。
+
+Mon May  2 01:21:10 EDT 2016
+*vfs层还比较薄弱。 文件的缓冲迫切需要做上。 这依赖于块设备层的缓冲。
+*慢慢来，任何模块都不能生疏，不能做完就放下，如果总是很快就忘，说明那个模块的设计有问题。
+ 
+
+Sat Apr 30 23:25:41 EDT 2016
+*一个进程使用了进程号9，另一个进程open还可能得到9这个fd吗。fd是不是全局的?那就必然要有一个全局的fd table。
+Fri Apr 29 14:16:17 EDT 2016
+*一个目录里有许多dentry，删除了一些之后，这些空置的dentry就以碎片的形式存在。现在有两个问题：1， 怎么在需要的时候找出合适的，怎么找出最合适的？2，一个长度为16的dentry被用于存储10的name，那么剩余的6个字节就永远不能寻回了。。。不对不对，是根本就不能存储非16长度的name，因为还要用这个16定位下一个dentry。 我现在想到的方法，是定期的做碎片整理。时机可以选在系统空闲的时候，或者一个dentry block将满的时候。
+
+Fri Apr 29 06:24:59 EDT 2016
+*刚才为inode_hashtable和dentry_hashtable申请内存时，调用的参数是(4 * D_HASHTABLE_LEN)和(4 * I_HASHTABLE_LEN),但hashtable不是一个指针数组，结果内存越界，出现handle_irq_event里的“sti now"的bug。以后要小心了。 申请内存和初始化这些东西，一定要小心，内存越界的bug排查起来会很辛苦。
+
+Fri Apr 29 04:08:42 EDT 2016
+*必须等init进程加载完分区表，才能创建别的进程。因为就算init vfs，也要等到分区表建立完成。而读分区表（包括ebr）是一个异步的，需要一段时间。（不如就把init vfs放在init 进程的后面，不要fun0,本来就该)
+
+*各个挂载设备的root dentry会放在hash table里吗，如果是，他们的hash值是完全相同的。就没办法在链表里区分了。---------------不会，它们只是由vfsmount->small_root指向。
+
+Thu Apr 28 23:02:24 EDT 2016
+*对于总root，不仅挂载设备的root dentry是虚拟的，而且挂载点是也是虚拟的。 似乎可以不要这个挂载点。。不是。我们要让根设备看起来是挂载在"/"上的。
+* 我在考虑不用挂载的方式实现总root。 但还是不能，因为这是整个文件系统的第一个vfsmount结构，子级的vfsmount要通过parent指向它。
+
+Thu Apr 28 22:06:54 EDT 2016
+*任何一个设备的根目录的dentry，都是内核虚拟出来的，因为已经是根目录了，它就不存在于任何一个父目录。 你可能觉得，它的父目录难道不该是”挂载点“的那个目录吗。不是，要知道，在把一个目录变成挂载点的时候，它作为一个directory，大多数属性是一动不动的，只是dentry->vfsmount加链入了一个vfsmount结构，内核也就因此不再访问它的content（在pathwalk的时候），但只要内核想，内核仍然能把它当做普通的目录进入。 它的ents里并没有那个虚拟的root dentry。它与这个small_root的联系，是通过vfsmount链表里的某个vfsmount->small_root的联系的。
+
+Thu Apr 28 09:09:52 EDT 2016
+*有时间要把utils.h分离出来一些，string.h。
+ 确实，大多数.c文件都需要包含string.h, list.h, valType.h，把它们都包含在一个头文件里，这样写c文件时候只需要包含一次就可以了。
+ 但是，第一，分离还是必要的。 第二，没有必要包含一个头文件时，一定不要包含它。这样干净。而且将来内核大了，总是改变头文件引起的重编译开销最大。第三，是不是用utils.h当这个wrapper，还是把utils.h也清理干净，称为一个纯粹的头文件。专门另外弄一个often.h。
+
+Thu Apr 28 04:46:14 EDT 2016
+*感觉linux的那些头文件也不合理。有dcache.h，为什么没有inode.h. struct dentry declared in dcache.h，struct inode却声明在fs.h。 感觉没必要记它的。
+
+Mon Apr 25 23:28:39 EDT 2016
+*i/shashtable_add/del/has，总觉得这几个接口很好，但hashtable_has这个接口必须用宏实现，而且应该需要7个参数，就显得没有意义了。add/del倒是可以考虑。而且不需要i/s分开。
+但问题是，hashtable_add并不很必要:
+hashtable_add(list_head* hashtable, int hash, list_head *toadd); 它的实现就两句代码，因为紧接着还要调用list_add。更关键的是。。不不不，可以考虑，这儿只是传一个hash value。虽然只是简单的包装，但对程序的可读性帮助很大。 由此也看出c的缺点，太基本太松散，一个逻辑要写一大堆代码，没办法用高级的函数实现。
+
+
+Mon Apr 25 02:51:49 EDT 2016
+*vfs该不该提供不缓存inode的选项？ 实现上是有可能的，像一条路径/home/wws/lab/，pathwalk一道之后，dentry都缓存起来了，下次根本就不经过inode。 但是就现有代码来说，对inode还是默认的硬性的依赖的，像比real_lookup的时候，会无条件的认为indir->dentry->inode是存在于内存的。
+*iget 这个函数被提炼出来是很自然的，但在里面递增inode个count计数就不那么自然了。最好功能纯粹：就是告诉你设备号：inode号，你把它（从hashtable或者磁盘上)读出来。
+
+Tue Apr 19 21:36:00 EDT 2016
+*函数宁可长一些，不要学linux分级成太多的函数。那样会前者鼻子走，忘得很快。
+*觉得不舒服肯定要原因，像刚才把hash的过程合并到一个函数，只是分离出一个通用的
+str_hash函数，就好多了。并且把抄来的str_hash的算法看了一下，就感觉好多了。
+
+Sun Mar 27 14:34:28 EDT 2016
+*在block里添加自己的id的确重要。 好几处都遇到了。 而且通过内存中block的地址根本
+无法算出来它的id，这个空间大概是省不得。
+
+Sat Mar 26 12:28:24 EDT 2016
+*linux的vfs真是清爽。
+
+Thu Mar 24 12:04:09 EDT 2016
+* 今天发现ring0的进程不能被正常schedule。
+  因为kernel.asm里设置了“只在用户态发生的中断才能引起schedule",所以，一个ring0进程的time_slice虽然变成0，并进而被设置成need_resched=1,但从timer的doIRQ返回的时候，根本就是直接restore_all的，不会去ret_with_reschedule。 ring生成1就好了。
+Thu Mar 24 06:24:05 EDT 2016
+×papaya的代码要做到0warning。
+
+Wed Mar 23 12:21:11 EDT 2016
+*放弃对block layer的模拟，因为实在受不了那些数据接口，函数绕来绕去。
+ reqeust queue里的do_request和make_reqeust指针很牵强。
+ 没有动力模仿下去，又没有能力做出判断。
+ 那就还是模仿0.11，只是从2.4里借鉴几个好的数据结构。以后都自己设计着写，看自动进化成什么样子。
+
+Sun Jul  5 03:40:49 EDT 2015
+１，双重页错误，可能是响应ｉｎｉｔ进程页错误时，在响应代码里访问了非法地址。
+像比，数据段在0x8049000，但并没有隐射。
+Thu Jul  2 02:04:55 PDT 2015
+1，testbuf太大的话，会DOUBLE PAGE error。先调小ceil_read最后拷贝的size。
+2,把testbuf从exter改成mm.c内的全局声明时就好了，似乎不是1的原因。
+
+
+
+
+
+
+===========tips
+* open, pipe时传入的flags参数, 只有低2位需要转换编码风格. 这两个似乎不属于
+  fcntl范畴, 内核是把它们提取到file->mode字段里. file->flags存储的完全是fcntl位.
+  除了低2位需要转换, 别的flags, 内核都是直接用的. 没有编码风格的差异, 当然,
+  在具体的内核函数里, 会检查是否有不需要的bit被set. (因而返回-EINVAL)
+  应该是由glibc保证这些flag bit在不同unix系统上的精准.
+  open的时候还有一个mode参数, 那时创建文件时指定文件系统访问权限.
+
+* glibc的重要性可见一斑: 不同的*nix, fcntl.h里定义的同名常量的数值是不同的.
+  glibc在编译时, 会根据目标系统, 使用对应的头文件.
+ 
+*
+  一直听别人说实际上磁盘IO用的是DMA，而非PIO．
+  今天才知道，此DMA非彼DMA．
+  早期的ISA DMA是很慢的，实际速度大概400KB每秒．PIO才是
+  The first interface type used between devices 
+  (mainly hard disks) and the computer.
+  后来是UDMA取代了PIO．
+  (中间还出现过一个WDMA,似乎是慢DMA的加强版,linux0.12上用的
+  似乎是PIO) 
+  另外，软盘用的是DMA没错．
+  那就是说，
+  最早期的时候有ISA DMA和PIO，但ISA DMA不够快，所以linux用了PIO．
+  后来出现了WDMA.
+  再后来出现了UDMA，它的优势已经很明显了，所以PIO被淘汰．
+  对吗．
+
+* x86 cpu在32位模式下，必须通过PAE才能利用NX位。
+　软件模拟的方法有多种，但都不完美。要么不够接近，要么overhead较大。最直观的是把代码段的limit设置短一些，仅仅覆盖线性地址空间的靠前部分，因为通常程序的代码都放在前面，数据在后，堆栈更是在3G之遥。
+  好在2008年起，很多一般的发布的linux版本都默认使用启用了PAE的内核。
+
+Sun Sep 11 09:41:22 CST 2016)
+*
+  为什么中断（包括系统调用），传递的参数是结构体pt_regs。
+  但异常传递的是*pt_regs? 另外，为什么errcode要单独传递？它不就在pt_regs里吗？
+*
+　目前来看，papaya还是挺矛盾的：既然在目录上学习linux的arch/xxx，自然是想支持多种cpu。但是目前的代码又完全不考虑可移植性，例如struct mm里竟然有一个cr3成员。
+　呃...学linux的目录，这是早就决定的。所以照搬arch/是顺便。
+　至于跨平台，还是早早作罢。我不了解x86以外的cpu。不想为了未来的“可持续发展”，跟着linux照葫芦画瓢。
+　没有跨平台，至少每一个模块都明明白白。况且内核代码会清晰很多，说不定弄巧成拙呢。			Wed Sep  7 17:36:18 CST 2016	)
+
+*
+  至少从2.6.32版本开始，include目录下的asm-i386, asm-alpha这些目录都取消了。
+  被转移到arch/下的 x86/asm, alpha/asm目录。
+  这种转移应该是合理的。在2.4里，看到asm-i386这种目录就不舒服，明明有arch目录，为什么不放在里面。
+
+* 
+  linux的系统调用，有的带regs参数，有的不带。
+　像fork, exec这种，它需要修改regs。所以必须传递给它。
+  但是大多数不需要，因为这些寄存器value就躺在参数位置上，直接用再自然不过了。
+
+*
+  glibc封装的系统调用和raw int0x80的行为可能有差异．
+  像brk(0)的行为，glibc返回０，裸的syscall返回边界值．
+  在man手册的NOTES里的C library/kernel ABI differences讲的有．
+
+
+
+
+===================Danger!==================
+*
+ 用__alloc_pages时候要小心, 它的第一个参数是GFP, 不是order!

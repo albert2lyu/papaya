@@ -1,0 +1,12 @@
+vma pgprot
+
+*
+ pgprot应该是page protect的意思，指页表项的低12位。
+ 但是低12位的accessed,dirty这些也是protect吗?
+ 
+*
+ pgprot在内核里的定义是:
+ typedef struct {
+	unsigned pgprot;	
+ }pgprot_t;
+ 应该也是为了利用编译检查。

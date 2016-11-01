@@ -1,0 +1,89 @@
+
+kill -9 杀不死的进程处理办法
+
+发表于2016/8/19 14:30:29  915人阅读
+
+分类： Unix环境高级编程 linux命令
+kill -9发送SIGKILL信号将其终止，但是以下两种情况不起作用：
+a、该进程处于"Zombie"状态（使用ps命令返回defunct的进程）。此时进程已经释放所有资源，但还未得到其父进程的确认。"Zombie"进程要等到下次重启时才会消失，但它的存在不会影响系统性能。
+b、 该进程处于"kernel mode"（核心态）且在等待不可获得的资源。处于核心态的进程忽略所有信号处理，因此对于这些一直处于核心态的进程只能通过重启系统实现。进程在AIX 中会处于两种状态，即用户态和核心态。只有处于用户态的进程才可以用“kill”命令将其终止  
+
+  
+
+  
+
+  
+
+Linux下怎么都kil不掉的进程
+2011-03-23 14:01
+无论是kill -9还是kill -15，还是其它信号量都kill不掉, 这些进程是Nagios检查进程. 难不成和我刚做的Oracle主备切换有关系? 如下:
+
+# ps -ef | grep find | grep -v grep
+nagios    4507     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios    5940     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios    7470     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+root      8880     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+root      9003     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+root      9150     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios   16276     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios   25925     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios   27372     1  0 Mar22 ?        00:00:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+
+可以看出父进程是1，即init进程.
+
+# ps aux | grep find | grep -v grep   
+nagios    4507  0.0  0.0  5328  644 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios    5940  0.0  0.0  3816  556 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios    7470  0.0  0.0  5412  640 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+root      8880  0.0  0.0  5516  496 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+root      9003  0.0  0.0  4268  572 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+root      9150  0.0  0.0  3860  572 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios   16276  0.0  0.0  5604  640 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios   25925  0.0  0.0  4504  644 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+nagios   27372  0.0  0.0  4992  644 ?        D    Mar22   0:00 /usr/bin/find / -maxdepth 2 -type f -mmin -61 -ls
+
+
+可以看出这些进程的状态是D. 我们知道D(disk)状态的进程是硬件资源不满足而处于深度休眠状态, 一般是等待磁盘. 这种进程用kill -9杀不掉, 要么继续等, 要么重启. 难道只能重启服务器才能解决么???
+
+ 
+
+ 
+
+$ cat /proc/21520/status
+Name:   ssuser
+State:  D (disk sleep)   深度睡眠是不处理信号量的
+SleepAVG:       94%
+Tgid:   21520
+Pid:    21520
+PPid:   1
+TracerPid:      0
+Uid:    505     505     505     505
+Gid:    505     505     505     505
+FDSize: 256
+Groups: 505
+VmPeak: 55344620 kB
+VmSize: 55282156 kB
+VmLck:         0 kB
+VmHWM:  29998216 kB
+VmRSS:  29989616 kB
+VmData: 55228868 kB
+VmStk:        84 kB
+VmExe:        64 kB
+VmLib:      5768 kB
+VmPTE:    108044 kB
+StaBrk: 00616000 kB
+Brk:    4088b000 kB
+StaStk: 7fff33620fb0 kB
+Threads:        8
+SigQ:   9/137216
+SigPnd: 0000000000000000
+ShdPnd: 00000000400845a3
+SigBlk: 0000000000000000
+SigIgn: 0000000000001000
+SigCgt: 0000000180000002
+CapInh: 0000000000000000
+CapPrm: 0000000000000000
+CapEff: 0000000000000000
+Cpus_allowed:   00000000,00000000,00000000,00000000,00000000,00000000,00000000,ffffffff
+Mems_allowed:   00000000,00000003
+

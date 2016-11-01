@@ -1,0 +1,7 @@
+page pgtable pgdir mmu
+
+1, 页目录的一个entry控制1024个页的R/W,U/S权限。相当于一个总闸门。
+
+2, 不要担心页目录的entry会影响对应页表的读写权限。例如，一个pgdir的entry的R/W设置成0,会不会造成相应的那个page table也无法修改。
+　　这是无稽之谈。因为我们接下来对那个table的访问，根本就是通过另一个映射实现的。这个page table肯定是通过alloc_page从分配的内核页。
+3, 记住，ring0下，页目录和页表的U/S, R/W位都将被忽略。

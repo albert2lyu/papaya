@@ -1,0 +1,9 @@
+PG_private private
+
+struct page的private成员
+
+1, Avalibale to the kernel component that is using the page.
+   If the page is free, this field is used by the buddy system.
+   当一个页 is free，链在buddy system里时，它的private用来存储order。
+   当分配出去，private可能被修改了。
+   所以free_pages需要order参数。

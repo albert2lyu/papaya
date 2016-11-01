@@ -1,0 +1,3 @@
+* path partial 
+  又 path component, path node
+  路径的节点名, 像比"/home/wws/lab/tmp.c",就有4个路径的节点，分别是home, wws, lab, tmp.c 。

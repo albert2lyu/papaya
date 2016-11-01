@@ -1,0 +1,34 @@
+
+qemu虚拟机中客户机上网  
+
+2013-09-24 21:02:07|  分类： 默认分类 |举报 |字号 订阅
+       
+
+  下载LOFTER
+我的照片书  |
+
+qemu 默认的上网方式是user-net.这种情况下你会看到Geust OS 中有一个网卡，通过DHCP方式得到了一个10.2.0.15的IP，通过真实主机访问互联网，但是虚拟机(Guest OS)与客户机的访问很难。这个简单,装上系统就是了，不需配置，而虚拟机也能容易地上互联网。
+
+另一种是Tap/tun模式
+
+a.首先要启用Tap设备。modprobe tun即可。如果内核中没有对tap的支持，要重新编译内核。
+
+b.设置qemu使用tap设备时主机添加的tap设备的IP.建这样一个脚本(/etc/qemu-ifup)，加上可执行权限即可(chmod +x /etc/qemu-ifup)。
+
+#! /bin/sh
+
+/sbin/ifconfig $1 172.20.0.1
+
+有了这个脚本后，当你用-net tap 参数启动qemu时，主机中就会多一个ip为172.20.0.1的tap设备。
+c.启动qemu:
+
+    qemu -hda linux1.img -boot c -net tap -net nic,model=rtl8139
+
+进入虚拟机系统后，将网卡IP设为172.20.0.100，掩码设为255.255.255.0,网关设置为172.20.0.1(就是你在/etc/qemu-ifup中设的IP)。现在虚拟机与主机间通信已经可以了，但是还需要第四步让虚拟机连上互联网。
+d.在iptables中进行设置，以让虚拟机访问互联网:
+分别执行:
+
+    [root@LFS ~]#echo 1 > /proc/sys/net/ipv4/ip_forward
+    [root@LFS ~]#iptables -t nat -A POSTROUTING -o eth0 -s 172.20.0.0/24 -j MASQUERADE
+
+注意/proc/sys/这个目录是不能保存的，所以如果你重启机器，这两个命令需要重新再做一次。（你可以将这两行命令写到/etc/ini.d/rc.local中去).现在试试，你的虚拟机就畅通无阻了!

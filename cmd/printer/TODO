@@ -1,0 +1,45 @@
+51, github的tabstop要换一种方式, 不要用?ts=的形式.
+50, free_pages和put_page对count的检查有重复。
+49, 找时间把memory.c里的do_wp_page的前后里外都看一下。2.4的代码。看page_fault是怎么处理copy_on_write的。明天把0.12的实现也看一下。
+39, do_fork最开始用到信号量了，找时间看看。我也好奇，在单核里，什么时候该用信号量，什么时候直接关cli(),前者对中断友好一些。后者简单一些。
+38, 现在的系统调用走的是中断门，以及所有的异常，中断，走的都是中断门，改天换成陷阱门,早晚要换的。
+37, 目前binfmt_elf.c里在交界处的双重映射，并没有实质的解决物理页浪费的问题。等
+	buf_head出来之后再看。
+36, sys_printf改成想办法直接jmp到oprintf，这样可以支持最多5个参数。
+35, 像映射8139的页目录entry，在alloc_mm时候，复制给新的页目录吗？
+34, 有时间看看old_mmap()和sys_mmap()有什么区别，它们是两个同一时代的单独的函数吗？如果是。为什么一个用常规的寄存器传６个参数，一个用寄存器传arg block?
+23, cmd来一个makefile怎么样。觉得不错。
+22, makefile2里面的cflags还有no-implicit-function
+21, 目前传给irqaction->handler()的stack_frame是0.
+20, oprintf("%"),这样，只打印一个百分号，是会出bug的。
+19, IP_PAYLOAD_LEN这个宏，对刚生成的skb是管用的。
+18, lsh对当前进程的ctrl-c无法正确处理。网络模块结束后希望能做掉。
+17, timer,tcp整个代码都没有考虑加锁（cli）
+16, IPHDR_FLIP的宏要改成do while的形式。
+15, _dimg.c必须要扩大了。
+14, oprintf 带color。
+13, oprintf的一个bug,好在只是大量输出后才出现。找时间再找。用一个while(1) printf("xx");就能重现。
+12, push eflags; cli; pop eax 尤其前两句应该仅连在一起,这样能把被split 中断的机会降到最低。
+11, 尽快把函数声明警告打开。
+10, assert.h分离出来，好多头文件只需要访问它。却不得不包含utils.h。
+9, ip.c里的dev_free_skb被注释掉了，因为会页错误。
+8, 写一个打印函数堆栈的程序。
+7, ntohs,htons这样的，在内核逐渐取消，就用byte_flip，字节反转，not bit flip。
+   因为我的内核在layer入口和出口都要搞一次像IP_HDRFLIP，那这个宏的实现到底
+   是用ntohs还是htonx呢。所以要增加一个byteflip函数。
+6, 搞清楚nasm次级标签跳转，如果直接jmp .xxx，而本block的.xxx在jmp行下方，而block之上还有一个.xxx。那往哪儿跳。 记得有一次调试，好像是往上跳的。
+6, papaya shouldn't respond to IP datagram when self's ip not mentioned.
+5, 8139的txbuf[4],后三个可能没有4字节对齐。会引起芯片word aligned的bug吗。
+1, mm_struct , vm_area, ioremap
+2, temporary equal map for mmio. proc.c TODO
+3,目前mmio隐射在0地址附近，创建进程之后，就访问不到了。
+
+已经解决了ｍｍｉｏ的映射，暂时的。　
+但回避了一点：对等映射0xfbxxxx段内存，会造成页错误。我怀疑是1M+4K处有内存缺陷。采用-3G的映射方式，把这部分页表放在1M处，就能访问了。就能访问到了。读出来的Mac地址看上去也没问题。
+
+4, sprious irq不光要处理，还要做counter，是EOI送的怎么不合适了。
+
+bug
+400m.img的分区表被破坏了，以后启用磁盘模块就会崩溃。
+
+* printf现在是栈上分配“写前缓存“，小心溢出。

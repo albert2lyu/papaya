@@ -1,0 +1,52 @@
+[系统调用因为信号提前返回]
+  睡眠进程因为信号而提前返回. 这个功能不是由signal模块实现的. 而是由各个系统调用的implentation实现的.
+  通常, 一个进程处于睡眠状态, 是因为它在某个系统调用里被阻塞.
+  kill()只是负责把它唤醒, 能不能唤醒, 是看这个进程的state是不是SLEEP_INTERRUPTBLE.
+  它醒后干什么, 是它自己的事. 
+  像wait4的实现:
+asmlinkage long sys_wait4(pid_t pid,unsigned int * stat_addr, int options, struct rusage * ru)
+{
+	...
+repeat:
+	...
+			case TASK_ZOMBIE:
+				...
+				goto end_wait4;
+	...
+	if (flag) {
+		retval = 0;
+		if (options & WNOHANG)
+			goto end_wait4;
+		retval = -ERESTARTSYS;
+		if (signal_pending(current))
+			goto end_wait4;
+		schedule();
+		goto repeat;
+	}
+	retval = -ECHILD;
+end_wait4:
+	current->state = TASK_RUNNING;
+	remove_wait_queue(&current->wait_chldexit,&wait);
+	return retval;
+}
+  可见, 因wait4休眠的父进程被信号唤醒后, 是跳到repeat"再来一次"的.
+  这个信号可能是子进程exit()时的报丧信号, 也可能是一个kill信号. 总之这个"父进程"
+因此回到repeat了. 再第二次扫描中, 如果是报丧信号, 肯定能扫描到对应的ZOMBIE进程,
+于是wait4这就结束了.
+  如果是其它信号, 那这次repeat又是两手空空, 最终来到
+	if (flag) {
+		...
+		retval = -ERESTARTSYS;
+		if (signal_pending(current))
+			goto end_wait4;
+		schedule();
+		goto repeat;
+	}
+  这次不会再休眠了, 因为signal_pending(current)肯定为true, 相应的处理是跳到
+end_wait4, 就此"提前返回"了.
+
+
+
+
+
+

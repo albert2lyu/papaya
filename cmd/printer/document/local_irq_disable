@@ -1,0 +1,150 @@
+
+互斥与同步——local_irq_enable与local_irq_disable
+Posted on 2012-07-25 15:51 fengyv 阅读(2877) 评论(0) 编辑 收藏
+
+内核版本：2.6.30
+
+平台：arm
+
+在 单处理器不可抢占系统中，使用local_irq_enable和local_irq_disable是消除异步并发源的有效方式。在驱动程序中要避免使 用这两个宏（系统不能长时间不响应中断），后面将要介绍的自旋锁等互斥机制中会经常用到这两个宏。local_irq_enable宏用于打开本地处理器 的中断，local_irq_disable宏则用来关闭本处理器的中断。这两个宏的定义如下：
+
+ 
+
+Linux/include/linux/irqflags.h
+ 
+ 59 #define local_irq_enable() \
+ 60         do { trace_hardirqs_on(); raw_local_irq_enable(); } while (0)
+ 61 #define local_irq_disable() \
+ 62         do { raw_local_irq_disable(); trace_hardirqs_off(); } while (0) 
+
+其中trace_hardirqs_on()和trace_hardirqs_off() 用于调试，这里重点讲解raw_local_irq_enable()和raw_local_irq_disable()，这两个宏的具体实现都依赖于处 理器架构，不同的处理器有不同的指令来关闭或启用处理器响应外部中断的能力。下面是ARM平台的实现：
+
+Linux/arch/arm/include/asm/irqflags.h
+ 
+  8 /*
+  9  * CPU interrupt mask handling.
+ 10  */
+ 11 #if __LINUX_ARM_ARCH__ >= 6 //ARMv6以后的指令集，通过CPSIE指令完成
+
+ 21 #define raw_local_irq_enable()  __asm__("cpsie i        @ __sti" : : : "memory", "cc")
+ 22 #define raw_local_irq_disable() __asm__("cpsid i        @ __cli" : : : "memory", "cc")
+ 23 #define local_fiq_enable()  __asm__("cpsie f    @ __stf" : : : "memory", "cc")
+ 24 #define local_fiq_disable() __asm__("cpsid f    @ __clf" : : : "memory", "cc")
+ 25 
+ 26 #else//ARMv6以前的指令集，S3C2440的指令集是ARMv4T，通过mrs和msr指令完成
+
+ 27 
+ 28 /*
+ 29  * Save the current interrupt enable state & disable IRQs
+ 30  */
+
+ 43         
+ 44 /*
+ 45  * Enable IRQs
+ 46  */
+ 47 #define raw_local_irq_enable()                                  \
+ 48         ({                                                      \
+ 49                 unsigned long temp;                             \
+ 50         __asm__ __volatile__(                                   \
+ 51         "mrs    %0, cpsr                @ local_irq_enable\n"   \
+ 52 "       bic     %0, %0, #128\n"                                 \
+ 53 "       msr     cpsr_c, %0"                                     \  //cpsr_c代表低8位
+ 54         : "=r" (temp)                                           \
+ 55         :                                                       \
+ 56         : "memory", "cc");                                      \
+ 57         })
+ 58 
+ 59 /*
+ 60  * Disable IRQs
+ 61  */
+ 62 #define raw_local_irq_disable()                                 \
+ 63         ({                                                      \
+ 64                 unsigned long temp;                             \
+ 65         __asm__ __volatile__(                                   \
+ 66         "mrs    %0, cpsr                @ local_irq_disable\n"  \
+ 67 "       orr     %0, %0, #128\n"                                 \
+ 68 "       msr     cpsr_c, %0"                                     \
+ 69         : "=r" (temp)                                           \
+ 70         :                                                       \
+ 71         : "memory", "cc");                                      \
+ 72         })
+
+103 
+104 #endif
+
+在单处理器不可抢占系统中，如果某段代码要访问某共享资源，那么在进入临界区前使用local_irq_disable关闭中断，这样在临界区中可以保证不会出现异步并发源，访问完成共享数据在出临界区时，再调用local_irq_enable启用中断。
+
+local_irq_disable和local_irq_enable还有一种变体：local_irq_save和local_irq_restore，其定义如下：
+
+ 
+
+Linux/include/linux/irqflags.h
+
+ 63 #define local_irq_save(flags)                           \
+ 64         do {                                            \
+ 65                 typecheck(unsigned long, flags);        \
+ 66                 raw_local_irq_save(flags);              \
+ 67                 trace_hardirqs_off();                   \
+ 68         } while (0)
+ 69 
+ 70 
+ 71 #define local_irq_restore(flags)                        \
+ 72         do {                                            \
+ 73                 typecheck(unsigned long, flags);        \
+ 74                 if (raw_irqs_disabled_flags(flags)) {   \
+ 75                         raw_local_irq_restore(flags);   \
+ 76                         trace_hardirqs_off();           \
+ 77                 } else {                                \
+ 78                         trace_hardirqs_on();            \
+ 79                         raw_local_irq_restore(flags);   \
+ 80                 }                                       \
+ 81         } while (0)
+
+这两个宏相对于local_irq_disable和local_irq_enable最大的区别在于，local_irq_save会在关闭中断前，将处理器当前的标志位保持在一个unsigned long flags中，在调用local_irq_restore时，在将保存的flags恢复到处理器的FLAGS寄存器中。这样做是为了防止在一个关闭中断的环境中因为调用local_irq_disable和local_irq_enable破坏之前的中断响应状态。
+
+我们接下来再看一下raw_local_irq_save和raw_local_irq_save和raw_local_irq_restore的具体实现：
+
+Linux/arch/arm/include/asm/irqflags.h
+
+ 11 #if __LINUX_ARM_ARCH__ >= 6
+ 12 
+ 13 #define raw_local_irq_save(x)                                   \
+ 14         ({                                                      \
+ 15         __asm__ __volatile__(                                   \
+ 16         "mrs    %0, cpsr                @ local_irq_save\n"     \
+ 17         "cpsid  i"                                              \
+ 18         : "=r" (x) : : "memory", "cc");                         \
+ 19         })
+ 
+ 26 #else
+ 27 
+ 28 /*
+ 29  * Save the current interrupt enable state & disable IRQs
+ 30  */
+ 31 #define raw_local_irq_save(x)                                   \
+ 32         ({                                                      \
+ 33                 unsigned long temp;                             \
+ 34                 (void) (&temp == &x);                           \
+ 35         __asm__ __volatile__(                                   \
+ 36         "mrs    %0, cpsr                @ local_irq_save\n"     \
+ 37 "       orr     %1, %0, #128\n"                                 \
+ 38 "       msr     cpsr_c, %1"                                     \
+ 39         : "=r" (x), "=r" (temp)                                 \
+ 40         :                                                       \
+ 41         : "memory", "cc");                                      \
+ 42         })
+
+104 #endif
+
+116 /*
+117  * restore saved IRQ & FIQ state
+118  */
+119 #define raw_local_irq_restore(x)                                \
+120         __asm__ __volatile__(                                   \
+121         "msr    cpsr_c, %0              @ local_irq_restore\n"  \
+122         :                                                       \
+123         : "r" (x)                                               \
+124         : "memory", "cc")
+125 
+
+在单处理器不可抢占系统中，使用local_irq_disable和local_irq_enable及其变体对共享数据保护是简单而有效的方法。但在使用时要注意，因为local_irq_disable和local_irq_enable是通过关闭中断的方式进行互斥保护，所以必须确保处于两者之间的代码执行时间不能太长，否则将影响系统的性能。

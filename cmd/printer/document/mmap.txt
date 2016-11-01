@@ -1,0 +1,127 @@
+mmap mmap2 old_mmap do_mmap
+
+【容易混淆的】
+  > 两个系统调用mmap和mmap2
+  mmap()是老牌的系统调用，最开始只有它。
+  但是，因为它的offset参数以字节为单位，在32位操作系统上，就限制了操作文件的最大尺寸是4G。
+  为此，linux从2.3.31加入了另一个系统调用mmap2()。它的最后一个参数是pgoffset，顾名思义，是以页为单位算偏移的。
+  就这么简单。
+
+  > 所以
+　所以，x86_64上没有mmap2()这个系统调用。因为不需要。
+　所以，glibc跟随linux的脚步，在linux2.4版本后，32位的glibc的mmap()改为呼叫mmap2()，原先是呼叫同名的mmap()。C语言版本提供的offset是个64位的整数。
+
+  > 注意
+  注意区别glibc的mmap()，和系统调用mmap()。
+
+  >关于do_mmap()
+  早先没有mmap2的时候,do_mmap()很单纯，就像do_execve，do_fork，完成实质性的mmap的工作。它接受的以字节为单位的offset。
+  引入mmap2之后，它的职责被do_mmap_pgoff取代了。
+  这么好一个名字不能闲着不用，于是它成了在内核里调用mmap功能的接口。相当于内核版本的mmap()。
+  这样挺乱的，因为别人看到do_mmap，肯定想到跟系统调用有关。
+    
+  >关于 
+  old_mmap()
+  这个函数很早就被送到arch/i386/kernel/sys_i386.c里了。那个文件里收容着各种各样的不规矩的系统调用。
+  old_mmap是传参不规矩。因为在很早的年代，linux支持的系统调用参数不超过4个。于是它按照arguments block的形式接受参数。
+  至于它的功能，跟mmap()一样。
+
+  > 细节
+  反汇编32位libc.a可以看到，有一个__mmap()，还有一个__mmap64()。应该是编译时期，根据off_t的具体长度，选择链接到其中之一吧。后者肯定是long long,操作4G以上的大文件。
+
+
+【基本功能】
+mmap()，以内存方式操作文件。其实就是先把虚存映射到物理页面，再把文件读入物理页面。页面脏了，由内核线程定时回写。
+
+
+
+【函数声明:只有最后一个参数不同】
+=============================================================(
+void *mmap2(void *addr, size_t length, int prot,
+			int flags, int fd, off_t pgoffset);
+
+void *mmap(void *addr, size_t length, int prot, int flags,
+		  int fd, off_t offset);
+=============================================================)
+
+
+
+【文件映射的lazy策略】
+   mmap()采用了lazy策略，把“虚存往文件的映射”推迟到缺页异常发生时。
+   可以对比brk()来看，brk()把请求的虚存空间老老实实的映射到物理内存，因为这个代价不大。但"虚存往文件映射",涉及到磁盘IO，代价大得多。
+
+
+
+
+
+【addr和offset要4K对齐】
+mmap()最后一个参数offset要求4K对齐。
+不对齐的，在glibc里就查出来了。
+下面是mmap()的glibc反汇编码，非64位off_t的版本。另一个版本是mmap64。也在libc里。
+看 1c: 那一行。
+00000000 <__mmap>:
+   0:   55                      push   %ebp
+   1:   53                      push   %ebx
+   2:   56                      push   %esi
+   3:   57                      push   %edi
+   4:   8b 5c 24 14             mov    0x14(%esp),%ebx
+   8:   8b 4c 24 18             mov    0x18(%esp),%ecx
+   c:   8b 54 24 1c             mov    0x1c(%esp),%edx
+  10:   8b 74 24 20             mov    0x20(%esp),%esi
+  14:   8b 7c 24 24             mov    0x24(%esp),%edi
+  18:   8b 6c 24 28             mov    0x28(%esp),%ebp
+  1c:   f7 c5 ff 0f 00 00       test   $0xfff,%ebp
+  22:   b8 ea ff ff ff          mov    $0xffffffea,%eax
+  27:   75 0e                   jne    37 <__mmap+0x37>
+  29:   c1 ed 0c                shr    $0xc,%ebp
+  2c:   b8 c0 00 00 00          mov    $0xc0,%eax
+  31:   ff 15 00 00 00 00       call   *0x0
+  37:   5f                      pop    %edi
+  38:   5e                      pop    %esi
+  39:   5b                      pop    %ebx
+  3a:   5d                      pop    %ebp
+  3b:   3d 00 f0 ff ff          cmp    $0xfffff000,%eax
+  40:   0f 87 fc ff ff ff       ja     42 <__mmap+0x42>
+  46:   c3                      ret 
+
+  linux内核有一个old_mmap()的内核函数，它接受的file offset就是以字节为单位。所以它内部有这一行代码：
+  if(a.offset & ~PAGE_MASK) goto out;
+  和glibc是一样的处理。
+
+  至于addr,你可以不对齐，但是内核会帮你对齐，返回的也是对齐后的值。
+
+
+【VM_DENYWRITE】
+  从一篇博客(https://yq.aliyun.com/articles/8893)里看到，试图写入一个正在运行的可执行文件，会被拒绝。
+  因为内核load时调用do_mmap的标志里加了DENY_WRITE。
+  
+
+【内核怎么确保可执行文件的data区不被回写?】
+  今天在写binfmt_elf.c时，要mmap()可执行文件的data的bss区，且vm_flags里要用VM_WRITE，那，这会不会导致被修改的file page回写到文件呢。
+  不会。因为vma收到的struct file参数以字节为单位的f_mode是只读的。VM_WRITE控制的是内存页的访问权限。
+
+
+
+［若length为０，则失败］
+       SUSv3  specifies  that  mmap() should fail if length is 0.  However, in
+       kernels before 2.6.12, mmap() succeeded in this case:  no  mapping  was
+       created  and the call returned addr.  Since kernel 2.6.12, mmap() fails
+       with the error EINVAL for this case.
+［文件映射区之后的部分了］
+
+       POSIX specifies that the system shall always zero fill any partial page
+       at the end of the object and that system will never write any modifica‐
+       tion of the object beyond its end.  On Linux, when you  write  data  to
+       such  partial  page  after the end of the object, the data stays in the
+       page cache even after the file is closed and unmapped and  even  though
+       the  data  is never written to the file itself, subsequent mappings may
+       see the modified content.  In some cases, this could be fixed by  call‐
+       ing  msync(2)  before the unmap takes place; however, this doesn't work
+       on tmpfs (for example, when using POSIX shared memory  interface  docu‐
+       mented in shm_overview(7)).
+
+*
+  若不启用MAP_PRIVATE标志，会得到16号errno.　设备忙？
+
+
+

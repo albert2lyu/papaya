@@ -1,0 +1,92 @@
+all:prepare_folder boot.bin kernel.elf 
+#'make' will search target-file and rely-file according through VPATH,if she
+#failed under current directory.
+VPATH=../lib/ ../bin/
+#header_path will be used when 'gcc -M'.you can not use '$(cflags)' instead of
+#'$(head_path)' under this case,because other unrelated cflags may affect the 
+#operation of 'gcc -M',according to by test.
+cheader_path=-I./include/ -I./arch/x86/include/ -I./arch/x86/include/asm/ -I./include/old/
+cflags=$(cheader_path) -Wall -std=c99 -fno-builtin -g3 -fno-stack-protector -nostdinc 
+asmflags=-i../include/ 
+ldpath=-L../lib/
+
+#the target of a rule matchs in a stiff way,kernel.a will match '%.a:%.asm' but
+#../lib/kernel.a won't.
+asmo=kernel.asmo utils.asmo bootinfo.asmo
+co= kernel.o   utils.o proc.o  video_drv.o schedule.o\
+ku_utils.o mm.o func_table.o pmm.o mmzone.o irq.o time.o i8259.o\
+elf.o 
+ 
+kernelrelyo=$(asmo)  $(co)	../src/block/ll_rw_blk.o ../src/block/buffer.o ../src/drivers/ide/ide.o  ../src/fs/namei.o ../src/fs/inode.o ../src/fs/dcache.o ../src/fs/super.o ../src/fs/cell/namei.o  ../src/fs/open.o ../src/fs/read_write.o ../src/mm/slab.o ../src/drivers/pci/pci.o	../src/drivers/pci/pci_vendor.o ../src/drivers/net/8139.o ../src/arch/x86/mm/ioremap.o ../src/net/core/dev.o ../src/net/core/skbuff.o  ../src/kernel/bh.o ../src/net/ipv4/arp.o ../src/net/ipv4/ip.o ../src/net/core/testnet.o  ../src/net/ipv4/icmp.o ../src/net/ipv4/udp.o ../src/lib/vsprintf.o ../src/lib/printf.o ../src/net/ipv4/tcp.o ../src/kernel/timer.o ../src/arch/x86/kernel/process.o ../src/fs/exec.o ../src/mm/mmap.o ../src/mm/memory.o ../src/lib/string.o ../src/fs/binfmt_elf.o ../src/arch/x86/mm/fault.o ../src/kernel/fork.o ../src/kernel/exit.o ../src/fs/pipe.o
+#../src/drivers/net/e1000.o
+include $(co:.o=.d)
+
+boot.bin:boot.asm
+	nasm -o ../bin/boot.bin boot.asm
+kernel.elf:$(kernelrelyo)
+	cd ../lib/;\
+	ld -m elf_i386 -s -Ttext 0xc0010400 -o ../bin/kernel.elf $(kernelrelyo);\
+	ld -m elf_i386 -Ttext 0xc0010400 -o ../bin/g_kernel.elf $(kernelrelyo) 
+
+%.d:%.c
+	set -e;rm -f $@;\
+	gcc -M $< $(cheader_path) > this_is_a_tmp_file;\
+	sed 's\:\ $@: \'  this_is_a_tmp_file  > $@;\
+	rm  -f this_is_a_tmp_file
+
+%.o:%.c
+	gcc -c -o ../lib/$@ $< $(cflags)
+
+%.asmo: %.asm ./include/old/*.inc
+	nasm -felf -o ../lib/$@ $< $(asmflags)
+
+clean:
+	rm  -rf ../lib/;\
+	rm -f *.d;
+#replace your 400m.img to after using make git
+
+git:
+	rm  -f ../lib/*;rm -f ../bin/*;rm -f *.d;\
+	rm -f ../cmd/parport.out ../cmd/_dimg;\
+	rm -f ../cmd/*.o;\
+	rm ../cmd/bochsout.txt;\
+	mv ../cmd/test ../../yanqi_test;\
+	mv ../cmd/*.img ../..;\
+	mv ../cmd/log ../../
+tig:
+	mv ../../*.img ../cmd/ ;\
+	mv ../../yanqi_test ../cmd/test;\
+	mv ../../log ../cmd/
+
+prepare_folder:
+	mkdir -p ../lib/ ../bin/
+.PHONY:all
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

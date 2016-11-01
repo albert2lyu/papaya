@@ -1,0 +1,24 @@
+brk do_brk
+
+* 
+  我很奇怪，linux的do_brk()，为什么有一步会执行do_unmmap(),《情景》里专门做了解释，大概是说，内核在brk过程中，就是向下expand data区下面的那个vma，在这个扩张的过程中，对于高端的overlap是暴力解除旧的vma，对于下部的overlap，则以失败退出。
+  下部overlap，很可能是碰到了用户堆栈。失败是应该的。
+  但也可能是碰到了用户自行mmap()的vma吧。有没有可能？如果可能了，接下来。。。
+  
+  其实我对《情景》的那个“上/下部overlap区别对待“的说法不太恭维。
+  因为在调用do_brk()之前，内核就调用了一次find_vma_intersection(),参数是端端正正的oldbrk和newbrk+PAGE_SIZE.这个检查我很喜欢，就是看即将征用的这片线性空间，有没有"居民"。有就直接goto out。
+  为什么到了do_brk()，又要做do_unmap()。
+  在一篇网络的分析文章上，也看到相同的疑惑，它就注释了一句：
+  ====================================================================
+	 munmap_back:
+	   //sys_brk的流程会进入到这个if吗？？？
+	   vma = find_vma_prepare(mm, addr, &prev, &rb_link, &rb_parent);
+	   if (vma && vma->vm_start < addr + len) {
+			  if (do_munmap(mm, addr, len))
+					 return -ENOMEM;
+			  goto munmap_back;
+	   }
+  ====================================================================)
+  是不是说，do_brk()还可能被别的流程调用？
+  不管它，我先实现一个最简单的brk()。
+
